@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小琪专属(      )</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        .cover {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(160deg, #2c1a35, #1b1424);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            transition: all 1.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .cover-text {
+            color: #e8d8e8;
+            font-size: 22px;
+            letter-spacing: 6px;
+            margin-bottom: 50px;
+            line-height: 1.6;
+            text-align: center;
+            animation: softBreath 3.5s ease-in-out infinite;
+        }
+        .open-btn {
+            padding: 16px 55px;
+            font-size: 18px;
+            color: #fff;
+            background: linear-gradient(90deg, #c87aa0, #b5659c);
+            border: 0;
+            border-radius: 999px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(200, 122, 160, 0.4);
+            transition: 0.4s ease;
+        }
+        .open-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 40px rgba(200, 122, 160, 0.6);
+        }
+        .cover.fade-out {
+            opacity: 0;
+            transform: scale(1.15);
+            pointer-events: none;
+        }
+        .tip {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            color: #ffd1e3;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+        .tip.show {
+            opacity: 1;
+        }
+        .love-wrap {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(-30deg, #fef3f8, #ffeef6, #fce4ef, #fde8f2);
+            background-size: 300% 300%;
+            animation: slowBg 15s ease infinite alternate;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+        .love-wrap.show {
+            opacity: 1;
+        }
+        .light-ball {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.5;
+        }
+        .b1 {
+            width: 300px;
+            height: 300px;
+            background: #ffc8dd;
+            top: 10%;
+            left: 15%;
+        }
+        .b2 {
+            width: 400px;
+            height: 400px;
+            background: #f8c8e0;
+            bottom: 10%;
+            right: 10%;
+        }
+        .text-box {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 0 30px;
+        }
+        .line {
+            font-size: 20px;
+            color: #9c5b7b;
+            line-height: 2.6;
+            opacity: 0;
+            transform: translateY(25px);
+            letter-spacing: 2px;
+        }
+        .line.big {
+            font-size: 28px;
+            color: #b84b78;
+            font-weight: 500;
+            margin-top: 15px;
+        }
+        .line.out {
+            animation: textOut 1s ease-out forwards;
+        }
+        #nextBtn {
+            position: fixed;
+            bottom: 60px;
+            right: 50px;
+            padding: 12px 30px;
+            font-size: 16px;
+            color: #fff;
+            background: linear-gradient(90deg, #c87aa0, #b5659c);
+            border: none;
+            border-radius: 999px;
+            z-index: 20;
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            transition: 0.4s ease;
+            box-shadow: 0 0 20px rgba(200, 122, 160, 0.4);
+        }
+        #nextBtn.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        #nextBtn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 30px rgba(200, 122, 160, 0.6);
+        }
+
+        .btn-group {
+            margin-top: 40px;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease;
+        }
+        .btn-group.center {
+            justify-content: center;
+        }
+        .love-btn {
+            padding: 16px 50px;
+            font-size: 18px;
+            color: #fff;
+            background: linear-gradient(90deg, #c87aa0, #b5659c);
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(200, 122, 160, 0.4);
+            transition: 0.4s ease, opacity 0.6s ease, transform 0.6s ease;
+        }
+        .love-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 35px rgba(200, 122, 160, 0.6);
+        }
+        .love-btn.hide {
+            opacity: 0;
+            transform: scale(0.5) translateY(-30px);
+            pointer-events: none;
+        }
+
+        @keyframes softBreath {
+            0%,100% {opacity: 0.65;}
+            50% {opacity: 1;}
+        }
+        @keyframes slowBg {
+            0% {background-position: 0% 0%;}
+            100% {background-position: 100% 100%;}
+        }
+        @keyframes textIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes textOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-30px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="tip" id="tip">打开声音，效果更佳哦~</div>
+    <div class="cover" id="cover">
+        <div class="cover-text">藏在心底的话，<br>只说给小琪宝宝你听</div>
+        <button class="open-btn" id="openBtn">轻轻点开</button>
+    </div>
+    <div class="love-wrap" id="loveWrap">
+        <div class="light-ball b1"></div>
+        <div class="light-ball b2"></div>
+        <div class="text-box" id="textBox">
+            <div class="line">世界很大</div>
+            <div class="line">人潮拥挤</div>
+            <div class="line">很庆幸</div>
+            <div class="line">我能够遇见你</div>
+            <div class="line"></div>
+            <div class="line">和你相处的每一刻</div>
+            <div class="line">都温柔又难忘</div>
+            <div class="line"></div>
+            <div class="line big">小琪 窝喜欢你</div>
+            <div class="line">认真且坚定</div>
+            <div class="line">温柔且长久</div>
+            <div class="line"></div>
+            <div class="line big">愿往后余生</div>
+            <div class="line">皆是你</div>
+        </div>
+    </div>
+    <button id="nextBtn">下一页</button>
+
+    <audio id="bgMusic" src="https://musichehe121.oss-cn-chengdu.aliyuncs.com/Music/%E5%91%8A%E7%99%BD%E6%B0%94%E7%90%83-%E5%91%A8%E6%9D%B0%E4%BC%A6-7149583-100.ogg" loop>
+
+    <script>
+        const cover = document.getElementById('cover');
+        const loveWrap = document.getElementById('loveWrap');
+        const openBtn = document.getElementById('openBtn');
+        const textBox = document.getElementById('textBox');
+        const nextBtn = document.getElementById('nextBtn');
+        const bgMusic = document.getElementById('bgMusic');
+        const tip = document.getElementById('tip');
+
+        const pages = [
+            `<div class="line">世界很大</div>
+<div class="line">人潮拥挤</div>
+<div class="line">很庆幸</div>
+<div class="line">我能够遇见你</div>
+<div class="line"></div>
+<div class="line">和你相处的每一刻</div>
+<div class="line">都温柔又难忘</div>
+<div class="line"></div>
+<div class="line big">窝喜欢你</div>
+<div class="line">认真且坚定</div>
+<div class="line">温柔且长久</div>
+<div class="line"></div>
+<div class="line big">愿往后余生</div>
+<div class="line">皆是你</div>`,
+
+            `<div class="line">春风十里</div>
+<div class="line">不及相遇有你</div>
+<div class="line">晴空万里</div>
+<div class="line">不及心中有你</div>
+<div class="line"></div>
+<div class="line">讲真心话</div>
+<div class="line">想把温柔全部都给你</div>
+<div class="line"></div>
+<div class="line big">不用奔赴大海</div>
+<div class="line">不用春暖花开</div>
+<div class="line">只要你在身边</div>
+<div class="line"></div>
+<div class="line big">往后每一天</div>
+<div class="line">窝都爱你</div>`,
+
+            `<div class="line">和你认识的那一刻</div>
+<div class="line">便注定了此生</div>
+<div class="line">心动一次</div>
+<div class="line">便是一生</div>
+<div class="line"></div>
+<div class="line">想牵你的手</div>
+<div class="line">从青丝到白发</div>
+<div class="line"></div>
+<div class="line big">朝暮与年岁共往</div>
+<div class="line">与你一同行至天光</div>
+<div class="line"></div>
+<div class="line big">窝爱你</div>
+<div class="line">不止今生</div>
+<div class="line">岁岁年年</div>`,
+
+            `<div class="line">世间万物</div>
+<div class="line">满天星辰</div>
+<div class="line">都不及</div>
+<div class="line">你眼底的温柔</div>
+<div class="line"></div>
+<div class="line">我不想错过</div>
+<div class="line">也不会放手</div>
+<div class="line"></div>
+<div class="line big">余生漫漫</div>
+<div class="line">万般皆你</div>
+<div class="line">岁岁年年</div>
+<div class="line"></div>
+<div class="line">小琪</div>
+<div class="line big">我超级超级喜欢你！！</div>`,
+
+            `<div class="line big">你爱我嘛~</div>
+<div class="btn-group" id="btnGroup">
+    <button class="love-btn" id="yesBtn">我也爱你</button>
+    <button class="love-btn" id="noBtn">让我想想</button>
+</div>`
+        ];
+
+        let currentPage = 0;
+
+        openBtn.onclick = function(){
+            tip.classList.add('show');
+            setTimeout(() => {
+                tip.classList.remove('show');
+                bgMusic.play().catch(err=>{});
+                cover.classList.add('fade-out');
+                setTimeout(()=>{
+                    loveWrap.classList.add('show');
+                    showLines();
+                },1000);
+            }, 2000);
+        };
+
+        function showLines(){
+            const lines = document.querySelectorAll('.line');
+            lines.forEach((item, i) => {
+                setTimeout(() => {
+                    item.style.animation = "textIn 1.2s ease-out forwards";
+                }, i * 900);
+            });
+
+            setTimeout(() => {
+                if(currentPage === pages.length - 1){
+                    nextBtn.classList.remove('show');
+                    bindLoveBtn();
+                    return;
+                }
+                if(currentPage < pages.length - 1){
+                    nextBtn.classList.add('show');
+                }else{
+                    nextBtn.innerText = "完结";
+                    nextBtn.classList.add('show');
+                }
+            }, lines.length * 900 + 1000);
+        }
+
+        function bindLoveBtn(){
+            const yesBtn = document.getElementById('yesBtn');
+            const noBtn = document.getElementById('noBtn');
+            const btnGroup = document.getElementById('btnGroup');
+
+            noBtn.onclick = function(){
+                noBtn.classList.add('hide');
+                setTimeout(() => {
+                    noBtn.remove();
+                    btnGroup.classList.add('center');
+                }, 600);
+            };
+
+            yesBtn.onclick = function(){
+                nextBtn.innerText = "完结";
+                nextBtn.classList.add('show');
+                const oldLines = document.querySelectorAll('.line');
+                oldLines.forEach(line => line.classList.add('out'));
+                setTimeout(() => {
+                    textBox.innerHTML = `<div class="line big">（*＾3＾）</div>`;
+                    showLines();
+                }, 1200);
+            };
+        }
+
+        nextBtn.onclick = function(){
+            nextBtn.classList.remove('show');
+            const oldLines = document.querySelectorAll('.line');
+            oldLines.forEach(line => line.classList.add('out'));
+
+            setTimeout(() => {
+                currentPage++;
+                textBox.innerHTML = pages[currentPage];
+                showLines();
+            }, 1200);
+        };
+    </script>
+</body>
+</html>
