@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Hehe11 系统 4.20</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacFont,"Segoe UI",Roboto,sans-serif}
+body{width:100vw;height:100vh;overflow:hidden;user-select:none;}
+.screen{
+  width:100vw;
+  height:100vh;
+  background:#fff;
+  overflow:hidden;
+  position:relative;
+}
+.notch{display:none;}
+.home-indicator{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:120px;height:4px;background:#bbb;border-radius:2px;z-index:99;}
+.lock-screen{
+  width:100%;height:100%;
+  background:url(https://picsum.photos/id/1039/800/1600) center/cover;
+  position:relative;color:#fff;
+}
+.lock-time{position:absolute;top:90px;width:100%;text-align:center;font-size:56px;font-weight:200}
+.lock-date{position:absolute;top:160px;width:100%;text-align:center;font-size:16px;opacity:.9}
+.slider-box{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);width:280px;height:64px;background:rgba(255,255,255,0.25);border-radius:32px}
+.slider-btn{width:64px;height:64px;background:#fff;border-radius:50%;position:absolute;left:0;top:0;display:flex;align-items:center;justify-content:center;color:#000;font-size:22px;cursor:grab;transition:left 0.2s;}
+.slider-tip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;opacity:.9}
+.pwd-box{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);text-align:center;width:240px;display:none;}
+.pwd-title{font-size:16px;margin-bottom:16px;opacity:.9}
+.pwd-dots{display:flex;justify-content:center;gap:12px;margin-bottom:20px;}
+.pwd-dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.3);transition:all 0.2s;}
+.pwd-dot.active{background:#fff;}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pad-btn{
+  width:60px;height:60px;border-radius:50%;
+  background:rgba(255,255,255,0.2);
+  font-size:28px;color:#fff;border:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.pad-btn:active{background:rgba(255,255,255,0.4);}
+.home-screen{width:100%;height:100%;background:#f2f2f7;padding:20px;padding-top:70px;display:none;position:relative;}
+.status-bar{display:flex;justify-content:space-between;padding:0 22px;position:absolute;top:40px;left:0;right:0;font-size:14px;color:#333;font-weight:500;z-index:98;}
+.app-container{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.app{display:flex;flex-direction:column;align-items:center;gap:8px}
+.app-icon{width:56px;height:56px;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;transition:transform 0.15s;}
+.app:active .app-icon{transform:scale(0.9);}
+.app-name{font-size:12px;color:#111;text-align:center;line-height:1.2;}
+.dock{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);width:280px;height:80px;background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);border-radius:20px;display:flex;align-items:center;justify-content:space-around;padding:0 10px;}
+.dock .app{margin:0;}
+.page-indicator{position:absolute;bottom:130px;left:50%;transform:translateX(-50%);display:flex;gap:6px;}
+.page-dot{width:8px;height:8px;border-radius:50%;background:#ccc;}
+.page-dot.active{background:#007aff;}
+.func-page{padding:26px;display:none;height:100%;background:#fff;overflow-y:auto}
+.page-title{font-size:22px;font-weight:bold;margin-bottom:20px}
+.back-btn{padding:10px 18px;background:#007aff;color:#fff;border:none;border-radius:12px;margin-bottom:24px;cursor:pointer}
+input,button,select,textarea{padding:10px 14px;border-radius:10px;border:1px solid #ddd;margin:6px;width:100%}
+button{background:#007aff;color:white;border:none;font-weight:500;cursor:pointer;}
+button:active{opacity:0.8;}
+.control-center{position:absolute;top:-260px;left:0;right:0;height:260px;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-radius:0 0 20px 20px;padding:30px 20px;transition:top 0.3s;z-index:99;}
+.control-center.show{top:0;}
+.control-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-top:20px;}
+.control-item{background:rgba(0,122,255,0.1);border-radius:12px;padding:10px;text-align:center;font-size:12px;user-select:none;}
+.control-item:active{background:rgba(0,122,255,0.2);}
+.log-box{margin-top:12px;padding:10px;background:#f5f5f5;border-radius:10px;min-height:40px;font-size:14px;color:#333;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="screen">
+<div class="control-center" id="controlCenter">
+  <div style="text-align:center;font-size:18px;font-weight:bold;">控制中心</div>
+  <div class="control-grid">
+    <div class="control-item">📶 Wi‑Fi</div>
+    <div class="control-item">🔵 蓝牙</div>
+    <div class="control-item">🔦 手电</div>
+    <div class="control-item">🔕 勿扰</div>
+    <div class="control-item">🔋 省电</div>
+    <div class="control-item">📷 相机</div>
+    <div class="control-item">🔊 音量</div>
+    <div class="control-item">🔆 亮度</div>
+  </div>
+  <div style="text-align:center;margin-top:15px;font-size:12px;color:#666;">点击空白关闭</div>
+</div>
+
+<div class="lock-screen" id="lockPage">
+  <div class="lock-time" id="lockTime">00:00</div>
+  <div class="lock-date" id="lockDate">2026年04月21日</div>
+  <div class="slider-box">
+    <div class="slider-tip">滑动解锁 →</div>
+    <div class="slider-btn" id="slideBtn">→</div>
+  </div>
+  <div class="pwd-box" id="pwdBox">
+    <div class="pwd-title">输入密码</div>
+    <div class="pwd-dots" id="pwdDots">
+      <div class="pwd-dot"></div>
+      <div class="pwd-dot"></div>
+      <div class="pwd-dot"></div>
+      <div class="pwd-dot"></div>
+    </div>
+    <div class="pad">
+      <button class="pad-btn" onclick="inputPwd(1)">1</button>
+      <button class="pad-btn" onclick="inputPwd(2)">2</button>
+      <button class="pad-btn" onclick="inputPwd(3)">3</button>
+      <button class="pad-btn" onclick="inputPwd(4)">4</button>
+      <button class="pad-btn" onclick="inputPwd(5)">5</button>
+      <button class="pad-btn" onclick="inputPwd(6)">6</button>
+      <button class="pad-btn" onclick="inputPwd(7)">7</button>
+      <button class="pad-btn" onclick="inputPwd(8)">8</button>
+      <button class="pad-btn" onclick="inputPwd(9)">9</button>
+      <div></div>
+      <button class="pad-btn" onclick="inputPwd(0)">0</button>
+      <div></div>
+    </div>
+  </div>
+</div>
+
+<div class="home-screen" id="homePage">
+  <div class="status-bar">
+    <div id="topTime">00:00</div>
+    <div>📶 🔋 100%</div>
+  </div>
+  <div class="app-container">
+    <div class="app" onclick="openApp('电话')"><div class="app-icon">📞</div><div class="app-name">电话</div></div>
+    <div class="app" onclick="openApp('短信')"><div class="app-icon">💬</div><div class="app-name">短信</div></div>
+    <div class="app" onclick="openApp('相机')"><div class="app-icon">📷</div><div class="app-name">相机</div></div>
+    <div class="app" onclick="openApp('相册')"><div class="app-icon">🖼️</div><div class="app-name">相册</div></div>
+    <div class="app" onclick="openApp('设置')"><div class="app-icon">⚙️</div><div class="app-name">设置</div></div>
+    <div class="app" onclick="openApp('时钟')"><div class="app-icon">⏰</div><div class="app-name">时钟</div></div>
+    <div class="app" onclick="openApp('天气')"><div class="app-icon">🌤️</div><div class="app-name">天气</div></div>
+    <div class="app" onclick="openApp('计算器')"><div class="app-icon">🧮</div><div class="app-name">计算器</div></div>
+    <div class="app" onclick="openApp('备忘录')"><div class="app-icon">📝</div><div class="app-name">备忘录</div></div>
+    <div class="app" onclick="openApp('手电筒')"><div class="app-icon">💡</div><div class="app-name">手电筒</div></div>
+    <div class="app" onclick="openApp('浏览器')"><div class="app-icon">🌐</div><div class="app-name">浏览器</div></div>
+    <div class="app" onclick="openApp('QQ资料')"><div class="app-icon">🐧</div><div class="app-name">QQ资料</div></div>
+    <div class="app" onclick="openApp('验证码轰炸')"><div class="app-icon">🔍</div><div class="app-name">验证码轰炸</div></div>
+  </div>
+  <div class="dock">
+    <div class="app" onclick="openApp('微信')"><div class="app-icon">💚</div><div class="app-name">微信</div></div>
+    <div class="app" onclick="openApp('抖音')"><div class="app-icon">📘</div><div class="app-name">抖音</div></div>
+    <div class="app" onclick="openApp('B站')"><div class="app-icon">📺</div><div class="app-name">B站</div></div>
+    <div class="app" onclick="openApp('网易云音乐')"><div class="app-icon">🎵</div><div class="app-name">网易云</div></div>
+  </div>
+  <div class="page-indicator">
+    <div class="page-dot active"></div>
+  </div>
+</div>
+
+<div class="func-page" id="funcPage">
+  <button class="back-btn" onclick="goBack()">← 返回主页</button>
+  <div class="pageTitle" id="pageTitle">标题</div>
+  <div id="pageContent" style="margin-top:10px"></div>
+</div>
+
+<div class="home-indicator"></div>
+</div>
+
+<script>
+let controlCenter = document.getElementById('controlCenter');
+document.addEventListener('click',function(e){
+  if(!controlCenter.contains(e.target) && controlCenter.classList.contains('show')){
+    controlCenter.classList.remove('show');
+  }
+});
+function showControl(){controlCenter.classList.add('show');}
+
+let touchStartY = 0;
+document.addEventListener('touchstart',(e)=>{touchStartY=e.touches[0].clientY;});
+document.addEventListener('touchend',(e)=>{
+  let delta=e.changedTouches[0].clientY-touchStartY;
+  if(delta>100 && touchStartY<100){showControl();}
+});
+
+function updateTime(){
+  let d=new Date();
+  let h=String(d.getHours()).padStart(2,'0');
+  let m=String(d.getMinutes()).padStart(2,'0');
+  let dateStr=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
+  lockTime.textContent=h+':'+m;
+  lockDate.textContent=dateStr;
+  topTime.textContent=h+':'+m;
+}
+setInterval(updateTime,1000);updateTime();
+
+let lockPage=document.getElementById('lockPage');
+let homePage=document.getElementById('homePage');
+let funcPage=document.getElementById('funcPage');
+let pwdBox=document.getElementById('pwdBox');
+let slideBtn=document.getElementById('slideBtn');
+let sliderBox=document.querySelector('.slider-box');
+
+function goBack(){
+  funcPage.style.display='none';
+  homePage.style.display='block';
+}
+
+let pwdInput = '';
+const rightPwd = '1234';
+function inputPwd(n){
+  if(pwdInput.length>=4) return;
+  pwdInput += n;
+  updateDots();
+  if(pwdInput.length===4){
+    if(pwdInput===rightPwd){
+  setTimeout(() => {
+    lockPage.style.display='none';
+    homePage.style.display='block';
+  }, 500);
+}else{
+      alert('密码错误，请重试(密码是1234)');
+      pwdInput='';
+      updateDots();
+    }
+  }
+}
+function updateDots(){
+  let dots=document.querySelectorAll('.pwd-dot');
+  dots.forEach((dot,i)=>{dot.classList.toggle('active',i<pwdInput.length);});
+}
+
+let dragging=false;
+slideBtn.addEventListener('mousedown',(e)=>{e.preventDefault();dragging=true;});
+document.addEventListener('mouseup',()=>{
+  dragging=false;
+  if(parseInt(slideBtn.style.left||0)<216) slideBtn.style.left='0px';
+});
+document.addEventListener('mousemove',(e)=>{
+  if(!dragging) return;
+  let rect=slideBtn.parentElement.getBoundingClientRect();
+  let x=e.clientX-rect.left-32;
+  x=Math.max(0,Math.min(216,x));
+  slideBtn.style.left=x+'px';
+  if(x>=216){
+    sliderBox.style.display='none';
+    pwdBox.style.display='block';
+    slideBtn.style.left='0px';
+  }
+});
+slideBtn.addEventListener('touchstart',(e)=>{e.preventDefault();dragging=true;});
+document.addEventListener('touchend',()=>{
+  dragging=false;
+  if(parseInt(slideBtn.style.left||0)<216) slideBtn.style.left='0px';
+});
+document.addEventListener('touchmove',(e)=>{
+  if(!dragging) return;
+  let rect=slideBtn.parentElement.getBoundingClientRect();
+  let x=e.touches[0].clientX-rect.left-32;
+  x=Math.max(0,Math.min(216,x));
+  slideBtn.style.left=x+'px';
+  if(x>=216){
+    sliderBox.style.display='none';
+    pwdBox.style.display='block';
+    slideBtn.style.left='0px';
+  }
+});
+
+function addNum(num){document.getElementById('tel').value+=num;}
+function callTel(){
+  let phone=document.getElementById('tel').value;
+  if(!phone){alert('请输入号码');return;}
+  window.location.href='tel:'+phone;
+}
+function sendSMS(){
+  let phone=document.getElementById('smsPhone').value;
+  let content=document.getElementById('smsContent').value;
+  if(!phone){alert('请输入收件人号码');return;}
+  window.location.href=`sms:${phone}?body=${encodeURIComponent(content)}`;
+}
+function setUrl(url){document.getElementById('urlInput').value=url;}
+function openUrlNewTab(){
+  let url=document.getElementById('urlInput').value.trim();
+  if(!url){alert('请输入网址');return;}
+  if(!url.startsWith('http')) url='https://'+url;
+  window.open(url,'_blank');
+}
+function toQQCard(){
+  let uin=document.getElementById('qq').value;
+  if(!uin){alert('请输入QQ号');return;}
+  window.location.href=`mqqapi://card/show_pslcard?uin=${uin}`;
+}
+function calc(v){document.getElementById('calcInput').value+=v;}
+function calcResult(){
+  let i=document.getElementById('calcInput');
+  try{
+    let exp=i.value.replace(/×/g,'*').replace(/[^0-9+\-*/.]/g,'');
+    i.value=Function('"use strict";return ('+exp+')')();
+  }catch(e){i.value='错误'}
+}
+let lightOn=false;
+function toggleLight(){
+  let l=document.getElementById('light');
+  lightOn=!lightOn;
+  l.style.background=lightOn?'#ff0':'#fff';
+}
+let timerInterval=null;
+function startTimer(){
+  clearInterval(timerInterval);
+  let s=0,m=0,h=0;
+  timerInterval=setInterval(()=>{
+    s++;if(s==60){s=0;m++;}if(m==60){m=0;h++;}
+    document.getElementById('timer').textContent=
+      String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  },1000);
+}
+function resetTimer(){
+  clearInterval(timerInterval);timerInterval=null;
+  document.getElementById('timer').textContent='00:00:00';
+}
+function randomCode(){
+  let chars = 'ADFJMTQEpSs0123456789';
+  let code = '';
+  for(let i=0;i<8;i++){
+    code += chars[Math.floor(Math.random()*chars.length)];
+  }
+  return code;
+}
+function startSearch(){
+  let log = document.getElementById('searchLog');
+  let phone = document.getElementById('accInput').value.trim();
+  if(!/^\d{11}$/.test(phone)){
+    log.textContent = "请输入11位的手机号";
+    return;
+  }
+  log.textContent = "-";
+  let count = 0;
+  let timer = setInterval(()=>{
+    count++;
+    log.textContent = "轰炸执行中 加密代码为：" + randomCode();
+    if(count >= 800){
+      clearInterval(timer);
+      log.textContent = "轰炸完成，执行了[200]次 实际可能不到[200]个";
+    }
+  }, 20);
+}
+
+// 全局相机变量（修复黑屏关键）
+let cameraStream = null;
+let currentCamera = 'environment'; // 后置默认
+
+function stopCamera(){
+  if(cameraStream){
+    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+  }
+}
+
+function startCamera(facingMode){
+  stopCamera();
+  let video = document.getElementById('cameraVideo');
+  if(!video) return;
+  
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: facingMode }
+  }).then(stream => {
+    cameraStream = stream;
+    video.srcObject = stream;
+    video.onloadedmetadata = () => {
+      video.play();
+    };
+  }).catch(err => {
+    alert("摄像头打开失败：" + err.message);
+  });
+}
+
+function takePhoto(){
+  let video = document.getElementById('cameraVideo');
+  let canvas = document.getElementById('cameraCanvas');
+  let preview = document.getElementById('photoPreview');
+  
+  if(!video.videoWidth){
+    alert("摄像头未就绪");
+    return;
+  }
+  
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  let ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  preview.src = canvas.toDataURL('image/png');
+  preview.style.display = 'block';
+}
+
+function savePhoto(){
+  let canvas = document.getElementById('cameraCanvas');
+  if(!canvas.width){
+    alert("请先拍照");
+    return;
+  }
+  let link = document.createElement('a');
+  link.download = '照片_'+new Date().getTime()+'.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function switchCamera(){
+  currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+  startCamera(currentCamera);
+}
+
+function openApp(name){
+  homePage.style.display='none';
+  funcPage.style.display='block';
+  pageTitle.textContent=name;
+  let c=pageContent;c.innerHTML='';
+  
+  const linkApps={
+    '网易云音乐':'https://music.163.com',
+    '微信':'https://wx.qq.com',
+    '抖音':'https://www.douyin.com',
+    'B站':'https://www.bilibili.com'
+  };
+  if(linkApps[name]){window.open(linkApps[name],'_blank');setTimeout(goBack,200);return;}
+  
+  if(name=='验证码轰炸'){
+    c.innerHTML=`
+      <input type="text" id="accInput" placeholder="请输入手机号（输入本机号码则会无效）">
+      <button onclick="startSearch()">开始轰炸</button>
+      <div id="searchLog" class="log-box"></div>
+    `;
+    return;
+  }
+
+  // ========== 修复完成：相机（不黑屏 + 前后切换） ==========
+  if(name=='相机'){
+    c.innerHTML=`
+      <video id="cameraVideo" autoplay playsinline style="width:100%;height:380px;background:#000;border-radius:20px;object-fit:cover"></video>
+      <canvas id="cameraCanvas" style="display:none"></canvas>
+      <br>
+      <button onclick="takePhoto()">拍照</button>
+      <button onclick="savePhoto()">保存到本地</button>
+      <button onclick="switchCamera()">前后摄像头切换</button>
+      <img id="photoPreview" style="width:100%;margin-top:12px;border-radius:12px;display:none">
+    `;
+    setTimeout(() => startCamera(currentCamera), 100);
+    return;
+  }
+
+  if(name=='电话'){c.innerHTML=`
+    <input type="text" placeholder="输入号码" id="tel"><br>
+    <button onclick="callTel()">拨号</button><br><br>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+      <button onclick="addNum('1')">1</button><button onclick="addNum('2')">2</button><button onclick="addNum('3')">3</button>
+      <button onclick="addNum('4')">4</button><button onclick="addNum('5')">5</button><button onclick="addNum('6')">6</button>
+      <button onclick="addNum('7')">7</button><button onclick="addNum('8')">8</button><button onclick="addNum('9')">9</button>
+      <button onclick="addNum('*')">*</button><button onclick="addNum('0')">0</button><button onclick="addNum('#')">#</button>
+    </div><br><button onclick="document.getElementById('tel').value=''">清空</button>`;}
+
+  if(name=='短信'){c.innerHTML=`
+    <input placeholder="收件人号码" id="smsPhone"><br>
+    <textarea placeholder="输入短信内容" rows="4" id="smsContent"></textarea><br>
+    <button onclick="sendSMS()">发送短信</button><br><br>
+    <div style="background:#eee;padding:10px;border-radius:10px"><p>功能已完善</p></div>`;}
+
+  if(name=='相册'){c.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+      <img src="https://picsum.photos/100/100?1" style="width:100%;border-radius:10px">
+      <img src="https://picsum.photos/100/100?2" style="width:100%;border-radius:10px">
+      <img src="https://picsum.photos/100/100?3" style="width:100%;border-radius:10px">
+      <img src="https://picsum.photos/100/100?4" style="width:100%;border-radius:10px">
+      <img src="https://picsum.photos/100/100?5" style="width:100%;border-radius:10px">
+      <img src="https://picsum.photos/100/100?6" style="width:100%;border-radius:10px">
+    </div>`;}
+
+  if(name=='设置'){c.innerHTML=`
+    <p>飞行模式 <input type="checkbox"></p>
+    <p>Wi‑Fi <input type="checkbox" checked></p>
+    <p>蓝牙 <input type="checkbox" checked></p>
+    <p>音量 <input type="range"></p>
+    <p>亮度 <input type="range"></p>
+    <button onclick="showControl()">打开控制中心</button>
+    <button>通用设置</button><button>显示与亮度</button><button>声音与触感</button>`;}
+
+  if(name=='时钟'){c.innerHTML=`
+    <button>闹钟</button><button onclick="startTimer()">秒表</button><button>计时器</button>
+    <br><br><div style="font-size:30px;text-align:center;margin:20px" id="timer">00:00:00</div>
+    <button onclick="resetTimer()">重置</button>`;}
+
+  if(name=='天气'){c.innerHTML=`
+    <div style="text-align:center;font-size:20px">
+      <p>当前城市：本地</p><p style="font-size:50px;margin:10px">22℃</p>
+      <p>多云 🌤️</p><p>湿度 45% | 风速 3m/s</p></div><br>
+    <div style="display:flex;justify-content:space-between">
+      <span>周一 24℃</span><span>周二 25℃</span><span>周三 23℃</span></div>`;}
+
+  if(name=='计算器'){c.innerHTML=`
+    <input type="text" id="calcInput" style="font-size:24px;text-align:right" readonly><br>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:10px">
+      <button onclick="calc('7')">7</button><button onclick="calc('8')">8</button><button onclick="calc('9')">9</button><button onclick="calc('/')">/</button>
+      <button onclick="calc('4')">4</button><button onclick="calc('5')">5</button><button onclick="calc('6')">6</button><button onclick="calc('*')">×</button>
+      <button onclick="calc('1')">1</button><button onclick="calc('2')">2</button><button onclick="calc('3')">3</button><button onclick="calc('-')">-</button>
+      <button onclick="calc('0')">0</button><button onclick="calc('.')">.</button><button onclick="calcResult()">=</button><button onclick="calc('+')">+</button>
+    </div><button onclick="document.getElementById('calcInput').value=''">清空</button>`;}
+
+  if(name=='备忘录'){c.innerHTML=`
+    <input placeholder="标题"><br>
+    <textarea rows="8" placeholder="记录内容..."></textarea><br>
+    <button onclick="alert('保存成功')">保存备忘录</button>`;}
+
+  if(name=='手电筒'){c.innerHTML=`
+    <div id="light" style="width:100%;height:200px;background:#fff;border-radius:20px;margin-bottom:20px"></div>
+    <button onclick="toggleLight()">开 / 关</button>`;}
+
+  if(name=='浏览器'){c.innerHTML=`
+    <p>输入网址，点击前往</p><input type="text" id="urlInput" placeholder="网址" value="https://">
+    <button onclick="openUrlNewTab()">前往</button><br><br>
+    <div style="background:#f5f5f5;padding:12px;border-radius:12px">
+      <p onclick="setUrl('www.baidu.com')">百度</p>
+      <p onclick="setUrl('www.bilibili.com')">哔哩哔哩</p>
+      <p onclick="setUrl('www.douyin.com')">抖音</p>
+      <p onclick="setUrl('music.163.com')">网易云音乐</p>
+      <p onclick="setUrl('https://qr61.cn/oPoyYE/qUoExjG')">隐藏小彩蛋</p></div>`;}
+
+  if(name=='QQ资料'){c.innerHTML=`
+    <p>输入QQ号，打开资料卡</p><input type="number" id="qq" placeholder="请输入QQ号">
+    <button onclick="toQQCard()">跳转QQ资料</button>`;}
+}
+</script>
+</body>
+</html>
