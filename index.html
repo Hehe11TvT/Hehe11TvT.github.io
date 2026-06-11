@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hehe11的人机验证</title>
+<title>分块识图验证 Demo</title>
 <style>
 *{
   margin: 0;
@@ -184,7 +184,6 @@ body{
 <!-- 成功结果页 -->
 <div class="verify-card result-page" id="successPage">
   <h2 class="success">✅ 你已完成人机认证</h2>
-  <!-- 已替换为新跳转链接 -->
   <a href="https://hehe11tvt.github.io/phone.html"><button class="action-btn enter-btn">进入系统</button></a>
   <button class="action-btn back-btn" id="backFromSuccess">返回上一页</button>
 </div>
@@ -205,9 +204,8 @@ const failPage = document.getElementById('failPage')
 const backFromSuccess = document.getElementById('backFromSuccess')
 const backFromFail = document.getElementById('backFromFail')
 
-// 正确坐标集合 (行,列)
+// 已取消 (1,3)，正确图块如下
 const correctSet = new Set([
-  "1,3",
   "2,3",
   "2,4",
   "3,2",
