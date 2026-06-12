@@ -179,8 +179,6 @@
             font-size: 1rem;
             font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
         }
-        
-        /* 陪伴时长卡片 - 时间数字换行（第二行显示） */
         .companion-stats {
             text-align: center;
             background: rgba(0,0,0,0.35);
@@ -280,8 +278,6 @@
             color: #e5cf92;
             font-style: italic;
         }
-
-        /* ========= 3D相册专属样式 ========= */
         .album-section {
             margin-top: 5rem;
             margin-bottom: 2rem;
@@ -333,7 +329,61 @@
             margin-top: 3rem;
             font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
         }
-        
+        .music-controller {
+            position: fixed;
+            bottom: 80px;
+            left: 24px;
+            z-index: 1000;
+            background: rgba(20, 25, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border-radius: 48px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(220, 190, 110, 0.6);
+            font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(220, 190, 110, 0.2);
+            transition: 0.2s ease;
+            cursor: default;
+            pointer-events: auto;
+        }
+        .music-controller button {
+            background: rgba(245, 235, 190, 0.15);
+            border: none;
+            color: #f5e7c1;
+            font-size: 1.3rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+            font-weight: 500;
+        }
+        .music-controller button:hover {
+            background: rgba(220, 190, 110, 0.7);
+            color: #1e1f2c;
+            transform: scale(1.04);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .music-status {
+            font-size: 0.78rem;
+            color: #f3e7c2;
+            max-width: 170px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 10px;
+            border-radius: 30px;
+            backdrop-filter: blur(2px);
+        }
         @media (max-width: 600px) {
             .name-title { font-size: 2.2rem; }
             .dynamic-message { font-size: 1.5rem; }
@@ -346,6 +396,14 @@
             .album-title:before,
             .album-title:after { margin: 0 8px; font-size: 1rem; }
             #canvas-container { height: 50vh; min-height: 400px; }
+            .music-controller {
+                bottom: 70px;
+                left: 16px;
+                padding: 5px 12px;
+                gap: 8px;
+            }
+            .music-status { max-width: 120px; font-size: 0.7rem; padding: 2px 8px; }
+            .music-controller button { width: 32px; height: 32px; font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -360,15 +418,13 @@
             <div class="dynamic-message" id="stateMessage">加载星辰祝福...</div>
             <div class="sub-time" id="subInfo"></div>
         </div>
-        
-        <!-- 修改版陪伴统计：标签和数字分为两行显示，完全符合要求 -->
         <div class="companion-stats" id="companionStats">
             <span class="stats-label">🌸 我们已经互相陪伴了 🌸</span>
             <span class="stats-value" id="companionTime">计算中...</span>
         </div>
         
         <div style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.7; font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;">—— 时光凝固 爱意永恒 ——</div>
-        <div class="signature-name" id="signatureBlock">- 爱你的何春锦宝宝 -</div>
+        <div class="signature-name" id="signatureBlock">- 爱你的何春锦 -</div>
     </div>
 
     <div class="story-section">
@@ -395,7 +451,7 @@
     </div>
     <div class="hidden-message" id="hiddenMessage">
         <div class="letter-content">
-            🌷 给独一无二的你：<br><br>
+            给独一无二的你：<br><br>
             有人说，喜欢是闹剧，但爱是沉静的史诗。我愿意用时间去证明，对你不仅仅是悸动。<br>
             你有着10后身上罕见的内核，从容、浪漫且坚强。我想陪你去看更多未知的风景，<br>
             听你说关于未来的构想，也分享那些微小的悲喜。在你十五岁之前的这个节点，<br>
@@ -403,23 +459,24 @@
             愿你永远忠于自己，笑得坦荡，梦得自由。<br><br>
             每一段与你的时光，都像银河里最温柔的闪烁。你值得世间所有美好的形容词，<br>
             更值得被毫无保留地偏爱。愿新的一岁，你依然热烈、自由、且光芒万丈。<br>
-            <div class="signature">—— 何春锦</div>
+            <div class="signature">   —— 何春锦</div>
         </div>
     </div>
-    
-    <!-- ========= 3D相册区域 ========= -->
     <div class="album-section" id="albumSection">
         <div class="album-title">📷 时光映像 · 我们的光影纪念册</div>
         <div id="canvas-container"></div>
-        <div class="album-note">✨ 拖拽旋转视角 | 双指缩放 | 自动旋转 ✨</div>
+        <div class="album-note">✨ 拖拽旋转视角 | 双指缩放 ✨</div>
     </div>
     
     <footer>
         ♾️ 时空无法稀释的情意 · 献给2011.07.20的你
     </footer>
 </div>
-
-<!-- 提前加载Three.js库 -->
+<div class="music-controller" id="musicController">
+    <button id="playPauseBtn" title="播放/暂停">🔊</button>
+    <button id="nextBtn" title="下一首">⏭️</button>
+    <span class="music-status" id="musicStatusText">✨ 音乐加载中</span>
+</div>
 <script type="importmap">
     {
         "imports": {
@@ -431,8 +488,7 @@
 
 <script>
     (function() {
-        // ==================== 原有生日页面逻辑（完全保留） ====================
-        const BIRTH_MONTH = 6;      // 7月是索引6
+        const BIRTH_MONTH = 6;
         const BIRTH_DAY = 20;
         const ANNIVERSARY_START = new Date(2026, 2, 7);  // 2026年3月7日
         
@@ -578,7 +634,7 @@
             afterBirthdayInterval = setInterval(updateFunc, 1000);
         }
         
-        // 更新陪伴时长 - 保持纯数字格式，让新样式展示更清晰
+        // 更新陪伴时长
         function updateCompanionDuration() {
             const now = new Date();
             const start = new Date(ANNIVERSARY_START);
@@ -755,10 +811,110 @@
                 setTimeout(() => c.style.transform = '', 150);
             });
         });
+        const MUSIC_LIST = [
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/Music/birthday/1.mp3",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/Music/birthday/2.mp3",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/Music/birthday/3.mp3",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/Music/birthday/4.mp3"
+        ];
         
-        // ==================== 3D相册模块（滚动到视口时初始化） ====================
+        let audioElement = null;
+        let currentMusicIndex = -1;
+        let isPlaying = false;
+        
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const musicStatusSpan = document.getElementById('musicStatusText');
+        
+        function getRandomMusicIndex(avoidCurrent = true) {
+            if (MUSIC_LIST.length === 0) return -1;
+            if (MUSIC_LIST.length === 1) return 0;
+            let newIdx = Math.floor(Math.random() * MUSIC_LIST.length);
+            if (avoidCurrent && newIdx === currentMusicIndex) {
+                newIdx = (newIdx + 1) % MUSIC_LIST.length;
+            }
+            return newIdx;
+        }
+        
+        function updateMusicStatusText() {
+            if (!audioElement || currentMusicIndex === -1) {
+                musicStatusSpan.innerText = "🎵 待播放";
+                return;
+            }
+            let fileName = MUSIC_LIST[currentMusicIndex]?.split('/').pop()?.replace('.mp3', '').substring(0, 20) || "旋律";
+            musicStatusSpan.innerText = isPlaying ? `🎵 ${fileName}` : `⏸️ ${fileName}`;
+        }
+        
+        function playTrack(index) {
+            if (index < 0 || index >= MUSIC_LIST.length) return;
+            if (!audioElement) {
+                audioElement = new Audio();
+                audioElement.volume = 0.6;
+                audioElement.addEventListener('ended', () => {
+                    if (MUSIC_LIST.length > 0) {
+                        const nextIdx = getRandomMusicIndex(true);
+                        if (nextIdx !== -1) {
+                            currentMusicIndex = nextIdx;
+                            audioElement.src = MUSIC_LIST[currentMusicIndex];
+                            audioElement.play().then(() => { isPlaying = true; updateMusicStatusText(); }).catch(e => console.warn);
+                        }
+                    }
+                });
+            }
+            currentMusicIndex = index;
+            audioElement.src = MUSIC_LIST[currentMusicIndex];
+            audioElement.load();
+            audioElement.play().then(() => {
+                isPlaying = true;
+                updateMusicStatusText();
+            }).catch(err => {
+                console.log("播放受阻，等待交互", err);
+                isPlaying = false;
+                updateMusicStatusText();
+            });
+        }
+        
+        function playRandomTrack() {
+            if (MUSIC_LIST.length === 0) return;
+            const newIdx = getRandomMusicIndex(false);
+            playTrack(newIdx);
+        }
+        
+        function togglePlayPause() {
+            if (!audioElement || MUSIC_LIST.length === 0) {
+                playRandomTrack();
+                return;
+            }
+            if (isPlaying) {
+                audioElement.pause();
+                isPlaying = false;
+                updateMusicStatusText();
+            } else {
+                audioElement.play().then(() => {
+                    isPlaying = true;
+                    updateMusicStatusText();
+                }).catch(e => console.warn);
+            }
+        }
+        
+        function nextTrack() {
+            if (MUSIC_LIST.length === 0) return;
+            let newIdx = getRandomMusicIndex(true);
+            if (newIdx === -1) newIdx = 0;
+            playTrack(newIdx);
+        }
+        
+        if (playPauseBtn) playPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlayPause(); });
+        if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextTrack(); });
+        
+        function initMusic() {
+            if (MUSIC_LIST.length > 0) playRandomTrack();
+        }
+        initMusic();
+        
+        //3D相册模块
         let threeInitialized = false;
-        let threeScene, threeCamera, threeRenderer, threeControls, photoCube, ringLoop, starsField, auraParticles;
+        let threeScene, threeCamera, threeRenderer, threeControls, photoCube, ringLoop, starsField3D, auraParticles;
         
         const imageUrls = [
             "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/IM1.jpg",
@@ -772,50 +928,42 @@
         async function initThreeAlbum() {
             if (threeInitialized) return;
             threeInitialized = true;
-            
             try {
                 const THREE = await import('three');
                 const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
-                
                 const container = document.getElementById('canvas-container');
                 if (!container) return;
-                
                 threeScene = new THREE.Scene();
                 threeScene.background = new THREE.Color(0x050b1a);
                 threeScene.fog = new THREE.FogExp2(0x050b1a, 0.008);
-                
                 threeCamera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 1000);
                 threeCamera.position.set(4.2, 2.8, 5.5);
-                
                 threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
                 threeRenderer.setSize(container.clientWidth, container.clientHeight);
                 threeRenderer.setPixelRatio(window.devicePixelRatio);
                 container.appendChild(threeRenderer.domElement);
-                
                 threeControls = new OrbitControls(threeCamera, threeRenderer.domElement);
                 threeControls.enableDamping = true;
                 threeControls.dampingFactor = 0.06;
                 threeControls.rotateSpeed = 1.2;
                 threeControls.zoomSpeed = 1.0;
                 threeControls.enableZoom = true;
-                threeControls.enablePan = false;   // 禁止平移，保持立方体在中心
+                threeControls.enablePan = false;
                 threeControls.autoRotate = true;
                 threeControls.autoRotateSpeed = 1.2;
                 threeControls.target.set(0, 0, 0);
                 
-                // 星空背景粒子
                 const starGeo = new THREE.BufferGeometry();
-                const starCount = 1800;
-                const starPositions = new Float32Array(starCount * 3);
-                for (let i = 0; i < starCount; i++) {
-                    starPositions[i*3] = (Math.random() - 0.5) * 1800;
-                    starPositions[i*3+1] = (Math.random() - 0.5) * 1000;
-                    starPositions[i*3+2] = (Math.random() - 0.5) * 400 - 150;
+                const starCnt = 1800;
+                const starPos = new Float32Array(starCnt * 3);
+                for (let i = 0; i < starCnt; i++) {
+                    starPos[i*3] = (Math.random() - 0.5) * 1800;
+                    starPos[i*3+1] = (Math.random() - 0.5) * 1000;
+                    starPos[i*3+2] = (Math.random() - 0.5) * 400 - 150;
                 }
-                starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-                starsField = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.28, transparent: true, opacity: 0.6 }));
-                threeScene.add(starsField);
-                
+                starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+                starsField3D = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.28, transparent: true, opacity: 0.6 }));
+                threeScene.add(starsField3D);
                 threeScene.add(new THREE.AmbientLight(0x4a5070));
                 const dirLight = new THREE.DirectionalLight(0xffffff, 1);
                 dirLight.position.set(3, 5, 2);
@@ -823,44 +971,27 @@
                 const fillLight = new THREE.PointLight(0x5588ff, 0.45);
                 fillLight.position.set(-2, 1.5, 3);
                 threeScene.add(fillLight);
-                
                 const cubeSize = 2.45;
                 const boxGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
                 const materials = [];
-                
-                function createMaterial(url, index) {
-                    const texture = new THREE.TextureLoader().load(url, 
-                        (tex) => { console.log(`3D相册 图片${index+1} 加载成功`); },
-                        undefined,
-                        (err) => { console.warn(`3D相册 图片加载失败: ${url}`, err); }
-                    );
+                function createMaterial(url, idx) {
+                    const texture = new THREE.TextureLoader().load(url, undefined, undefined, (err) => console.warn(`图片加载失败: ${url}`));
                     texture.crossOrigin = "Anonymous";
                     return new THREE.MeshStandardMaterial({ map: texture, roughness: 0.3, metalness: 0.08, side: THREE.DoubleSide });
                 }
-                
-                for (let i = 0; i < 6; i++) {
-                    const url = imageUrls[i % imageUrls.length];
-                    materials.push(createMaterial(url, i));
-                }
-                
+                for (let i = 0; i < 6; i++) materials.push(createMaterial(imageUrls[i % imageUrls.length], i));
                 photoCube = new THREE.Mesh(boxGeometry, materials);
                 threeScene.add(photoCube);
-                
                 const edgesGeo = new THREE.EdgesGeometry(boxGeometry);
                 const wireframe = new THREE.LineSegments(edgesGeo, new THREE.LineBasicMaterial({ color: 0x6c9eff }));
                 photoCube.add(wireframe);
-                
                 const cornerGlowMat = new THREE.MeshStandardMaterial({ color: 0xffaa77, emissive: 0x442200, emissiveIntensity: 0.4 });
-                const cornerPositions = [
-                    [-1,-1,-1], [1,-1,-1], [1,-1,1], [-1,-1,1],
-                    [-1,1,-1], [1,1,-1], [1,1,1], [-1,1,1]
-                ];
+                const cornerPositions = [[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1],[-1,1,-1],[1,1,-1],[1,1,1],[-1,1,1]];
                 cornerPositions.forEach(pos => {
                     const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.058, 10, 10), cornerGlowMat);
                     sphere.position.set(pos[0] * cubeSize/2, pos[1] * cubeSize/2, pos[2] * cubeSize/2);
                     photoCube.add(sphere);
                 });
-                
                 const auraCount = 1000;
                 const auraGeo = new THREE.BufferGeometry();
                 const auraPositions = new Float32Array(auraCount * 3);
@@ -875,7 +1006,6 @@
                 auraGeo.setAttribute('position', new THREE.BufferAttribute(auraPositions, 3));
                 auraParticles = new THREE.Points(auraGeo, new THREE.PointsMaterial({ color: 0x7aaaff, size: 0.022, transparent: true, opacity: 0.5 }));
                 threeScene.add(auraParticles);
-                
                 const ringPoints = [];
                 const ringRad = 1.72;
                 for (let i = 0; i <= 100; i++) {
@@ -885,56 +1015,38 @@
                 const ringGeo = new THREE.BufferGeometry().setFromPoints(ringPoints);
                 ringLoop = new THREE.LineLoop(ringGeo, new THREE.LineBasicMaterial({ color: 0x4c9eff }));
                 threeScene.add(ringLoop);
-                
-                let time = 0;
                 function animateThree() {
                     if (!threeRenderer || !threeScene) return;
                     requestAnimationFrame(animateThree);
-                    time += 0.016;
                     if (threeControls) threeControls.update();
-                    if (starsField) {
-                        starsField.rotation.y += 0.0004;
-                        starsField.rotation.x += 0.0002;
-                    }
-                    if (auraParticles) {
-                        auraParticles.rotation.y += 0.0015;
-                        auraParticles.rotation.x += 0.0008;
-                    }
+                    if (starsField3D) { starsField3D.rotation.y += 0.0004; starsField3D.rotation.x += 0.0002; }
+                    if (auraParticles) { auraParticles.rotation.y += 0.0015; auraParticles.rotation.x += 0.0008; }
                     if (ringLoop) ringLoop.rotation.z += 0.003;
                     if (threeRenderer && threeCamera) threeRenderer.render(threeScene, threeCamera);
                 }
                 animateThree();
-                
                 const resizeObserver = new ResizeObserver(() => {
                     if (container && threeCamera && threeRenderer) {
-                        const w = container.clientWidth;
-                        const h = container.clientHeight;
+                        const w = container.clientWidth, h = container.clientHeight;
                         threeCamera.aspect = w / h;
                         threeCamera.updateProjectionMatrix();
                         threeRenderer.setSize(w, h);
                     }
                 });
                 resizeObserver.observe(container);
-                
-                console.log('3D相册初始化成功 - 平移已禁用，立方体固定在中心');
-            } catch (error) {
-                console.error('3D相册初始化失败:', error);
-            }
+                console.log('3D相册初始化成功');
+            } catch (error) { console.error('3D相册失败:', error); }
         }
         
         const albumSection = document.getElementById('albumSection');
         if (albumSection) {
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting && !threeInitialized) {
-                        initThreeAlbum();
-                    }
-                });
+                entries.forEach(entry => { if (entry.isIntersecting && !threeInitialized) initThreeAlbum(); });
             }, { threshold: 0.2 });
             observer.observe(albumSection);
         }
         
-        console.log("%c❤️ 致2011.07.20 & 我们的纪念日2026.03.07 · 何春锦宝宝的爱意永存", "color:#f3dfa2; font-size:14px;");
+        console.log("%c❤️ 致2011.07.20 & 纪念日2026.03.07 · 何春锦宝宝的爱意永存", "color:#f3dfa2; font-size:14px;");
     })();
 </script>
 </body>
