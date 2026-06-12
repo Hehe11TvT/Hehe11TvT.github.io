@@ -329,6 +329,7 @@
             margin-top: 3rem;
             font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
         }
+        
         .music-controller {
             position: fixed;
             bottom: 80px;
@@ -459,9 +460,10 @@
             愿你永远忠于自己，笑得坦荡，梦得自由。<br><br>
             每一段与你的时光，都像银河里最温柔的闪烁。你值得世间所有美好的形容词，<br>
             更值得被毫无保留地偏爱。愿新的一岁，你依然热烈、自由、且光芒万丈。<br>
-            <div class="signature">   —— 何春锦</div>
+            <div class="signature">    —— 何春锦</div>
         </div>
     </div>
+    
     <div class="album-section" id="albumSection">
         <div class="album-title">📷 时光映像 · 我们的光影纪念册</div>
         <div id="canvas-container"></div>
@@ -472,11 +474,13 @@
         ♾️ 时空无法稀释的情意 · 献给2011.07.20的你
     </footer>
 </div>
+
 <div class="music-controller" id="musicController">
-    <button id="playPauseBtn" title="播放/暂停">🔊</button>
+    <button id="playPauseBtn" title="播放/暂停">▶️</button>
     <button id="nextBtn" title="下一首">⏭️</button>
     <span class="music-status" id="musicStatusText">✨ 音乐加载中</span>
 </div>
+
 <script type="importmap">
     {
         "imports": {
@@ -490,7 +494,7 @@
     (function() {
         const BIRTH_MONTH = 6;
         const BIRTH_DAY = 20;
-        const ANNIVERSARY_START = new Date(2026, 2, 7);  // 2026年3月7日
+        const ANNIVERSARY_START = new Date(2026, 2, 7);
         
         const today = new Date();
         const currentYear = today.getFullYear();
@@ -634,7 +638,6 @@
             afterBirthdayInterval = setInterval(updateFunc, 1000);
         }
         
-        // 更新陪伴时长
         function updateCompanionDuration() {
             const now = new Date();
             const start = new Date(ANNIVERSARY_START);
@@ -745,7 +748,6 @@
         
         initTimeMachine();
         
-        // 星空画布
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
@@ -788,7 +790,6 @@
         resizeCanvas();
         drawStars();
         
-        // 手写信交互
         const revealBtn = document.getElementById('revealBtn');
         const hiddenMsgDiv = document.getElementById('hiddenMessage');
         let opened = false;
@@ -811,6 +812,7 @@
                 setTimeout(() => c.style.transform = '', 150);
             });
         });
+        
         const MUSIC_LIST = [
             "https://musichehe121.oss-cn-chengdu.aliyuncs.com/Music/birthday/1.mp3",
             "https://musichehe121.oss-cn-chengdu.aliyuncs.com/Music/birthday/2.mp3",
@@ -819,100 +821,107 @@
         ];
         
         let audioElement = null;
-        let currentMusicIndex = -1;
+        let currentIndex = 3;
         let isPlaying = false;
         
         const playPauseBtn = document.getElementById('playPauseBtn');
         const nextBtn = document.getElementById('nextBtn');
         const musicStatusSpan = document.getElementById('musicStatusText');
         
-        function getRandomMusicIndex(avoidCurrent = true) {
-            if (MUSIC_LIST.length === 0) return -1;
-            if (MUSIC_LIST.length === 1) return 0;
-            let newIdx = Math.floor(Math.random() * MUSIC_LIST.length);
-            if (avoidCurrent && newIdx === currentMusicIndex) {
-                newIdx = (newIdx + 1) % MUSIC_LIST.length;
-            }
-            return newIdx;
-        }
-        
-        function updateMusicStatusText() {
-            if (!audioElement || currentMusicIndex === -1) {
+        function updateStatusText() {
+            if (!audioElement) {
                 musicStatusSpan.innerText = "🎵 待播放";
                 return;
             }
-            let fileName = MUSIC_LIST[currentMusicIndex]?.split('/').pop()?.replace('.mp3', '').substring(0, 20) || "旋律";
+            let fileName = MUSIC_LIST[currentIndex]?.split('/').pop()?.replace('.mp3', '').substring(0, 20) || "旋律";
             musicStatusSpan.innerText = isPlaying ? `🎵 ${fileName}` : `⏸️ ${fileName}`;
         }
         
-        function playTrack(index) {
-            if (index < 0 || index >= MUSIC_LIST.length) return;
+        function preloadAllSongs() {
+            for (let i = 0; i < MUSIC_LIST.length; i++) {
+                const preloadAudio = new Audio();
+                preloadAudio.preload = 'auto';
+                preloadAudio.src = MUSIC_LIST[i];
+                preloadAudio.load();
+            }
+        }
+        
+        function playSong(index) {
             if (!audioElement) {
                 audioElement = new Audio();
                 audioElement.volume = 0.6;
                 audioElement.addEventListener('ended', () => {
-                    if (MUSIC_LIST.length > 0) {
-                        const nextIdx = getRandomMusicIndex(true);
-                        if (nextIdx !== -1) {
-                            currentMusicIndex = nextIdx;
-                            audioElement.src = MUSIC_LIST[currentMusicIndex];
-                            audioElement.play().then(() => { isPlaying = true; updateMusicStatusText(); }).catch(e => console.warn);
-                        }
-                    }
+                    currentIndex = (currentIndex + 1) % MUSIC_LIST.length;
+                    audioElement.src = MUSIC_LIST[currentIndex];
+                    audioElement.load();
+                    audioElement.play().then(() => {
+                        isPlaying = true;
+                        updateStatusText();
+                    }).catch(e => console.warn);
                 });
             }
-            currentMusicIndex = index;
-            audioElement.src = MUSIC_LIST[currentMusicIndex];
+            currentIndex = index;
+            audioElement.src = MUSIC_LIST[currentIndex];
             audioElement.load();
             audioElement.play().then(() => {
                 isPlaying = true;
-                updateMusicStatusText();
+                updateStatusText();
             }).catch(err => {
-                console.log("播放受阻，等待交互", err);
+                console.log("自动播放受阻", err);
                 isPlaying = false;
-                updateMusicStatusText();
+                updateStatusText();
+                const startOnInteraction = () => {
+                    if (!isPlaying && audioElement) {
+                        audioElement.play().then(() => {
+                            isPlaying = true;
+                            updateStatusText();
+                        }).catch(()=>{});
+                    }
+                    document.removeEventListener('click', startOnInteraction);
+                    document.removeEventListener('touchstart', startOnInteraction);
+                };
+                document.addEventListener('click', startOnInteraction);
+                document.addEventListener('touchstart', startOnInteraction);
             });
         }
         
-        function playRandomTrack() {
-            if (MUSIC_LIST.length === 0) return;
-            const newIdx = getRandomMusicIndex(false);
-            playTrack(newIdx);
-        }
-        
         function togglePlayPause() {
-            if (!audioElement || MUSIC_LIST.length === 0) {
-                playRandomTrack();
+            if (!audioElement) {
+                playSong(3);
                 return;
             }
             if (isPlaying) {
                 audioElement.pause();
                 isPlaying = false;
-                updateMusicStatusText();
+                updateStatusText();
             } else {
                 audioElement.play().then(() => {
                     isPlaying = true;
-                    updateMusicStatusText();
+                    updateStatusText();
                 }).catch(e => console.warn);
             }
         }
         
         function nextTrack() {
-            if (MUSIC_LIST.length === 0) return;
-            let newIdx = getRandomMusicIndex(true);
-            if (newIdx === -1) newIdx = 0;
-            playTrack(newIdx);
+            if (!audioElement) {
+                playSong(3);
+                return;
+            }
+            currentIndex = (currentIndex + 1) % MUSIC_LIST.length;
+            audioElement.src = MUSIC_LIST[currentIndex];
+            audioElement.load();
+            audioElement.play().then(() => {
+                isPlaying = true;
+                updateStatusText();
+            }).catch(e => console.warn);
         }
         
         if (playPauseBtn) playPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlayPause(); });
         if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextTrack(); });
         
-        function initMusic() {
-            if (MUSIC_LIST.length > 0) playRandomTrack();
-        }
-        initMusic();
+        preloadAllSongs();
+        playSong(3);
         
-        //3D相册模块
         let threeInitialized = false;
         let threeScene, threeCamera, threeRenderer, threeControls, photoCube, ringLoop, starsField3D, auraParticles;
         
@@ -974,12 +983,12 @@
                 const cubeSize = 2.45;
                 const boxGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
                 const materials = [];
-                function createMaterial(url, idx) {
-                    const texture = new THREE.TextureLoader().load(url, undefined, undefined, (err) => console.warn(`图片加载失败: ${url}`));
+                function createMaterial(url) {
+                    const texture = new THREE.TextureLoader().load(url);
                     texture.crossOrigin = "Anonymous";
                     return new THREE.MeshStandardMaterial({ map: texture, roughness: 0.3, metalness: 0.08, side: THREE.DoubleSide });
                 }
-                for (let i = 0; i < 6; i++) materials.push(createMaterial(imageUrls[i % imageUrls.length], i));
+                for (let i = 0; i < 6; i++) materials.push(createMaterial(imageUrls[i % imageUrls.length]));
                 photoCube = new THREE.Mesh(boxGeometry, materials);
                 threeScene.add(photoCube);
                 const edgesGeo = new THREE.EdgesGeometry(boxGeometry);
@@ -1034,7 +1043,6 @@
                     }
                 });
                 resizeObserver.observe(container);
-                console.log('3D相册初始化成功');
             } catch (error) { console.error('3D相册失败:', error); }
         }
         
@@ -1045,8 +1053,6 @@
             }, { threshold: 0.2 });
             observer.observe(albumSection);
         }
-        
-        console.log("%c❤️ 致2011.07.20 & 纪念日2026.03.07 · 何春锦宝宝的爱意永存", "color:#f3dfa2; font-size:14px;");
     })();
 </script>
 </body>
