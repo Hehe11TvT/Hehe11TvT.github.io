@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>星辰轨迹 · 予你（2026）</title>
+    <title>星辰轨迹 · 予你(2026)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
     <style>
         * {
@@ -15,23 +15,15 @@
         body {
             min-height: 100vh;
             background: radial-gradient(circle at 30% 20%, #0a0f1f, #010105);
-            /* 基础字体保持系统默认，不影响关键区域 */
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             color: #edeef5;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
 
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #191e2c;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #b89f60;
-            border-radius: 20px;
-        }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #191e2c; }
+        ::-webkit-scrollbar-thumb { background: #b89f60; border-radius: 20px; }
 
         #starCanvas {
             position: fixed;
@@ -87,7 +79,6 @@
             margin-bottom: 0.6rem;
         }
 
-        /* 倒计时核心容器 - 统一使用微软雅黑 */
         .time-core {
             background: rgba(8, 12, 20, 0.6);
             backdrop-filter: blur(16px);
@@ -98,10 +89,8 @@
             max-width: 90%;
             border: 1px solid rgba(200, 175, 110, 0.5);
             box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
-            transition: all 0.2s ease;
         }
 
-        /* 整个倒计时区域文字 (包括🎂表情和数字) 统一微软雅黑，清晰现代 */
         .dynamic-message {
             font-size: 2rem;
             font-weight: 600;
@@ -116,10 +105,8 @@
             font-weight: 400;
             font-family: '微软雅黑', 'Microsoft YaHei', 'Inter', sans-serif;
             color: #cbc2a0;
-            word-break: keep-all;
         }
 
-        /* 倒计时数字专用强调，与整体协调，同样使用微软雅黑 */
         .time-digits {
             font-family: '微软雅黑', 'Microsoft YaHei', 'Inter', monospace;
             font-size: 2rem;
@@ -131,7 +118,6 @@
             letter-spacing: 2px;
         }
 
-        /* 叙事区块 */
         .story-section {
             background: rgba(12, 18, 28, 0.55);
             backdrop-filter: blur(10px);
@@ -174,6 +160,7 @@
             text-align: center;
             transition: 0.25s ease;
             border: 1px solid rgba(210, 180, 100, 0.2);
+            cursor: pointer;
         }
         .memory-card:hover {
             transform: translateY(-6px);
@@ -265,18 +252,6 @@
             overflow-y: auto;
             padding: 2rem;
         }
-        .hidden-message.show::-webkit-scrollbar {
-            width: 4px;
-        }
-        .hidden-message.show::-webkit-scrollbar-track {
-            background: rgba(30, 35, 50, 0.6);
-            border-radius: 10px;
-        }
-        .hidden-message.show::-webkit-scrollbar-thumb {
-            background: #c0a86a;
-            border-radius: 10px;
-        }
-        
         .letter-content {
             text-align: center;
             font-family: '微软雅黑', 'Microsoft YaHei', 'Cormorant Garamond', serif;
@@ -291,6 +266,51 @@
             font-style: italic;
         }
 
+        /* ========= 3D相册专属样式 ========= */
+        .album-section {
+            margin-top: 5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .album-title {
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            color: #ecdcaa;
+            letter-spacing: 2px;
+        }
+        
+        .album-title:before,
+        .album-title:after {
+            content: "✦";
+            margin: 0 15px;
+            opacity: 0.6;
+            font-size: 1.4rem;
+        }
+        
+        #canvas-container {
+            width: 100%;
+            height: 70vh;
+            min-height: 500px;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.6);
+            border: 1px solid rgba(200, 175, 110, 0.4);
+            background: rgba(5, 8, 18, 0.4);
+            backdrop-filter: blur(4px);
+        }
+        
+        .album-note {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #b8ae8a;
+            margin-top: 1rem;
+            font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+        }
+
         footer {
             text-align: center;
             font-size: 0.7rem;
@@ -298,19 +318,19 @@
             margin-top: 3rem;
             font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
         }
+        
         @media (max-width: 600px) {
             .name-title { font-size: 2.2rem; }
             .dynamic-message { font-size: 1.5rem; }
             .time-digits { font-size: 1.4rem; }
             .time-core { padding: 1rem 1.2rem; }
-            .hidden-message.show {
-                max-height: 520px;
-                padding: 1.5rem;
-            }
-            .letter-content {
-                font-size: 1rem;
-            }
+            .hidden-message.show { max-height: 520px; padding: 1.5rem; }
+            .letter-content { font-size: 1rem; }
             .companion-stats span { font-size: 1rem; }
+            .album-title { font-size: 1.6rem; }
+            .album-title:before,
+            .album-title:after { margin: 0 8px; font-size: 1rem; }
+            #canvas-container { height: 50vh; min-height: 400px; }
         }
     </style>
 </head>
@@ -320,13 +340,11 @@
     <div class="hero">
         <div class="greeting-badge">✨ 致 独一无二的梦琪 ✨</div>
         <div class="name-title">送给最特别的 · 欧阳梦琪</div>
-        <!-- 核心动态区域：根据生日条件变化 -->
         <div class="time-core" id="dynamicCore">
             <div class="dynamic-message" id="stateMessage">加载星辰祝福...</div>
             <div class="sub-time" id="subInfo"></div>
         </div>
         
-        <!-- 陪伴时长展示区：从纪念日2026.03.07开始 -->
         <div class="companion-stats" id="companionStats">
             🌸 我们已经互相陪伴了 <span id="companionTime">计算中...</span> 🌸
         </div>
@@ -335,7 +353,6 @@
         <div class="signature-name" id="signatureBlock">- 爱你的何春锦宝宝 -</div>
     </div>
 
-    <!-- 叙事部分 成熟深情 -->
     <div class="story-section">
         <div class="section-title">生于七月的盛夏</div>
         <div class="poem-text">
@@ -355,7 +372,6 @@
         “ 于千万种生活中，我最向往有你的那种。生日快乐，不止今天。”
     </div>
 
-    <!-- 浪漫信笺 -->
     <div class="secret-section">
         <button class="reveal-btn" id="revealBtn">✉️ 展开手写信笺 ✉️</button>
     </div>
@@ -372,25 +388,38 @@
             <div class="signature">—— 何春锦</div>
         </div>
     </div>
+    
+    <!-- ========= 3D相册区域 ========= -->
+    <div class="album-section" id="albumSection">
+        <div class="album-title">📷 时光映像 · 我们的光影纪念册</div>
+        <div id="canvas-container"></div>
+        <div class="album-note">✨ 拖拽旋转视角 | 双指缩放 | 自动旋转 ✨</div>
+    </div>
+    
     <footer>
         ♾️ 时空无法稀释的情意 · 献给2011.07.20的你
     </footer>
 </div>
 
+<!-- 提前加载Three.js库 -->
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+        }
+    }
+</script>
+
 <script>
     (function() {
-        // 固定生日：2011年7月20日 (每年7月20日)
-        const BIRTH_MONTH = 6;      // 7月 (0索引)
+        // ==================== 原有生日页面逻辑（完全保留） ====================
+        const BIRTH_MONTH = 6;
         const BIRTH_DAY = 20;
+        const ANNIVERSARY_START = new Date(2026, 2, 7);
         
-        // 纪念日：2026年3月7日 (开始互相陪伴的起点)
-        const ANNIVERSARY_START = new Date(2026, 2, 7); // 注意 month 2 代表三月
-        
-        // 获取当前日期
         const today = new Date();
         const currentYear = today.getFullYear();
-        
-        // 构造今年的生日日期对象
         let thisYearBirthday = new Date(currentYear, BIRTH_MONTH, BIRTH_DAY);
         
         function getDayStart(date) {
@@ -399,20 +428,15 @@
         const todayStart = getDayStart(today);
         const thisBirthStart = getDayStart(thisYearBirthday);
         
-        let status = 0; // 0-生日前倒计时，1-生日当天，2-生日后
-        if (todayStart.getTime() === thisBirthStart.getTime()) {
-            status = 1;
-        } else if (todayStart < thisBirthStart) {
-            status = 0;
-        } else {
-            status = 2;
-        }
+        let status = 0;
+        if (todayStart.getTime() === thisBirthStart.getTime()) status = 1;
+        else if (todayStart < thisBirthStart) status = 0;
+        else status = 2;
         
         const stateMsgDiv = document.getElementById('stateMessage');
         const subInfoDiv = document.getElementById('subInfo');
         let countdownInterval = null;
         
-        // ---------- 倒计时辅助函数 ----------
         function getTimeRemaining(targetDate) {
             const now = new Date();
             const diffMs = targetDate - now;
@@ -425,77 +449,39 @@
             return { days, hours, minutes, seconds, total: totalSeconds };
         }
         
-        // 格式化倒计时 满足要求：“🎂你还有（时间）生日🎂”  (status=0时)
         function formatCountdownWithBirthdayWord(remaining) {
             let timeStr = '';
-            if (remaining.days > 0) {
-                timeStr = `${remaining.days}天 ${remaining.hours.toString().padStart(2,'0')}时 ${remaining.minutes.toString().padStart(2,'0')}分 ${remaining.seconds.toString().padStart(2,'0')}秒`;
-            } else {
-                timeStr = `${remaining.hours.toString().padStart(2,'0')}时 ${remaining.minutes.toString().padStart(2,'0')}分 ${remaining.seconds.toString().padStart(2,'0')}秒`;
-            }
+            if (remaining.days > 0) timeStr = `${remaining.days}天 ${remaining.hours.toString().padStart(2,'0')}时 ${remaining.minutes.toString().padStart(2,'0')}分 ${remaining.seconds.toString().padStart(2,'0')}秒`;
+            else timeStr = `${remaining.hours.toString().padStart(2,'0')}时 ${remaining.minutes.toString().padStart(2,'0')}分 ${remaining.seconds.toString().padStart(2,'0')}秒`;
             return `🎂 你还有 ${timeStr} 生日 🎂`;
         }
         
-        // 更新生日前倒计时
         function updateCountdownUI() {
             if (status !== 0) return;
             const remaining = getTimeRemaining(thisYearBirthday);
-            if (remaining.total <= 0) {
-                location.reload();
-                return;
-            }
-            const message = formatCountdownWithBirthdayWord(remaining);
-            stateMsgDiv.innerHTML = message;
+            if (remaining.total <= 0) { location.reload(); return; }
+            stateMsgDiv.innerHTML = formatCountdownWithBirthdayWord(remaining);
             subInfoDiv.innerHTML = `距离7月20日 · 你的专属星辰日`;
         }
         
-        // 生日当天显示
         function showBirthdayToday() {
             stateMsgDiv.innerHTML = `✨ 祝你生日快乐 ✨`;
             subInfoDiv.innerHTML = `今天是你新一岁的第一天，愿光芒永远追随你 · 七月二十日属于你`;
             createConfettiEffect();
         }
         
-        // ---------- 生日后：距离十五岁生日 精确到 年 月 日 时 分 秒 ----------
-        function showAfterBirthdayDetailed() {
-            const fifteenBirthday = new Date(2026, 6, 20); // 2026年7月20日 十五岁生日
-            const now = new Date();
-            
-            if (now > fifteenBirthday) {
-                // 如果已经过了十五岁生日，显示已经过了多久（但按照需求保持友好）
-                const elapsed = getPreciseElapsed(fifteenBirthday, now);
-                stateMsgDiv.innerHTML = `✨ 星辰见证 · 十五岁礼成 ✨`;
-                subInfoDiv.innerHTML = `距离十五岁生日已经 ${elapsed.years}年 ${elapsed.months}月 ${elapsed.days}日 ${elapsed.hours}时 ${elapsed.minutes}分 ${elapsed.seconds}秒 · 岁月为你加冕`;
-            } else {
-                // 正向精确倒计时到十五岁生日：显示 年/月/日/时/分/秒
-                const preciseRemaining = getPreciseRemainingToDate(fifteenBirthday, now);
-                stateMsgDiv.innerHTML = `🎂 距离你的十五岁生日 🎂`;
-                subInfoDiv.innerHTML = `<span class="time-digits">${preciseRemaining.years}年 ${preciseRemaining.months}月 ${preciseRemaining.days}日 ${preciseRemaining.hours}时 ${preciseRemaining.minutes}分 ${preciseRemaining.seconds}秒</span> · 时光奔赴，静候华章`;
-            }
-        }
-        
-        // 精确计算剩余时间（年/月/日/时/分/秒）用于未来时刻
         function getPreciseRemainingToDate(futureDate, currentDate) {
             let diffMs = futureDate - currentDate;
             if (diffMs <= 0) return { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
-            
-            // 先计算总秒数
             let totalSeconds = Math.floor(diffMs / 1000);
             const seconds = totalSeconds % 60;
             totalSeconds = Math.floor(totalSeconds / 60);
             const minutes = totalSeconds % 60;
             totalSeconds = Math.floor(totalSeconds / 60);
             const hours = totalSeconds % 24;
-            const totalDays = Math.floor(totalSeconds / 24);
             
-            // 将总天数折算成年、月、日 (基于近似月份长度，为了浪漫精确展示)
-            // 使用起始日期计算年差月差
             let tempDate = new Date(currentDate);
             let years = 0;
-            let months = 0;
-            let days = totalDays;
-            
-            // 优雅计算：逐年累加直到超过未来日期
             let yearTest = new Date(tempDate);
             yearTest.setFullYear(tempDate.getFullYear() + 1);
             while (yearTest <= futureDate) {
@@ -503,15 +489,11 @@
                 tempDate.setFullYear(tempDate.getFullYear() + 1);
                 yearTest.setFullYear(tempDate.getFullYear() + 1);
             }
-            // 剩余天数重新计算
             let remainingMs = futureDate - tempDate;
-            let remainingTotalDays = Math.floor(remainingMs / (1000 * 3600 * 24));
-            days = remainingTotalDays;
-            
-            // 按月计算
+            let days = Math.floor(remainingMs / (1000 * 3600 * 24));
             let monthTest = new Date(tempDate);
             monthTest.setMonth(tempDate.getMonth() + 1);
-            months = 0;
+            let months = 0;
             while (monthTest <= futureDate) {
                 months++;
                 tempDate.setMonth(tempDate.getMonth() + 1);
@@ -519,11 +501,9 @@
             }
             remainingMs = futureDate - tempDate;
             days = Math.floor(remainingMs / (1000 * 3600 * 24));
-            
             return { years, months, days, hours, minutes, seconds };
         }
         
-        // 计算已过精确时间（用于十五岁已过情况）
         function getPreciseElapsed(pastDate, currentDate) {
             let diffMs = currentDate - pastDate;
             if (diffMs < 0) return { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
@@ -533,7 +513,6 @@
             const minutes = totalSeconds % 60;
             totalSeconds = Math.floor(totalSeconds / 60);
             const hours = totalSeconds % 24;
-            const totalDays = Math.floor(totalSeconds / 24);
             
             let tempDate = new Date(pastDate);
             let years = 0;
@@ -545,8 +524,7 @@
                 yearTest.setFullYear(tempDate.getFullYear() + 1);
             }
             let remainingMs = currentDate - tempDate;
-            let remainingTotalDays = Math.floor(remainingMs / (1000 * 3600 * 24));
-            let days = remainingTotalDays;
+            let days = Math.floor(remainingMs / (1000 * 3600 * 24));
             let monthTest = new Date(tempDate);
             monthTest.setMonth(tempDate.getMonth() + 1);
             let months = 0;
@@ -560,20 +538,28 @@
             return { years, months, days, hours, minutes, seconds };
         }
         
-        // 更新生日后显示（每秒刷新以达到时分秒跳动）
+        function showAfterBirthdayDetailed() {
+            const fifteenBirthday = new Date(2026, 6, 20);
+            const now = new Date();
+            if (now > fifteenBirthday) {
+                const elapsed = getPreciseElapsed(fifteenBirthday, now);
+                stateMsgDiv.innerHTML = `✨ 星辰见证 · 十五岁礼成 ✨`;
+                subInfoDiv.innerHTML = `距离十五岁生日已经 ${elapsed.years}年 ${elapsed.months}月 ${elapsed.days}日 ${elapsed.hours}时 ${elapsed.minutes}分 ${elapsed.seconds}秒 · 岁月为你加冕`;
+            } else {
+                const preciseRemaining = getPreciseRemainingToDate(fifteenBirthday, now);
+                stateMsgDiv.innerHTML = `🎂 距离你的十五岁生日 🎂`;
+                subInfoDiv.innerHTML = `<span class="time-digits">${preciseRemaining.years}年 ${preciseRemaining.months}月 ${preciseRemaining.days}日 ${preciseRemaining.hours}时 ${preciseRemaining.minutes}分 ${preciseRemaining.seconds}秒</span> · 时光奔赴，静候华章`;
+            }
+        }
+        
         let afterBirthdayInterval = null;
         function startAfterBirthdayUpdater() {
             if (afterBirthdayInterval) clearInterval(afterBirthdayInterval);
-            const updateFunc = () => {
-                if (status === 2) {
-                    showAfterBirthdayDetailed();
-                }
-            };
+            const updateFunc = () => { if (status === 2) showAfterBirthdayDetailed(); };
             updateFunc();
             afterBirthdayInterval = setInterval(updateFunc, 1000);
         }
         
-        // ---------- 陪伴时长计算：纪念日2026.03.07 到此时此刻，显示 年-月-日-时 ----------
         function updateCompanionDuration() {
             const now = new Date();
             const start = new Date(ANNIVERSARY_START);
@@ -581,16 +567,6 @@
                 document.getElementById('companionTime').innerText = `期待相逢 · 时光将为我们停留`;
                 return;
             }
-            let diffMs = now - start;
-            let totalSeconds = Math.floor(diffMs / 1000);
-            const seconds = totalSeconds % 60;
-            totalSeconds = Math.floor(totalSeconds / 60);
-            const minutes = totalSeconds % 60;
-            totalSeconds = Math.floor(totalSeconds / 60);
-            const hours = totalSeconds % 24;
-            const totalDays = Math.floor(totalSeconds / 24);
-            
-            // 计算年月日 (基于起止)
             let tempDate = new Date(start);
             let years = 0;
             let yearTest = new Date(tempDate);
@@ -601,8 +577,7 @@
                 yearTest.setFullYear(tempDate.getFullYear() + 1);
             }
             let remainingMs = now - tempDate;
-            let remainingTotalDays = Math.floor(remainingMs / (1000 * 3600 * 24));
-            let days = remainingTotalDays;
+            let days = Math.floor(remainingMs / (1000 * 3600 * 24));
             let monthTest = new Date(tempDate);
             monthTest.setMonth(tempDate.getMonth() + 1);
             let months = 0;
@@ -613,18 +588,17 @@
             }
             remainingMs = now - tempDate;
             days = Math.floor(remainingMs / (1000 * 3600 * 24));
+            const hours = new Date(remainingMs).getUTCHours();
             
             document.getElementById('companionTime').innerHTML = `${years}年 ${months}月 ${days}日 ${hours}时`;
         }
         
-        // 每秒更新陪伴时长
         let companionInterval = null;
         function startCompanionUpdater() {
             updateCompanionDuration();
             companionInterval = setInterval(updateCompanionDuration, 1000);
         }
         
-        // 撒花效果
         function createConfettiEffect() {
             const colors = ['#e9d6a7', '#d8bf7a', '#f3e5c0', '#cfb778', '#f7e3b0'];
             for (let i = 0; i < 70; i++) {
@@ -650,18 +624,14 @@
             }
         }
         
-        // 日期变更监听（跨天刷新）
         function startDateChangeWatcher() {
             let lastDateStr = getDayStart(new Date()).toISOString().slice(0,10);
             setInterval(() => {
                 const nowStr = getDayStart(new Date()).toISOString().slice(0,10);
-                if (nowStr !== lastDateStr) {
-                    location.reload();
-                }
+                if (nowStr !== lastDateStr) location.reload();
             }, 60000);
         }
         
-        // 初始化所有状态
         function initTimeMachine() {
             if (status === 0) {
                 updateCountdownUI();
@@ -681,9 +651,7 @@
                         if (afterBirthdayInterval) clearInterval(afterBirthdayInterval);
                         startAfterBirthdayUpdater();
                         startCompanionUpdater();
-                    } else {
-                        updateCountdownUI();
-                    }
+                    } else updateCountdownUI();
                 }, 1000);
                 startCompanionUpdater();
             } else if (status === 1) {
@@ -699,7 +667,7 @@
         
         initTimeMachine();
         
-        // ---------- 星空画布 (优雅氛围) ----------
+        // 星空画布
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
@@ -710,20 +678,13 @@
             height = window.innerHeight;
             canvas.width = width;
             canvas.height = height;
-            initStars();
-        }
-        
-        function initStars() {
             stars = [];
             const starCount = Math.min(350, Math.floor(width * height / 4600));
             for (let i = 0; i < starCount; i++) {
                 stars.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    radius: Math.random() * 2.2 + 0.6,
-                    alpha: Math.random() * 0.6 + 0.2,
-                    twinkle: 0.4 + Math.random() * 1.3,
-                    phase: Math.random() * Math.PI * 2
+                    x: Math.random() * width, y: Math.random() * height,
+                    radius: Math.random() * 2.2 + 0.6, alpha: Math.random() * 0.6 + 0.2,
+                    twinkle: 0.4 + Math.random() * 1.3, phase: Math.random() * Math.PI * 2
                 });
             }
         }
@@ -745,7 +706,7 @@
             requestAnimationFrame(drawStars);
         }
         
-        window.addEventListener('resize', () => { resizeCanvas(); });
+        window.addEventListener('resize', () => resizeCanvas());
         resizeCanvas();
         drawStars();
         
@@ -765,7 +726,6 @@
             }
         });
         
-        // 记忆卡片微交互
         const cards = document.querySelectorAll('.memory-card');
         cards.forEach(c => {
             c.addEventListener('click', () => {
@@ -773,6 +733,203 @@
                 setTimeout(() => c.style.transform = '', 150);
             });
         });
+        
+        // ==================== 3D相册模块（滚动到视口时初始化） ====================
+        let threeInitialized = false;
+        let threeScene, threeCamera, threeRenderer, threeControls, photoCube, ringLoop, starsField, auraParticles;
+        
+        // 图片直链配置
+        const imageUrls = [
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/IM1.jpg",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/IM2.jpg",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/IM3.jpg",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/IM4.jpg",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/IM5.jpg",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/IM6.jpg"
+        ];
+        
+        async function initThreeAlbum() {
+            if (threeInitialized) return;
+            threeInitialized = true;
+            
+            try {
+                const THREE = await import('three');
+                const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+                
+                const container = document.getElementById('canvas-container');
+                if (!container) return;
+                
+                // 场景
+                threeScene = new THREE.Scene();
+                threeScene.background = new THREE.Color(0x050b1a);
+                threeScene.fog = new THREE.FogExp2(0x050b1a, 0.008);
+                
+                // 相机
+                threeCamera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 1000);
+                threeCamera.position.set(4.2, 2.8, 5.5);
+                
+                // 渲染器
+                threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                threeRenderer.setSize(container.clientWidth, container.clientHeight);
+                threeRenderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(threeRenderer.domElement);
+                
+                // ========= 控制器配置：禁用平移（右键平移），确保立方体始终在中心 =========
+                threeControls = new OrbitControls(threeCamera, threeRenderer.domElement);
+                threeControls.enableDamping = true;          // 惯性效果
+                threeControls.dampingFactor = 0.06;
+                threeControls.rotateSpeed = 1.2;             // 旋转速度
+                threeControls.zoomSpeed = 1.0;               // 缩放速度
+                threeControls.enableZoom = true;             // 允许缩放
+                threeControls.enablePan = false;             // 【关键】禁用平移（禁用右键平移/拖拽平移）
+                threeControls.autoRotate = true;             // 自动旋转
+                threeControls.autoRotateSpeed = 1.2;         // 自动旋转速度
+                threeControls.target.set(0, 0, 0);           // 目标点固定在立方体中心
+                
+                // 可选：限制垂直旋转角度（避免看到背后眩晕，如需要可取消注释）
+                // threeControls.minPolarAngle = 0;           // 最小俯角（0 = 顶部）
+                // threeControls.maxPolarAngle = Math.PI;     // 最大俯角（默认PI，即可以看到底部）
+                
+                // 星空背景粒子
+                const starGeo = new THREE.BufferGeometry();
+                const starCount = 1800;
+                const starPositions = new Float32Array(starCount * 3);
+                for (let i = 0; i < starCount; i++) {
+                    starPositions[i*3] = (Math.random() - 0.5) * 1800;
+                    starPositions[i*3+1] = (Math.random() - 0.5) * 1000;
+                    starPositions[i*3+2] = (Math.random() - 0.5) * 400 - 150;
+                }
+                starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+                starsField = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.28, transparent: true, opacity: 0.6 }));
+                threeScene.add(starsField);
+                
+                // 灯光
+                threeScene.add(new THREE.AmbientLight(0x4a5070));
+                const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+                dirLight.position.set(3, 5, 2);
+                threeScene.add(dirLight);
+                const fillLight = new THREE.PointLight(0x5588ff, 0.45);
+                fillLight.position.set(-2, 1.5, 3);
+                threeScene.add(fillLight);
+                
+                // 创建纹理材质
+                const cubeSize = 2.45;
+                const boxGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+                const materials = [];
+                
+                function createMaterial(url, index) {
+                    const texture = new THREE.TextureLoader().load(url, 
+                        (tex) => { console.log(`3D相册 图片${index+1} 加载成功`); },
+                        undefined,
+                        (err) => { console.warn(`3D相册 图片${index+1} 加载失败: ${url}`, err); }
+                    );
+                    texture.crossOrigin = "Anonymous";
+                    return new THREE.MeshStandardMaterial({ map: texture, roughness: 0.3, metalness: 0.08, side: THREE.DoubleSide });
+                }
+                
+                for (let i = 0; i < 6; i++) {
+                    const url = imageUrls[i % imageUrls.length];
+                    materials.push(createMaterial(url, i));
+                }
+                
+                photoCube = new THREE.Mesh(boxGeometry, materials);
+                threeScene.add(photoCube);
+                
+                // 边框
+                const edgesGeo = new THREE.EdgesGeometry(boxGeometry);
+                const wireframe = new THREE.LineSegments(edgesGeo, new THREE.LineBasicMaterial({ color: 0x6c9eff }));
+                photoCube.add(wireframe);
+                
+                // 角落光点
+                const cornerGlowMat = new THREE.MeshStandardMaterial({ color: 0xffaa77, emissive: 0x442200, emissiveIntensity: 0.4 });
+                const cornerPositions = [
+                    [-1,-1,-1], [1,-1,-1], [1,-1,1], [-1,-1,1],
+                    [-1,1,-1], [1,1,-1], [1,1,1], [-1,1,1]
+                ];
+                cornerPositions.forEach(pos => {
+                    const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.058, 10, 10), cornerGlowMat);
+                    sphere.position.set(pos[0] * cubeSize/2, pos[1] * cubeSize/2, pos[2] * cubeSize/2);
+                    photoCube.add(sphere);
+                });
+                
+                // 漂浮粒子
+                const auraCount = 1000;
+                const auraGeo = new THREE.BufferGeometry();
+                const auraPositions = new Float32Array(auraCount * 3);
+                for (let i = 0; i < auraCount; i++) {
+                    const rad = 1.6 + Math.random() * 1.2;
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.acos(2 * Math.random() - 1);
+                    auraPositions[i*3] = rad * Math.sin(phi) * Math.cos(theta);
+                    auraPositions[i*3+1] = rad * Math.sin(phi) * Math.sin(theta);
+                    auraPositions[i*3+2] = rad * Math.cos(phi);
+                }
+                auraGeo.setAttribute('position', new THREE.BufferAttribute(auraPositions, 3));
+                auraParticles = new THREE.Points(auraGeo, new THREE.PointsMaterial({ color: 0x7aaaff, size: 0.022, transparent: true, opacity: 0.5 }));
+                threeScene.add(auraParticles);
+                
+                // 光环
+                const ringPoints = [];
+                const ringRad = 1.72;
+                for (let i = 0; i <= 100; i++) {
+                    const ang = (i / 100) * Math.PI * 2;
+                    ringPoints.push(new THREE.Vector3(Math.cos(ang) * ringRad, 0.15, Math.sin(ang) * ringRad));
+                }
+                const ringGeo = new THREE.BufferGeometry().setFromPoints(ringPoints);
+                ringLoop = new THREE.LineLoop(ringGeo, new THREE.LineBasicMaterial({ color: 0x4c9eff }));
+                threeScene.add(ringLoop);
+                
+                // 动画循环
+                let time = 0;
+                function animateThree() {
+                    if (!threeRenderer || !threeScene) return;
+                    requestAnimationFrame(animateThree);
+                    time += 0.016;
+                    if (threeControls) threeControls.update(); // 自动旋转在这里生效
+                    if (starsField) {
+                        starsField.rotation.y += 0.0004;
+                        starsField.rotation.x += 0.0002;
+                    }
+                    if (auraParticles) {
+                        auraParticles.rotation.y += 0.0015;
+                        auraParticles.rotation.x += 0.0008;
+                    }
+                    if (ringLoop) ringLoop.rotation.z += 0.003;
+                    if (threeRenderer && threeCamera) threeRenderer.render(threeScene, threeCamera);
+                }
+                animateThree();
+                
+                // 窗口尺寸适配
+                const resizeObserver = new ResizeObserver(() => {
+                    if (container && threeCamera && threeRenderer) {
+                        const w = container.clientWidth;
+                        const h = container.clientHeight;
+                        threeCamera.aspect = w / h;
+                        threeCamera.updateProjectionMatrix();
+                        threeRenderer.setSize(w, h);
+                    }
+                });
+                resizeObserver.observe(container);
+                
+                console.log('3D相册初始化成功 - 平移已禁用，立方体固定在中心');
+            } catch (error) {
+                console.error('3D相册初始化失败:', error);
+            }
+        }
+        
+        // 滚动监听：当3D相册区域进入视口时初始化
+        const albumSection = document.getElementById('albumSection');
+        if (albumSection) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !threeInitialized) {
+                        console.log('3D相册区域进入视口，开始初始化');
+                        initThreeAlbum();
+                    }
+                });
+            }, { threshold: 0.2 });
+            observer.observe(albumSection);
+        }
         
         console.log("%c❤️ 致2011.07.20 & 我们的纪念日2026.03.07 · 何春锦宝宝的爱意永存", "color:#f3dfa2; font-size:14px;");
     })();
