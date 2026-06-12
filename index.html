@@ -135,6 +135,46 @@ body{
   margin-top: 15px;
   background: #00aa55;
 }
+/* ===== 新增：按钮loading动画样式（仅添加此部分，未修改其他样式） ===== */
+.action-btn.loading {
+  pointer-events: none;
+  opacity: 0.7;
+  position: relative;
+  color: transparent !important;
+}
+.action-btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 50%;
+  left: 50%;
+  margin-left: -9px;
+  margin-top: -9px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.8s linear infinite;
+}
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+/* ===== 新增样式结束 ===== */
+
+/* ===== 修复：成功页面按钮垂直排列 + 统一宽度 ===== */
+.success-btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.success-btn-wrapper .action-btn {
+  width: 160px;
+  margin-top: 0;
+  text-align: center;
+  display: inline-block;
+}
+/* ===== 修复结束 ===== */
 </style>
 </head>
 <body>
@@ -181,11 +221,13 @@ body{
   </div>
 </div>
 
-<!-- 成功结果页 -->
+<!-- 成功结果页：按钮垂直排列 + 统一宽度 -->
 <div class="verify-card result-page" id="successPage">
   <h2 class="success">✅ 你已完成人机认证</h2>
-  <a href="https://hehe11tvt.github.io/phone.html"><button class="action-btn enter-btn">进入系统</button></a>
-  <button class="action-btn back-btn" id="backFromSuccess">返回上一页</button>
+  <div class="success-btn-wrapper">
+    <a href="https://hehe11tvt.github.io/phone.html" style="text-decoration: none;"><button class="action-btn enter-btn">进入系统</button></a>
+    <button class="action-btn back-btn" id="backFromSuccess">返回上一页</button>
+  </div>
 </div>
 
 <!-- 失败结果页 -->
@@ -251,8 +293,26 @@ function checkSelection(){
   return true
 }
 
-// 按钮逻辑
-mainBtn.addEventListener('click',()=>{
+// ===== 新增：带loading动画的按钮处理逻辑（仅修改此处，其他逻辑完全不变）=====
+let isProcessing = false; // 防止重复点击
+
+mainBtn.addEventListener('click', async () => {
+  // 如果已经在处理中，直接返回
+  if (isProcessing) return;
+  
+  // 锁定按钮，防止重复点击
+  isProcessing = true;
+  
+  // 添加loading样式（按钮会显示转圈圈，文字被隐藏）
+  mainBtn.classList.add('loading');
+  
+  // 等待1秒（转圈圈动画持续1秒）
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // 移除loading样式，恢复按钮文字显示
+  mainBtn.classList.remove('loading');
+  
+  // 执行原有的判断逻辑（完全保持不变）
   const hasSelected = Array.from(items).some(i=>i.classList.contains('active'))
   if(hasSelected){
     if(checkSelection()){
@@ -266,9 +326,13 @@ mainBtn.addEventListener('click',()=>{
     verifyPage.style.display = 'none'
     failPage.style.display = 'block'
   }
+  
+  // 解锁按钮
+  isProcessing = false;
 })
+// ===== 新增代码结束 =====
 
-// 返回上一页：关闭当前页面 + 清空所有选中
+// 返回上一页：关闭当前页面 + 清空所有选中（完全保持原有逻辑）
 backFromSuccess.addEventListener('click',()=>{
   successPage.style.display = 'none'
   verifyPage.style.display = 'block'
