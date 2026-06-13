@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Hehe11的人机验证</title>
 <style>
 *{
@@ -26,6 +26,7 @@ body{
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  transition: all 0.2s;
 }
 /* 顶部蓝色提示栏 */
 .tip-bar{
@@ -96,6 +97,18 @@ body{
   height: 28px;
   fill: #666;
   cursor: pointer;
+  transition: fill 0.2s, transform 0.1s;
+}
+.left-ctrl svg:active{
+  transform: scale(0.95);
+}
+/* 耳机按钮悬浮效果 */
+.left-ctrl svg:nth-child(2):hover {
+  fill: #1677ff;
+}
+/* 刷新按钮悬浮效果 */
+.left-ctrl svg:first-child:hover {
+  fill: #00aa55;
 }
 .action-btn{
   background: #1677ff;
@@ -135,7 +148,7 @@ body{
   margin-top: 15px;
   background: #00aa55;
 }
-/* ===== 新增：按钮loading动画样式（仅添加此部分，未修改其他样式） ===== */
+/* ===== 原有按钮loading动画样式（主按钮） ===== */
 .action-btn.loading {
   pointer-events: none;
   opacity: 0.7;
@@ -159,7 +172,28 @@ body{
 @keyframes btn-spin {
   to { transform: rotate(360deg); }
 }
-/* ===== 新增样式结束 ===== */
+
+/* ===== 盲人模式提交按钮专属loading样式 ===== */
+.blind-submit.loading {
+  pointer-events: none;
+  opacity: 0.7;
+  position: relative;
+  color: transparent !important;
+}
+.blind-submit.loading::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 50%;
+  left: 50%;
+  margin-left: -9px;
+  margin-top: -9px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.8s linear infinite;
+}
 
 /* ===== 修复：成功页面按钮垂直排列 + 统一宽度 ===== */
 .success-btn-wrapper {
@@ -175,11 +209,167 @@ body{
   display: inline-block;
 }
 /* ===== 修复结束 ===== */
+
+/* ========== 盲人模式弹窗 (第二小窗口) 样式 ========== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(2px);
+}
+.blind-box {
+  width: 340px;
+  background: #fff;
+  border-radius: 28px;
+  box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+  overflow: hidden;
+  animation: fadeSlideUp 0.2s ease;
+}
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.blind-header {
+  background: #1e293b;
+  color: white;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.blind-header h3 {
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.blind-header h3 svg {
+  width: 22px;
+  height: 22px;
+  fill: white;
+}
+.close-modal {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 26px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 6px;
+  opacity: 0.8;
+  transition: 0.2s;
+}
+.close-modal:hover {
+  opacity: 1;
+}
+.blind-body {
+  padding: 24px 22px;
+  background: #fef9e6;
+}
+.audio-area {
+  background: #ffffff;
+  border-radius: 40px;
+  padding: 12px 16px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #ffd966;
+}
+.audio-label {
+  font-weight: 600;
+  color: #b45309;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.play-audio-btn {
+  background: #1677ff;
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s;
+}
+.play-audio-btn:active {
+  transform: scale(0.96);
+}
+.input-group {
+  margin-bottom: 28px;
+}
+.input-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #374151;
+}
+.input-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 36px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+  background: white;
+}
+.input-group input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 3px rgba(22,119,255,0.2);
+}
+.blind-submit {
+  width: 100%;
+  background: #00aa55;
+  padding: 12px;
+  border-radius: 40px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.blind-submit:active {
+  transform: scale(0.97);
+  background: #008844;
+}
+.error-msg {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 12px;
+  text-align: center;
+  min-height: 32px;
+}
+/* ========== 盲人模式结束 ========== */
 </style>
 </head>
 <body>
+
+<!-- 主验证卡片 -->
 <div class="verify-card" id="verifyPage">
-  <!-- 顶部提示 -->
   <div class="tip-bar">
     <h2>请选择包含</h2>
     <div class="big-text">石胜军</div>
@@ -187,7 +377,7 @@ body{
     <p>如果没有，请点击“跳过”。</p>
   </div>
 
-  <!-- 4x4分块图片 顺序：行1-4，列1-4 -->
+  <!-- 4x4分块图片 -->
   <div class="grid-wrap" id="gridBox">
     <div class="grid-item" data-row="1" data-col="1"><img src="https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/retouch_2026061112103639.jpg"></div>
     <div class="grid-item" data-row="1" data-col="2"><img src="https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/retouch_2.jpg"></div>
@@ -210,18 +400,26 @@ body{
     <div class="grid-item" data-row="4" data-col="4"><img src="https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/retouch_16.jpg"></div>
   </div>
 
-  <!-- 底部控制栏 -->
   <div class="bottom-bar">
     <div class="left-ctrl">
-      <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-      <svg viewBox="0 0 24 24"><path d="M12 2c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/></svg>
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+      <!-- 最左边：刷新按钮（弯曲箭头），功能：重置所有图片选中状态 -->
+      <svg viewBox="0 0 24 24" id="refreshBtn">
+        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+      </svg>
+      <!-- 中间的耳机图标（原无功能），现在点击打开盲人模式弹窗 -->
+      <svg viewBox="0 0 24 24" id="headphoneBtn" style="fill:#666;">
+        <path d="M12 2c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/>
+      </svg>
+      <!-- 最右边：信息/帮助图标（保持原样） -->
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+      </svg>
     </div>
     <button class="action-btn" id="mainBtn">跳过</button>
   </div>
 </div>
 
-<!-- 成功结果页：按钮垂直排列 + 统一宽度 -->
+<!-- 成功结果页 -->
 <div class="verify-card result-page" id="successPage">
   <h2 class="success">✅ 你已完成人机认证</h2>
   <div class="success-btn-wrapper">
@@ -236,7 +434,35 @@ body{
   <button class="action-btn back-btn" id="backFromFail">返回上一页</button>
 </div>
 
+<!-- 盲人模式弹窗 (第二小窗口) -->
+<div id="blindModal" class="modal-overlay">
+  <div class="blind-box">
+    <div class="blind-header">
+      <h3>
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path d="M12 2c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z" fill="white"/>
+        </svg>
+        盲人模式 · 语音验证
+      </h3>
+      <button class="close-modal" id="closeModalBtn">&times;</button>
+    </div>
+    <div class="blind-body">
+      <div class="audio-area">
+        <span class="audio-label">音频验证</span>
+        <button class="play-audio-btn" id="playAudioBtn">播放音频</button>
+      </div>
+      <div class="input-group">
+        <label>请输入听到的内容</label>
+        <input type="text" id="audioCodeInput" placeholder="请输入音频中的验证码" autocomplete="off">
+      </div>
+      <button class="blind-submit" id="submitBlindBtn">提交验证</button>
+      <div id="blindErrorMsg" class="error-msg"></div>
+    </div>
+  </div>
+</div>
+
 <script>
+// --------------------- 原验证逻辑完全保留 -------------------------
 const gridBox = document.getElementById('gridBox')
 const items = gridBox.querySelectorAll('.grid-item')
 const mainBtn = document.getElementById('mainBtn')
@@ -265,22 +491,22 @@ items.forEach(item=>{
   })
 })
 
-// 根据选中项切换 跳过 / 下一步
 function updateBtnText(){
   const hasSelected = Array.from(items).some(i=>i.classList.contains('active'))
   mainBtn.textContent = hasSelected ? '下一步' : '跳过'
 }
 
-// 刷新重置选中状态
 function resetSelect(){
   items.forEach(i=>i.classList.remove('active'))
   updateBtnText()
 }
 
-// 刷新图标重置选中
-document.querySelector('.left-ctrl svg:first-child').addEventListener('click', resetSelect)
+// 【最左边刷新按钮】绑定重置选中功能
+const refreshBtn = document.getElementById('refreshBtn')
+if(refreshBtn) {
+  refreshBtn.addEventListener('click', resetSelect)
+}
 
-// 校验选中是否完全匹配
 function checkSelection(){
   const selected = Array.from(items)
     .filter(i=>i.classList.contains('active'))
@@ -293,26 +519,14 @@ function checkSelection(){
   return true
 }
 
-// ===== 新增：带loading动画的按钮处理逻辑（仅修改此处，其他逻辑完全不变）=====
-let isProcessing = false; // 防止重复点击
-
+let isProcessing = false;
 mainBtn.addEventListener('click', async () => {
-  // 如果已经在处理中，直接返回
   if (isProcessing) return;
-  
-  // 锁定按钮，防止重复点击
   isProcessing = true;
-  
-  // 添加loading样式（按钮会显示转圈圈，文字被隐藏）
   mainBtn.classList.add('loading');
-  
-  // 等待1秒（转圈圈动画持续1秒）
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // 移除loading样式，恢复按钮文字显示
   mainBtn.classList.remove('loading');
   
-  // 执行原有的判断逻辑（完全保持不变）
   const hasSelected = Array.from(items).some(i=>i.classList.contains('active'))
   if(hasSelected){
     if(checkSelection()){
@@ -326,13 +540,9 @@ mainBtn.addEventListener('click', async () => {
     verifyPage.style.display = 'none'
     failPage.style.display = 'block'
   }
-  
-  // 解锁按钮
   isProcessing = false;
 })
-// ===== 新增代码结束 =====
 
-// 返回上一页：关闭当前页面 + 清空所有选中（完全保持原有逻辑）
 backFromSuccess.addEventListener('click',()=>{
   successPage.style.display = 'none'
   verifyPage.style.display = 'block'
@@ -343,6 +553,166 @@ backFromFail.addEventListener('click',()=>{
   verifyPage.style.display = 'block'
   resetSelect()
 })
+
+// ===================== 盲人模式（耳机按钮 + 音频播放 + 验证判定）=====================
+// 已按最新要求：将音频直链替换为 https://musichehe121.oss-cn-chengdu.aliyuncs.com/Music/yanzhengma.mp3
+// 其他要求：点提交验证时按钮转圈2秒再判断，播放音频每次停止上一次播放（防重音）
+
+const headphoneBtn = document.getElementById('headphoneBtn');
+const blindModal = document.getElementById('blindModal');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const playAudioBtn = document.getElementById('playAudioBtn');
+const submitBlindBtn = document.getElementById('submitBlindBtn');
+const audioCodeInput = document.getElementById('audioCodeInput');
+const blindErrorMsg = document.getElementById('blindErrorMsg');
+
+let currentAudio = null;          // 当前播放的音频实例
+
+// 【已替换】新的音频直链 (用户提供)
+const BLIND_AUDIO_URL = 'https://musichehe121.oss-cn-chengdu.aliyuncs.com/Music/yanzhengma.mp3';
+
+/**
+ * 播放音频（每次调用会先停止上一次播放的音频，防止重叠）
+ * 增强错误处理，确保用户能感知播放状态
+ */
+function playAudioCheck() {
+  // 如果已有正在播放的音频，先停止并销毁引用
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+  
+  // 创建新音频实例
+  const audio = new Audio(BLIND_AUDIO_URL);
+  currentAudio = audio;
+  
+  // 播放并处理异常（浏览器可能因为策略阻止自动播放，但这里由用户点击触发，一般可播）
+  audio.play().catch(error => {
+    console.error('音频播放失败:', error);
+    blindErrorMsg.innerText = '播放失败，请检查网络或点击重试';
+    setTimeout(() => {
+      if (blindErrorMsg.innerText === '播放失败，请检查网络或点击重试') {
+        blindErrorMsg.innerText = '';
+      }
+    }, 2000);
+    // 播放失败后清空当前音频引用
+    if (currentAudio === audio) currentAudio = null;
+  });
+  
+  // 播放结束时清理引用
+  audio.onended = () => {
+    if (currentAudio === audio) {
+      currentAudio = null;
+    }
+  };
+  
+  // 播放错误时清理
+  audio.onerror = () => {
+    if (currentAudio === audio) {
+      currentAudio = null;
+    }
+    // 不重复显示错误，避免覆盖已有提示
+    if (!blindErrorMsg.innerText) {
+      blindErrorMsg.innerText = '音频加载出错，请稍后重试';
+      setTimeout(() => {
+        if (blindErrorMsg.innerText === '音频加载出错，请稍后重试') blindErrorMsg.innerText = '';
+      }, 2000);
+    }
+  };
+}
+
+// 耳机按钮：打开盲人模式弹窗，并清空之前的状态以及任何残留错误/音频
+if(headphoneBtn) {
+  headphoneBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    // 重置输入和错误提示
+    audioCodeInput.value = '';
+    blindErrorMsg.innerText = '';
+    // 如果有正在播放的音频，停止播放
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio = null;
+    }
+    blindModal.style.display = 'flex';
+  });
+}
+
+// 关闭弹窗（同时停止播放音频）
+function closeModal() {
+  blindModal.style.display = 'none';
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+}
+closeModalBtn.addEventListener('click', closeModal);
+blindModal.addEventListener('click', (e) => {
+  if (e.target === blindModal) closeModal();
+});
+
+// 播放音频按钮：每次点击都停止上一次音频并重新播放新音频
+playAudioBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  playAudioCheck();
+});
+
+// 【核心优化】提交验证按钮：显示两秒转圈动画，再进行判断（完全符合需求）
+let isBlindSubmitting = false;  // 防止重复点击
+submitBlindBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+  // 防止在动画/验证过程中重复提交
+  if (isBlindSubmitting) return;
+  
+  const userInput = audioCodeInput.value.trim();
+  if (!userInput) {
+    blindErrorMsg.innerText = '请输入听到的内容';
+    return;
+  }
+  
+  // 锁定按钮，开启loading动画
+  isBlindSubmitting = true;
+  submitBlindBtn.classList.add('loading');
+  // 按钮文字变为透明（loading伪类已隐藏原文字），并显示转圈圈
+  
+  // 等待2秒（转圈动画持续2秒后判断）
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  // 移除loading动画
+  submitBlindBtn.classList.remove('loading');
+  let isValid = (userInput === '我要日死你的妈');
+  if (isValid) {
+    // 验证成功：关闭模态框，显示成功页面
+    closeModal();  // 该方法内部会停止音频
+    verifyPage.style.display = 'none';
+    successPage.style.display = 'block';
+  } else {
+    // 验证失败：关闭模态框，显示失败页面
+    closeModal();
+    verifyPage.style.display = 'none';
+    failPage.style.display = 'block';
+  }
+  
+  // 解锁提交状态
+  isBlindSubmitting = false;
+});
+
+// 按ESC关闭弹窗的同时停止音频
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && blindModal.style.display === 'flex') {
+    closeModal();
+  }
+});
+
+// 额外优化：弹窗打开时如果按回车提交支持（提升无障碍体验）
+audioCodeInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter' && blindModal.style.display === 'flex' && !isBlindSubmitting) {
+    e.preventDefault();
+    submitBlindBtn.click();
+  }
+});
 </script>
 </body>
 </html>
