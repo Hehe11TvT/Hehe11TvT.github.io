@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>时光纪念 · 回忆时光</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: auto;
+        }
+
+        body {
+            width: 100%;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 30% 40%, #0a0f2a, #020514);
+            font-family: 'Segoe UI', 'Poppins', 'SF Pro Display', 'Inter', system-ui, -apple-system, 'Roboto', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            color: #f3eefc;
+            padding: 0;
+            margin: 0;
+        }
+
+        #stars-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.95;
+        }
+
+        .galaxy-glow {
+            position: fixed;
+            top: 15%;
+            left: -30%;
+            width: 160%;
+            height: 70%;
+            background: radial-gradient(ellipse at center, rgba(100, 70, 200, 0.25), rgba(8, 6, 28, 0) 75%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .galaxy-glow-2 {
+            top: auto;
+            bottom: 5%;
+            left: auto;
+            right: -20%;
+            width: 130%;
+            height: 55%;
+            background: radial-gradient(ellipse, rgba(140, 100, 230, 0.2), rgba(0, 0, 0, 0) 85%);
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 560px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 1.2rem 0.8rem 2.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-card {
+            background: rgba(12, 18, 38, 0.65);
+            backdrop-filter: blur(16px);
+            border-radius: 2.2rem;
+            padding: 1.5rem 1.2rem 1.8rem;
+            border: 1px solid rgba(210, 180, 255, 0.35);
+            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(220, 190, 255, 0.1) inset;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .couple-title {
+            text-align: center;
+            font-size: 1.85rem;
+            letter-spacing: 1px;
+            font-weight: 500;
+            background: linear-gradient(135deg, #FFF9F0, #dbcaff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.2rem;
+            text-shadow: 0 0 10px rgba(170, 130, 250, 0.3);
+            word-break: keep-all;
+        }
+
+        .timer-digits {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.7rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .time-unit {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 1.6rem;
+            padding: 0.6rem 0.2rem;
+            backdrop-filter: blur(4px);
+            border-bottom: 1px solid rgba(255, 225, 180, 0.35);
+            transition: transform 0.1s ease;
+        }
+
+        .unit-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', 'SF Mono', monospace;
+            letter-spacing: 1px;
+            background: linear-gradient(145deg, #FFECD6, #cdb8ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            line-height: 1.2;
+        }
+
+        .unit-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            margin-top: 0.2rem;
+            font-weight: 400;
+        }
+
+        .celebration-banner {
+            margin: 1rem 0 0.6rem;
+            padding: 0.85rem 1rem;
+            border-radius: 2.5rem;
+            background: linear-gradient(115deg, rgba(255, 190, 100, 0.22), rgba(160, 120, 250, 0.28));
+            backdrop-filter: blur(16px);
+            text-align: center;
+            border: 1px solid rgba(255, 215, 150, 0.65);
+            animation: gentlePulse 1.8s infinite ease;
+        }
+
+        .celebration-text {
+            font-size: 1.28rem;
+            font-weight: 600;
+            background: linear-gradient(125deg, #FFF2CC, #ffda9e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 0.5px;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        .bless-message {
+            margin-top: 1.8rem;
+            text-align: center;
+            font-size: 0.9rem;
+            font-style: normal;
+            padding: 0.7rem 0.9rem;
+            background: rgba(5, 8, 25, 0.55);
+            border-radius: 2rem;
+            backdrop-filter: blur(5px);
+            border-left: 3px solid #e2b2ff;
+            color: #eadaff;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .footer-star {
+            margin-top: 1.8rem;
+            font-size: 0.65rem;
+            opacity: 0.55;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        @keyframes gentlePulse {
+            0% { opacity: 0.9; transform: scale(1); box-shadow: 0 0 0px rgba(255,200,150,0.2);}
+            50% { opacity: 1; transform: scale(1.01); box-shadow: 0 0 12px rgba(255,210,150,0.5);}
+            100% { opacity: 0.9; transform: scale(1); box-shadow: 0 0 0px rgba(255,200,150,0.2);}
+        }
+
+        @media (max-width: 600px) {
+            .container { width: 92%; padding: 0.8rem 0 2rem; }
+            .time-card { padding: 1.2rem 1rem 1.5rem; border-radius: 1.8rem; }
+            .couple-title { font-size: 1.6rem; margin-bottom: 0.8rem; }
+            .timer-digits { gap: 0.5rem; margin: 1rem 0 0.5rem; }
+            .unit-number { font-size: 1.9rem; }
+            .unit-label { font-size: 0.65rem; }
+            .celebration-text { font-size: 1.1rem; }
+            .bless-message { font-size: 0.85rem; padding: 0.6rem 0.7rem; margin-top: 1.2rem; }
+            .footer-star { margin-top: 1.2rem; font-size: 0.6rem; }
+        }
+
+        @media (max-width: 430px) {
+            .timer-digits { gap: 0.4rem; }
+            .unit-number { font-size: 1.65rem; }
+            .celebration-text { font-size: 1rem; }
+            .couple-title { font-size: 1.45rem; }
+        }
+
+        .shooting-star {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .custom-title-line {
+            text-align: center;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        .love-line {
+            font-size: 1.3rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            background: linear-gradient(120deg, #ffe9ce, #e0c8ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            opacity: 0.9;
+            margin-bottom: 0.35rem;
+        }
+        .permanent-line {
+            font-size: 0.9rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            color: #d4c2ff;
+            opacity: 0.8;
+        }
+        @media (max-width: 600px) {
+            .love-line { font-size: 1.1rem; }
+            .permanent-line { font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+<canvas id="stars-canvas"></canvas>
+<div class="galaxy-glow"></div>
+<div class="galaxy-glow galaxy-glow-2"></div>
+
+<div class="container">
+    <div class="custom-title-line">
+        <div class="love-line">致 · 我们的爱情</div>
+        <div class="permanent-line">网站是永久的，我们也是</div>
+    </div>
+    <div class="time-card">
+        <div class="couple-title"> 何春锦 & 欧阳梦琪 </div>
+        
+        <div class="timer-digits">
+            <div class="time-unit"><div class="unit-number" id="years">0</div><div class="unit-label">年</div></div>
+            <div class="time-unit"><div class="unit-number" id="months">0</div><div class="unit-label">月</div></div>
+            <div class="time-unit"><div class="unit-number" id="days">0</div><div class="unit-label">日</div></div>
+            <div class="time-unit"><div class="unit-number" id="hours">0</div><div class="unit-label">时</div></div>
+            <div class="time-unit"><div class="unit-number" id="minutes">0</div><div class="unit-label">分</div></div>
+            <div class="time-unit"><div class="unit-number" id="seconds">0</div><div class="unit-label">秒</div></div>
+        </div>
+        
+        <div id="celebrationArea" class="celebration-banner" style="display: none;">
+            <div class="celebration-text" id="celebrationMsg"></div>
+        </div>
+        
+        <div class="bless-message" id="blessMessage">
+            🌙 星河滚烫，你是人间理想。
+        </div>
+    </div>
+    <div class="footer-star">✦ 始于 2026.03.07 22:46 ✦ 星辉共此时 ✦</div>
+</div>
+
+<script>
+    (function() {
+        const START_DATE = new Date(2026, 2, 7, 22, 46, 0);
+        
+        const FESTIVALS_MAP = {
+            "5-20": "💖 祝我们520快乐 · 爱你不止今天 💖",
+            "2-14": "🌹 祝我们情人节快乐，玫瑰与星光皆是你 🌹",
+            "12-25": "🎄 祝我们圣诞节快乐，星河共白头 🎄",
+            "1-1": "🎆 祝我们元旦快乐，新岁共赴璀璨 🎆",
+            "10-1": "🇨🇳 祝我们国庆节快乐，一同看遍山河浪漫 🏞️"
+        };
+        
+        const QIXI_MSG = "💞 祝我们七夕节快乐，鹊桥星海见证深情 💞";
+        const CENTURY_MSG_PREFIX = "🎉 相识整百天 · 第";
+        
+        const BLESS_LIBRARY = [
+            "✨ 你是我的星轨中心，每一次公转都绕向你 ✨",
+            "🌌 与你共度的朝夕，比银河系的光晕更柔软 🌌",
+            "💫 遇见你之后，宇宙的浪漫都有了具象 💫",
+            "🪐 从2026那个春夜开始，时光有了心跳声 🪐",
+            "🌙 你眼眸中的星辰，是我永恒的导航 🌙",
+            "💖 你是最温柔的引力，让我永远倾向你 💖",
+            "🌟 愿我们携手穿越时间星海，不负相遇 🌟",
+            "🎇 和你在一起，日日明朗，夜夜流光 🎇",
+            "🌸 爱意如星尘，细碎却布满天际 🌸",
+            "🍃 风也温柔，星也缱绻，恰似我们 🍃"
+        ];
+        
+        let currentBlessText = "";
+        function updateRandomBlessing() {
+            const randomIdx = Math.floor(Math.random() * BLESS_LIBRARY.length);
+            currentBlessText = BLESS_LIBRARY[randomIdx];
+            const blessEl = document.getElementById("blessMessage");
+            if(blessEl) blessEl.innerHTML = ` ${currentBlessText} `;
+        }
+        
+        function refreshBlessing() {
+            const blessEl = document.getElementById("blessMessage");
+            if(blessEl) blessEl.innerHTML = ` ${currentBlessText} `;
+        }
+        
+        function getTimeElapsed(startDate, endDate) {
+            if (endDate < startDate) return { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+            let years = endDate.getFullYear() - startDate.getFullYear();
+            let months = endDate.getMonth() - startDate.getMonth();
+            let days = endDate.getDate() - startDate.getDate();
+            let hours = endDate.getHours() - startDate.getHours();
+            let minutes = endDate.getMinutes() - startDate.getMinutes();
+            let seconds = endDate.getSeconds() - startDate.getSeconds();
+            
+            if (seconds < 0) { seconds += 60; minutes--; }
+            if (minutes < 0) { minutes += 60; hours--; }
+            if (hours < 0) { hours += 24; days--; }
+            if (days < 0) {
+                months--;
+                let prevMonthDate = new Date(endDate.getFullYear(), endDate.getMonth(), 0);
+                let daysInPrevMonth = prevMonthDate.getDate();
+                days += daysInPrevMonth;
+            }
+            if (months < 0) { years--; months += 12; }
+            return { years, months, days, hours, minutes, seconds };
+        }
+        
+        function getTotalDays(startDate, endDate) {
+            const diffMs = endDate - startDate;
+            return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        }
+        
+        function isHundredDays(totalDays) {
+            return totalDays > 0 && totalDays % 100 === 0;
+        }
+        
+        function getQixiDate(year) {
+            const qixiMap = {
+                2026: new Date(2026, 7, 19),
+                2027: new Date(2027, 7, 8),
+                2028: new Date(2028, 6, 27),
+                2029: new Date(2029, 7, 15),
+                2030: new Date(2030, 7, 4),
+                2031: new Date(2031, 7, 24),
+                2032: new Date(2032, 7, 12),
+                2033: new Date(2033, 7, 1),
+                2034: new Date(2034, 7, 20),
+                2035: new Date(2035, 7, 9)
+            };
+            if (qixiMap[year]) return qixiMap[year];
+            return new Date(year, 7, 19);
+        }
+        
+        function getCelebrationMessage(now, totalDays, startDate) {
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            
+            if (month === 3 && day === 7) {
+                const yearsTogether = year - 2026;
+                const ordinal = yearsTogether === 0 ? "1周年" : `${yearsTogether+1}周年`;
+                return { shouldCelebrate: true, message: `💎 纪念日快乐 · 相识${ordinal} 💎 星河共赴，爱意如初` };
+            }
+            
+            if (isHundredDays(totalDays)) {
+                const hundredNum = totalDays;
+                return { shouldCelebrate: true, message: `${CENTURY_MSG_PREFIX}${hundredNum}天 🎊 星辉为证，继续深爱吧 🎊` };
+            }
+            
+            const key = `${month}-${day}`;
+            if (FESTIVALS_MAP[key]) {
+                return { shouldCelebrate: true, message: FESTIVALS_MAP[key] };
+            }
+            
+            const qixiDate = getQixiDate(year);
+            if (qixiDate && now.getFullYear() === qixiDate.getFullYear() && now.getMonth() === qixiDate.getMonth() && now.getDate() === qixiDate.getDate()) {
+                return { shouldCelebrate: true, message: QIXI_MSG };
+            }
+            
+            return { shouldCelebrate: false, message: "" };
+        }
+        
+        function updateTimerAndFestival() {
+            const now = new Date();
+            if (now < START_DATE) {
+                document.getElementById("years").innerText = "0";
+                document.getElementById("months").innerText = "0";
+                document.getElementById("days").innerText = "0";
+                document.getElementById("hours").innerText = "00";
+                document.getElementById("minutes").innerText = "00";
+                document.getElementById("seconds").innerText = "00";
+                const celeArea = document.getElementById("celebrationArea");
+                celeArea.style.display = "none";
+                return;
+            }
+            
+            const elapsed = getTimeElapsed(START_DATE, now);
+            document.getElementById("years").innerText = elapsed.years;
+            document.getElementById("months").innerText = elapsed.months;
+            document.getElementById("days").innerText = elapsed.days;
+            document.getElementById("hours").innerText = elapsed.hours < 10 ? "0"+elapsed.hours : elapsed.hours;
+            document.getElementById("minutes").innerText = elapsed.minutes < 10 ? "0"+elapsed.minutes : elapsed.minutes;
+            document.getElementById("seconds").innerText = elapsed.seconds < 10 ? "0"+elapsed.seconds : elapsed.seconds;
+            
+            const totalDays = getTotalDays(START_DATE, now);
+            const celebration = getCelebrationMessage(now, totalDays, START_DATE);
+            const celeArea = document.getElementById("celebrationArea");
+            const celeMsgDiv = document.getElementById("celebrationMsg");
+            
+            if (celebration.shouldCelebrate) {
+                celeArea.style.display = "flex";
+                celeMsgDiv.innerText = celebration.message;
+                celeArea.style.animation = "none";
+                setTimeout(() => { celeArea.style.animation = "gentlePulse 1.8s infinite ease"; }, 10);
+            } else {
+                celeArea.style.display = "none";
+            }
+        }
+        
+        function initStars() {
+            const canvas = document.getElementById("stars-canvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            let stars = [];
+            const STAR_COUNT = 220;
+            
+            function resizeCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                initStarsArray();
+                drawStars();
+            }
+            
+            function initStarsArray() {
+                stars = [];
+                for(let i = 0; i < STAR_COUNT; i++) {
+                    stars.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        radius: Math.random() * 2.2 + 0.8,
+                        alpha: Math.random() * 0.6 + 0.2,
+                        twinkleSpeed: 0.008 + Math.random() * 0.025,
+                        phase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+            
+            let time = 0;
+            function drawStars() {
+                if (!ctx) return;
+                ctx.clearRect(0, 0, width, height);
+                for(let s of stars) {
+                    ctx.beginPath();
+                    let twinkle = 0.5 + 0.5 * Math.sin(time * s.twinkleSpeed + s.phase);
+                    let opacity = Math.min(0.85, s.alpha + twinkle * 0.4);
+                    ctx.arc(s.x, s.y, s.radius, 0, Math.PI*2);
+                    ctx.fillStyle = `rgba(255, 248, 210, ${opacity})`;
+                    ctx.fill();
+                }
+                if (Math.random() < 0.02) {
+                    ctx.beginPath();
+                    let fx = Math.random() * width;
+                    let fy = Math.random() * height * 0.6;
+                    ctx.moveTo(fx, fy);
+                    ctx.lineTo(fx - 8, fy + 12);
+                    ctx.lineWidth = 1.2;
+                    ctx.strokeStyle = `rgba(255, 220, 170, 0.5)`;
+                    ctx.stroke();
+                }
+                time += 0.018;
+                requestAnimationFrame(drawStars);
+            }
+            
+            window.addEventListener("resize", () => { resizeCanvas(); });
+            resizeCanvas();
+        }
+        
+        let lastDateStr = "";
+        function monitorDateChange() {
+            setInterval(() => {
+                const today = new Date().toDateString();
+                if (lastDateStr !== today) {
+                    lastDateStr = today;
+                    updateRandomBlessing();
+                    refreshBlessing();
+                }
+            }, 60000);
+        }
+        
+        initStars();
+        updateRandomBlessing();
+        refreshBlessing();
+        
+        let interval = setInterval(() => {
+            updateTimerAndFestival();
+        }, 1000);
+        updateTimerAndFestival();
+        
+        monitorDateChange();
+        
+        window.addEventListener("beforeunload", () => {
+            if(interval) clearInterval(interval);
+        });
+        
+        setTimeout(() => {
+            updateTimerAndFestival();
+        }, 100);
+    })();
+</script>
+</body>
+</html>
