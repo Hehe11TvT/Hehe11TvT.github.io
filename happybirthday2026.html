@@ -312,6 +312,48 @@
             border: 1px solid rgba(200, 175, 110, 0.4);
             background: rgba(5, 8, 18, 0.4);
             backdrop-filter: blur(4px);
+            position: relative;
+        }
+        
+        /* 加载动画覆盖层 - 仅显示在相册容器内部 */
+        .album-loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 18, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            gap: 1rem;
+            transition: opacity 0.4s ease;
+            font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+            color: #ecdcaa;
+            pointer-events: none;
+        }
+        .album-loader-overlay .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(220, 190, 110, 0.3);
+            border-top: 3px solid #e0c88a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .album-loader-overlay .loading-text {
+            font-size: 1rem;
+            letter-spacing: 2px;
+            background: rgba(0,0,0,0.5);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
         }
         
         .album-note {
@@ -413,6 +455,7 @@
 <div class="container">
     <div class="hero">
         <div class="greeting-badge">✨ 致 独一无二的梦琪 ✨</div>
+        <div class="greeting-badge"> 网站有效期是永久，我们也是</div>
         <div class="name-title">送给最特别的 · </div>
         <div class="name-title">欧阳梦琪</div>
         <div class="time-core" id="dynamicCore">
@@ -466,15 +509,23 @@
     
     <div class="album-section" id="albumSection">
         <div class="album-title">📷 时光映像 · 我们的光影纪念册</div>
-        <div id="canvas-container"></div>
+        <div id="canvas-container" style="position: relative;">
+            <!-- 相册加载占位动画层 -->
+            <div id="albumLoader" class="album-loader-overlay" style="display: flex;">
+                <div class="spinner"></div>
+                <div class="loading-text">正在加载</div>
+            </div>
+        </div>
         <div class="album-note">✨ 拖拽旋转视角 | 双指缩放 ✨</div>
     </div>
     
     <footer>
         ♾️ 时空无法稀释的情意 · 献给2011.07.20的你
     </footer>
+    <footer>
+        制作人:何春锦  制作时间:2026年6月10日
+    </footer>
 </div>
-
 <div class="music-controller" id="musicController">
     <button id="playPauseBtn" title="播放/暂停">▶️</button>
     <button id="nextBtn" title="下一首">⏭️</button>
@@ -922,7 +973,8 @@
         playSong(3);
         
         let threeInitialized = false;
-        let threeScene, threeCamera, threeRenderer, threeControls, photoCube, ringLoop, starsField3D, auraParticles;
+        let threeScene, threeCamera, threeRenderer, threeControls, photoCube, ringLoop, starsField3D, auraParticles, sunMesh, sunLightSoft;
+        const loaderOverlay = document.getElementById('albumLoader');
         
         const imageUrls = [
             "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/IM1.jpg",
@@ -972,13 +1024,69 @@
                 starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
                 starsField3D = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.28, transparent: true, opacity: 0.6 }));
                 threeScene.add(starsField3D);
+                
                 threeScene.add(new THREE.AmbientLight(0x4a5070));
-                const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-                dirLight.position.set(3, 5, 2);
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
+                dirLight.position.set(2, 3, 2);
                 threeScene.add(dirLight);
-                const fillLight = new THREE.PointLight(0x5588ff, 0.45);
-                fillLight.position.set(-2, 1.5, 3);
+                const fillLight = new THREE.PointLight(0x88aacc, 0.35);
+                fillLight.position.set(-1.5, 1, 2.5);
                 threeScene.add(fillLight);
+                const sunGeometry = new THREE.SphereGeometry(0.78, 128, 128);
+                const sunMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xfff5ea,
+                    emissive: 0xffddbb,
+                    emissiveIntensity: 1.15,
+                    metalness: 0.02,
+                    roughness: 0.4
+                });
+                sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
+                sunMesh.position.set(9.2, 5.6, -22.5);
+                threeScene.add(sunMesh);
+                const glowCoreGeo = new THREE.SphereGeometry(1.25, 64, 64);
+                const glowCoreMat = new THREE.MeshBasicMaterial({
+                    color: 0xfff2e0,
+                    transparent: true,
+                    opacity: 0.21,
+                    side: THREE.BackSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const sunGlowCore = new THREE.Mesh(glowCoreGeo, glowCoreMat);
+                sunMesh.add(sunGlowCore);
+                const outerGlowGeo = new THREE.SphereGeometry(1.78, 64, 64);
+                const outerGlowMat = new THREE.MeshBasicMaterial({
+                    color: 0xffeedd,
+                    transparent: true,
+                    opacity: 0.13,
+                    side: THREE.BackSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const outerHalo = new THREE.Mesh(outerGlowGeo, outerGlowMat);
+                sunMesh.add(outerHalo);
+                const spikeGlowGeo = new THREE.SphereGeometry(2.25, 48, 48);
+                const spikeMat = new THREE.MeshBasicMaterial({
+                    color: 0xffeedd,
+                    transparent: true,
+                    opacity: 0.07,
+                    side: THREE.BackSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const spikeHalo = new THREE.Mesh(spikeGlowGeo, spikeMat);
+                sunMesh.add(spikeHalo);
+                const starBurstGeo = new THREE.SphereGeometry(2.7, 32, 32);
+                const starBurstMat = new THREE.MeshBasicMaterial({
+                    color: 0xfff5e5,
+                    transparent: true,
+                    opacity: 0.045,
+                    side: THREE.BackSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const starBurst = new THREE.Mesh(starBurstGeo, starBurstMat);
+                sunMesh.add(starBurst);
+                sunLightSoft = new THREE.PointLight(0xffeacc, 0.28, 38);
+                sunLightSoft.position.set(9.2, 5.6, -22.5);
+                threeScene.add(sunLightSoft);
+                
                 const cubeSize = 2.45;
                 const boxGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
                 const materials = [];
@@ -993,18 +1101,12 @@
                 const edgesGeo = new THREE.EdgesGeometry(boxGeometry);
                 const wireframe = new THREE.LineSegments(edgesGeo, new THREE.LineBasicMaterial({ color: 0x6c9eff }));
                 photoCube.add(wireframe);
-                const cornerGlowMat = new THREE.MeshStandardMaterial({ color: 0xffaa77, emissive: 0x442200, emissiveIntensity: 0.4 });
-                const cornerPositions = [[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1],[-1,1,-1],[1,1,-1],[1,1,1],[-1,1,1]];
-                cornerPositions.forEach(pos => {
-                    const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.058, 10, 10), cornerGlowMat);
-                    sphere.position.set(pos[0] * cubeSize/2, pos[1] * cubeSize/2, pos[2] * cubeSize/2);
-                    photoCube.add(sphere);
-                });
-                const auraCount = 1000;
+                
+                const auraCount = 700;
                 const auraGeo = new THREE.BufferGeometry();
                 const auraPositions = new Float32Array(auraCount * 3);
                 for (let i = 0; i < auraCount; i++) {
-                    const rad = 1.6 + Math.random() * 1.2;
+                    const rad = 1.6 + Math.random() * 1.5;
                     const theta = Math.random() * Math.PI * 2;
                     const phi = Math.acos(2 * Math.random() - 1);
                     auraPositions[i*3] = rad * Math.sin(phi) * Math.cos(theta);
@@ -1012,23 +1114,32 @@
                     auraPositions[i*3+2] = rad * Math.cos(phi);
                 }
                 auraGeo.setAttribute('position', new THREE.BufferAttribute(auraPositions, 3));
-                auraParticles = new THREE.Points(auraGeo, new THREE.PointsMaterial({ color: 0x7aaaff, size: 0.022, transparent: true, opacity: 0.5 }));
+                auraParticles = new THREE.Points(auraGeo, new THREE.PointsMaterial({ color: 0x7aaaff, size: 0.022, transparent: true, opacity: 0.4 }));
                 threeScene.add(auraParticles);
+                
                 const ringPoints = [];
-                const ringRad = 1.72;
-                for (let i = 0; i <= 100; i++) {
-                    const ang = (i / 100) * Math.PI * 2;
+                const ringRad = 2.1;
+                for (let i = 0; i <= 120; i++) {
+                    const ang = (i / 120) * Math.PI * 2;
                     ringPoints.push(new THREE.Vector3(Math.cos(ang) * ringRad, 0.15, Math.sin(ang) * ringRad));
                 }
                 const ringGeo = new THREE.BufferGeometry().setFromPoints(ringPoints);
                 ringLoop = new THREE.LineLoop(ringGeo, new THREE.LineBasicMaterial({ color: 0x4c9eff }));
                 threeScene.add(ringLoop);
+                
+                let timeSun = 0;
                 function animateThree() {
                     if (!threeRenderer || !threeScene) return;
                     requestAnimationFrame(animateThree);
+                    timeSun += 0.005;
+                    if (sunMesh) {
+                        const scaleVar = 1 + Math.sin(timeSun * 1.4) * 0.008;
+                        sunMesh.scale.set(scaleVar, scaleVar, scaleVar);
+                        if (sunLightSoft) sunLightSoft.intensity = 0.26 + Math.sin(timeSun * 1.9) * 0.06;
+                    }
                     if (threeControls) threeControls.update();
                     if (starsField3D) { starsField3D.rotation.y += 0.0004; starsField3D.rotation.x += 0.0002; }
-                    if (auraParticles) { auraParticles.rotation.y += 0.0015; auraParticles.rotation.x += 0.0008; }
+                    if (auraParticles) { auraParticles.rotation.y += 0.0012; auraParticles.rotation.x += 0.0006; }
                     if (ringLoop) ringLoop.rotation.z += 0.003;
                     if (threeRenderer && threeCamera) threeRenderer.render(threeScene, threeCamera);
                 }
@@ -1042,7 +1153,17 @@
                     }
                 });
                 resizeObserver.observe(container);
-            } catch (error) { console.error('3D相册失败:', error); }
+                
+                if (loaderOverlay) {
+                    loaderOverlay.style.opacity = '0';
+                    setTimeout(() => { if (loaderOverlay) loaderOverlay.style.display = 'none'; }, 400);
+                }
+            } catch (error) { 
+                console.error('3D相册失败:', error);
+                if (loaderOverlay) {
+                    loaderOverlay.style.display = 'none';
+                }
+            }
         }
         
         const albumSection = document.getElementById('albumSection');
