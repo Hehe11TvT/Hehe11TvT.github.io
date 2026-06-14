@@ -795,40 +795,68 @@
             });
         });
         
-        // ---------- 修改音频: 只保留第四首歌，无任何UI，延迟2秒自动播放 ----------
-        const FOURTH_SONG_URL = "https://cdn.jsdelivr.net/gh/Hehe11TvT/Hehe11TvT.github.io@main/Music/4.mp3";
+        // ---------- 音频：只保留第四首歌，开启循环，交互后播放（兼容性更强）----------
+const FOURTH_SONG_URL = "https://cdn.jsdelivr.net/gh/Hehe11TvT/Hehe11TvT.github.io@main/Music/4.mp3";
+
+let bgAudio = null;
+let playAttempted = false;
+
+function initRobustAudio() {
+    // 创建 Audio 元素
+    bgAudio = new Audio();
+    bgAudio.src = FOURTH_SONG_URL;
+    bgAudio.volume = 0.6;
+    bgAudio.loop = true;
+    bgAudio.preload = "auto";
+    
+    // 加载音频（但不自动播放）
+    bgAudio.load();
+    
+    // 播放函数
+    const tryPlay = () => {
+        if (!bgAudio) return;
+        if (!bgAudio.paused) return; // 已经在播放
+        if (playAttempted) return;   // 已经尝试过
         
-        let bgAudio = null;
-        
-        function initAutoPlaySong() {
-            bgAudio = new Audio();
-            bgAudio.src = FOURTH_SONG_URL;
-            bgAudio.volume = 0.6;
-            bgAudio.loop = true;
-            bgAudio.preload = "auto";
-            
-            // 预加载
-            bgAudio.load();
-            
-            // 延迟2秒后尝试自动播放
-            setTimeout(() => {
-                if (bgAudio) {
-                    bgAudio.play().catch(e => {
-                        console.log("音频自动播放被阻止，需要用户交互。");
-                        const resumeHandler = () => {
-                            if (bgAudio && bgAudio.paused) {
-                                bgAudio.play().catch(()=>{});
-                            }
-                            document.removeEventListener('click', resumeHandler);
-                            document.removeEventListener('touchstart', resumeHandler);
-                        };
-                        document.addEventListener('click', resumeHandler);
-                        document.addEventListener('touchstart', resumeHandler);
-                    });
-                }
-            }, 2000);
+        bgAudio.play().then(() => {
+            playAttempted = true;
+            console.log("✅ 音乐播放成功");
+        }).catch(err => {
+            console.log("⚠️ 播放失败:", err);
+            // 失败时保持等待下一次交互
+        });
+    };
+    
+    // 方式1：监听多种用户交互事件
+    const events = ['click', 'touchstart', 'keydown', 'scroll'];
+    const onUserInteraction = () => {
+        tryPlay();
+        // 播放成功后移除监听
+        if (playAttempted) {
+            events.forEach(ev => document.removeEventListener(ev, onUserInteraction));
         }
-        initAutoPlaySong();
+    };
+    events.forEach(ev => document.addEventListener(ev, onUserInteraction));
+    
+    // 方式2：延迟3秒后如果还没有播放，尝试一次（针对部分允许自动播放的环境）
+    setTimeout(() => {
+        if (!playAttempted && bgAudio && bgAudio.paused) {
+            bgAudio.play().then(() => {
+                playAttempted = true;
+                console.log("✅ 延迟自动播放成功");
+            }).catch(() => {});
+        }
+    }, 3000);
+    
+    // 方式3：监听页面可见性变化，用户切回页面时再尝试
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && !playAttempted && bgAudio && bgAudio.paused) {
+            bgAudio.play().catch(() => {});
+        }
+    });
+}
+
+initRobustAudio();
         
         let threeInitialized = false;
         let threeScene, threeCamera, threeRenderer, threeControls, photoCube, ringLoop, starsField3D, auraParticles, sunMesh, sunLightSoft;
