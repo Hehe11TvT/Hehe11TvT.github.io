@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>星辰轨迹 · 予你(2026)</title>
+    <title>星辰轨迹 · 予你 · 梦琪生日快乐</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
     <style>
         * {
@@ -393,7 +393,7 @@
 <canvas id="starCanvas"></canvas>
 <div class="container">
     <div class="hero">
-        <div class="greeting-badge">✨ 致 独一无二的梦琪 ✨</div>
+        <div class="greeting-badge">✨ 致 独一无二的梦琪 ✨<br>十五岁，生日快乐！</div>
         <div class="greeting-badge"> 网站有效期是永久，我们也是</div>
         <div class="name-title">送给最特别的 · </div>
         <div class="name-title">欧阳梦琪</div>
@@ -407,7 +407,7 @@
         </div>
         
         <div style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.7; font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;">—— 时光凝固 爱意永恒 ——</div>
-        <div class="signature-name" id="signatureBlock">- 爱你的何春锦 -</div>
+        <div class="signature-name" id="signatureBlock">- 爱你的何春锦 -<br><br>今后你的每一个生日<br>我都会陪伴</div>
     </div>
 
     <div class="story-section">
@@ -511,9 +511,9 @@
         
         function formatCountdownWithBirthdayWord(remaining) {
             let timeStr = '';
-            if (remaining.days > 0) timeStr = `${remaining.days}天 ${remaining.hours.toString().padStart(2,'0')}时 ${remaining.minutes.toString().padStart(2,'0')}分 ${remaining.seconds.toString().padStart(2,'0')}秒`;
+            if (remaining.days > 0) timeStr = `${remaining.days}天${remaining.hours.toString().padStart(2,'0')}时${remaining.minutes.toString().padStart(2,'0')}分${remaining.seconds.toString().padStart(2,'0')}秒`;
             else timeStr = `${remaining.hours.toString().padStart(2,'0')}时 ${remaining.minutes.toString().padStart(2,'0')}分 ${remaining.seconds.toString().padStart(2,'0')}秒`;
-            return `🎂 你还有 ${timeStr} 生日 🎂`;
+            return `距离你生日还有🎂<br>${timeStr}`;
         }
         
         function updateCountdownUI() {
@@ -603,8 +603,8 @@
             const now = new Date();
             if (now > fifteenBirthday) {
                 const elapsed = getPreciseElapsed(fifteenBirthday, now);
-                stateMsgDiv.innerHTML = `✨ 星辰见证 · 十五岁礼成 ✨`;
-                subInfoDiv.innerHTML = `距离十五岁生日已经 ${elapsed.years}年 ${elapsed.months}月 ${elapsed.days}日 ${elapsed.hours}时 ${elapsed.minutes}分 ${elapsed.seconds}秒 · 岁月为你加冕`;
+                stateMsgDiv.innerHTML = `🌟星辰见证🌟<br>十五岁礼成`;
+                subInfoDiv.innerHTML = `距离十五岁生日已经<br>${elapsed.years}年 ${elapsed.months}月 ${elapsed.days}日 ${elapsed.hours}时 ${elapsed.minutes}分 ${elapsed.seconds}秒<br>岁月为你加冕`;
             } else {
                 const preciseRemaining = getPreciseRemainingToDate(fifteenBirthday, now);
                 stateMsgDiv.innerHTML = `🎂 距离你的十五岁生日 🎂`;
