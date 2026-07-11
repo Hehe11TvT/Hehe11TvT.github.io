@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>星辰轨迹 · 予你 · 梦琪生日快乐</title>
+    <title>星辰轨迹 · 予你 · Happy birthday</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
     <style>
         * {
@@ -21,6 +21,275 @@
             scroll-behavior: smooth;
         }
 
+        /* ===== 邮件开屏层 ===== */
+        #mailSplash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, #0a0f1f, #010105);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+            font-family: 'Inter', '微软雅黑', sans-serif;
+            padding: 1.5rem;
+        }
+        #mailSplash.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .splash-title {
+            font-size: 2.8rem;
+            font-weight: 500;
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, #F7EFDF, #DCC991);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 1.8rem;
+            line-height: 1.3;
+        }
+        .splash-title small {
+            display: block;
+            font-size: 1.2rem;
+            opacity: 0.7;
+            margin-top: 0.2rem;
+        }
+        /* 邮件图标容器 */
+        #mailIconWrapper {
+            position: relative;
+            width: 160px;
+            height: 120px;
+            margin: 0.5rem auto 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        /* 邮件主体：信封 + 封口 */
+        .envelope {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #e8dcc0;
+            border-radius: 12px 12px 6px 6px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,245,210,0.3);
+            transition: all 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
+            transform-origin: center center;
+        }
+        /* 信封封口（三角 flap） */
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #dacba8;
+            clip-path: polygon(0 0, 50% 45%, 100% 0);
+            border-radius: 12px 12px 0 0;
+            transition: all 0.7s cubic-bezier(0.34, 1.2, 0.64, 1);
+            transform-origin: top center;
+            z-index: 2;
+            box-shadow: inset 0 -6px 12px rgba(0,0,0,0.1);
+        }
+        /* 封口上的线条装饰 */
+        .envelope-flap::after {
+            content: "";
+            position: absolute;
+            top: 25%;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background: rgba(180, 150, 100, 0.3);
+            border-radius: 2px;
+        }
+        /* 信封上的“折痕”装饰线 */
+        .envelope-line {
+            position: absolute;
+            bottom: 16%;
+            left: 10%;
+            width: 80%;
+            height: 1.5px;
+            background: rgba(150, 120, 80, 0.25);
+            border-radius: 2px;
+            z-index: 1;
+        }
+        .envelope-line2 {
+            bottom: 30%;
+        }
+        /* 邮件上的“邮票”装饰 */
+        .stamp {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 28px;
+            height: 32px;
+            background: #c9b07a;
+            border-radius: 4px;
+            border: 1px solid rgba(200,170,110,0.4);
+            z-index: 3;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #4d3e2b;
+            font-weight: 600;
+            transform: rotate(8deg);
+        }
+        .stamp::after {
+            content: "✦";
+            font-size: 16px;
+        }
+        /* 邮件中间的分割线（打开时用） */
+        .envelope-split-top,
+        .envelope-split-bottom {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            overflow: hidden;
+            transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 1;
+            pointer-events: none;
+        }
+        .envelope-split-top {
+            top: 0;
+            border-radius: 12px 12px 0 0;
+            background: #e8dcc0;
+            clip-path: inset(0 0 0 0);
+        }
+        .envelope-split-bottom {
+            bottom: 0;
+            border-radius: 0 0 6px 6px;
+            background: #e8dcc0;
+            clip-path: inset(0 0 0 0);
+        }
+        /* 拆开状态：上下分离 */
+        #mailIconWrapper.split .envelope-split-top {
+            transform: translateY(-70px) scale(0.96);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        #mailIconWrapper.split .envelope-split-bottom {
+            transform: translateY(70px) scale(0.96);
+            box-shadow: 0 -20px 40px rgba(0,0,0,0.3);
+        }
+        #mailIconWrapper.split .envelope-flap {
+            opacity: 0;
+            transform: scaleY(0.2);
+        }
+        #mailIconWrapper.split .stamp,
+        #mailIconWrapper.split .envelope-line {
+            opacity: 0;
+        }
+        /* 邮件下方的按钮 */
+        #openMailBtn {
+            background: linear-gradient(115deg, #262d3f, #181e2c);
+            border: 1px solid #cfb77c;
+            color: #f5e7c1;
+            padding: 0.8rem 2.8rem;
+            font-size: 1.2rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 500;
+            backdrop-filter: blur(6px);
+            transition: 0.25s;
+            font-family: '微软雅黑', 'Inter', sans-serif;
+            letter-spacing: 2px;
+            margin-top: 0.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        #openMailBtn:hover {
+            background: #343d54;
+            border-color: #ebd5a0;
+            transform: scale(1.02);
+        }
+        /* 输入框区域（第二阶段） */
+        #inputArea {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, #0a0f1f, #010105);
+            z-index: 9998;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            transition: opacity 0.5s;
+            font-family: '微软雅黑', 'Inter', sans-serif;
+        }
+        #inputArea.show {
+            display: flex;
+        }
+        #inputArea .prompt {
+            font-size: 1.6rem;
+            color: #f2ecdb;
+            margin-bottom: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            font-family: 'Cormorant Garamond', serif;
+            background: rgba(0,0,0,0.3);
+            padding: 0.2rem 1.8rem;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+        #nameInput {
+            background: rgba(20, 26, 40, 0.7);
+            border: 1px solid #b89f60;
+            border-radius: 60px;
+            padding: 0.9rem 2rem;
+            font-size: 1.2rem;
+            color: #f5e7c1;
+            width: 280px;
+            max-width: 85%;
+            text-align: center;
+            outline: none;
+            backdrop-filter: blur(6px);
+            font-family: '微软雅黑', 'Inter', sans-serif;
+            transition: 0.2s;
+        }
+        #nameInput:focus {
+            border-color: #ebd5a0;
+            box-shadow: 0 0 20px rgba(200, 175, 110, 0.2);
+        }
+        #inputError {
+            color: #e08a7a;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            min-height: 1.8rem;
+            background: rgba(0,0,0,0.3);
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+        #confirmNameBtn {
+            margin-top: 1.5rem;
+            background: linear-gradient(115deg, #2f374b, #1c2232);
+            border: 1px solid #cfb77c;
+            color: #f5e7c1;
+            padding: 0.6rem 2.4rem;
+            font-size: 1rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.25s;
+            font-family: '微软雅黑', 'Inter', sans-serif;
+        }
+        #confirmNameBtn:hover {
+            background: #3e485f;
+            border-color: #ebd5a0;
+        }
+
+        /* 原有样式保留 */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: #191e2c; }
         ::-webkit-scrollbar-thumb { background: #b89f60; border-radius: 20px; }
@@ -42,6 +311,11 @@
             max-width: 1100px;
             margin: 0 auto;
             padding: 1.8rem 1.5rem 4rem;
+            opacity: 0;
+            transition: opacity 1s ease 0.3s;
+        }
+        .container.reveal {
+            opacity: 1;
         }
 
         .hero {
@@ -293,7 +567,6 @@
             color: #ecdcaa;
             letter-spacing: 2px;
         }
-        
         .album-title:before,
         .album-title:after {
             content: "✦";
@@ -301,7 +574,6 @@
             opacity: 0.6;
             font-size: 1.4rem;
         }
-        
         #canvas-container {
             width: 100%;
             height: 70vh;
@@ -314,8 +586,6 @@
             backdrop-filter: blur(4px);
             position: relative;
         }
-        
-        /* 加载动画覆盖层 - 仅显示在相册容器内部 */
         .album-loader-overlay {
             position: absolute;
             top: 0;
@@ -355,7 +625,6 @@
             padding: 0.3rem 1rem;
             border-radius: 40px;
         }
-        
         .album-note {
             text-align: center;
             font-size: 0.85rem;
@@ -363,7 +632,6 @@
             margin-top: 1rem;
             font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
         }
-
         footer {
             text-align: center;
             font-size: 0.7rem;
@@ -371,9 +639,6 @@
             margin-top: 3rem;
             font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
         }
-        
-        /* 音乐UI完全移除 - 无控制器区域 */
-        
         @media (max-width: 600px) {
             .name-title { font-size: 2.2rem; }
             .dynamic-message { font-size: 1.5rem; }
@@ -386,12 +651,46 @@
             .album-title:before,
             .album-title:after { margin: 0 8px; font-size: 1rem; }
             #canvas-container { height: 50vh; min-height: 400px; }
+            .splash-title { font-size: 2rem; }
+            #mailIconWrapper { width: 120px; height: 90px; }
         }
     </style>
 </head>
 <body>
 <canvas id="starCanvas"></canvas>
-<div class="container">
+
+<!-- ===== 邮件开屏层 ===== -->
+<div id="mailSplash">
+    <div class="splash-title">
+        你收到一封神秘邮件
+    </div>
+    <div id="mailIconWrapper">
+        <!-- 信封主体（拆解用） -->
+        <div class="envelope-split-top"></div>
+        <div class="envelope-split-bottom"></div>
+        <!-- 封口 flap -->
+        <div class="envelope-flap"></div>
+        <!-- 装饰线 -->
+        <div class="envelope-line"></div>
+        <div class="envelope-line envelope-line2"></div>
+        <!-- 邮票 -->
+        <div class="stamp"></div>
+        <!-- 邮件主体（底） -->
+        <div class="envelope" style="z-index:0;"></div>
+    </div>
+    <button id="openMailBtn">打开</button>
+</div>
+
+<!-- ===== 输入框层（第二阶段） ===== -->
+<div id="inputArea">
+    <div class="prompt">请输入收件人姓名</div>
+    <input type="text" id="nameInput" placeholder="输入姓名..." autocomplete="off">
+    <div id="inputError"></div>
+    <button id="confirmNameBtn">确认</button>
+</div>
+
+<!-- ===== 主内容容器 ===== -->
+<div class="container" id="mainContainer">
     <div class="hero">
         <div class="greeting-badge">✨ 致 独一无二的梦琪 ✨<br>十五岁，生日快乐！</div>
         <div class="greeting-badge"> 网站有效期是永久，我们也是</div>
@@ -405,7 +704,6 @@
             <span class="stats-label">🌸 我们已经互相陪伴了 🌸</span>
             <span class="stats-value" id="companionTime">计算中...</span>
         </div>
-        
         <div style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.7; font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;">—— 时光凝固 爱意永恒 ——</div>
         <div class="signature-name" id="signatureBlock">- 爱你的何春锦 -<br><br>今后你的每一个生日<br>我都会陪伴</div>
     </div>
@@ -449,7 +747,6 @@
     <div class="album-section" id="albumSection">
         <div class="album-title">时光映像 · 我们的光影纪念册</div>
         <div id="canvas-container" style="position: relative;">
-            <!-- 相册加载占位动画层 -->
             <div id="albumLoader" class="album-loader-overlay" style="display: flex;">
                 <div class="spinner"></div>
                 <div class="loading-text">正在加载</div>
@@ -457,7 +754,6 @@
         </div>
         <div class="album-note">✨ 拖拽旋转视角 | 双指缩放 ✨</div>
     </div>
-    
     <footer>
         ♾️ 时空无法稀释的情意 · 献给2011.07.20的你<br>制作人:何春锦<br>制作时间:2026年6月10日
     </footer>
@@ -474,6 +770,69 @@
 
 <script>
     (function() {
+        // ---------- 邮件开屏逻辑 ----------
+        const mailSplash = document.getElementById('mailSplash');
+        const mailIcon = document.getElementById('mailIconWrapper');
+        const openBtn = document.getElementById('openMailBtn');
+        const inputArea = document.getElementById('inputArea');
+        const nameInput = document.getElementById('nameInput');
+        const confirmBtn = document.getElementById('confirmNameBtn');
+        const inputError = document.getElementById('inputError');
+        const mainContainer = document.getElementById('mainContainer');
+
+        let step = 'splash'; // splash | input | done
+
+        // 点击打开按钮 -> 邮件分割 + 弹出输入框
+        openBtn.addEventListener('click', function() {
+            if (step !== 'splash') return;
+            // 邮件分割动画
+            mailIcon.classList.add('split');
+            // 隐藏按钮
+            openBtn.style.opacity = '0';
+            openBtn.style.pointerEvents = 'none';
+            // 延迟显示输入框
+            setTimeout(() => {
+                mailSplash.style.display = 'none'; // 隐藏背景但保留邮件悬浮效果
+                inputArea.classList.add('show');
+                nameInput.focus();
+                step = 'input';
+            }, 900);
+        });
+
+        // 确认姓名
+        function handleNameConfirm() {
+            if (step !== 'input') return;
+            const val = nameInput.value.trim();
+            if (val === '欧阳梦琪') {
+                // 正确：隐藏输入层，显示主内容，邮件完全打开（显示主页面）
+                inputArea.classList.remove('show');
+                inputArea.style.display = 'none';
+                mailSplash.classList.add('hide');
+                mainContainer.classList.add('reveal');
+                step = 'done';
+                // 触发相册加载
+                if (typeof initThreeAlbum === 'function') {
+                    // 延迟确保DOM可见
+                    setTimeout(() => { initThreeAlbum(); }, 400);
+                }
+                // 音乐播放尝试（如果有）
+                if (window.bgAudio && window.bgAudio.paused) {
+                    window.bgAudio.play().catch(()=>{});
+                }
+            } else {
+                inputError.textContent = '❌ 你不是收件人';
+                nameInput.value = '';
+                nameInput.focus();
+                setTimeout(() => { inputError.textContent = ''; }, 2000);
+            }
+        }
+
+        confirmBtn.addEventListener('click', handleNameConfirm);
+        nameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') handleNameConfirm();
+        });
+
+        // ---------- 原有逻辑（保留） ----------
         const BIRTH_MONTH = 6;
         const BIRTH_DAY = 20;
         const ANNIVERSARY_START = new Date(2026, 2, 7);
@@ -730,6 +1089,7 @@
         
         initTimeMachine();
         
+        // ---------- 星星背景 ----------
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
@@ -772,6 +1132,7 @@
         resizeCanvas();
         drawStars();
         
+        // ---------- 手写信笺 ----------
         const revealBtn = document.getElementById('revealBtn');
         const hiddenMsgDiv = document.getElementById('hiddenMessage');
         let opened = false;
@@ -795,73 +1156,51 @@
             });
         });
         
-        // ---------- 音频：只保留第四首歌，开启循环，交互后播放（兼容性更强）----------
-const FOURTH_SONG_URL = "https://cdn.jsdelivr.net/gh/Hehe11TvT/Hehe11TvT.github.io@main/Music/4.mp3";
-
-let bgAudio = null;
-let playAttempted = false;
-
-function initRobustAudio() {
-    // 创建 Audio 元素
-    bgAudio = new Audio();
-    bgAudio.src = FOURTH_SONG_URL;
-    bgAudio.volume = 0.6;
-    bgAudio.loop = true;
-    bgAudio.preload = "auto";
-    
-    // 加载音频（但不自动播放）
-    bgAudio.load();
-    
-    // 播放函数
-    const tryPlay = () => {
-        if (!bgAudio) return;
-        if (!bgAudio.paused) return; // 已经在播放
-        if (playAttempted) return;   // 已经尝试过
+        // ---------- 音频 ----------
+        const FOURTH_SONG_URL = "https://cdn.jsdelivr.net/gh/Hehe11TvT/Hehe11TvT.github.io@main/Music/4.mp3";
+        let bgAudio = null;
+        let playAttempted = false;
+        function initRobustAudio() {
+            bgAudio = new Audio();
+            bgAudio.src = FOURTH_SONG_URL;
+            bgAudio.volume = 0.6;
+            bgAudio.loop = true;
+            bgAudio.preload = "auto";
+            bgAudio.load();
+            window.bgAudio = bgAudio;
+            const tryPlay = () => {
+                if (!bgAudio) return;
+                if (!bgAudio.paused) return;
+                if (playAttempted) return;
+                bgAudio.play().then(() => {
+                    playAttempted = true;
+                }).catch(err => {});
+            };
+            const events = ['click', 'touchstart', 'keydown', 'scroll'];
+            const onUserInteraction = () => {
+                tryPlay();
+                if (playAttempted) {
+                    events.forEach(ev => document.removeEventListener(ev, onUserInteraction));
+                }
+            };
+            events.forEach(ev => document.addEventListener(ev, onUserInteraction));
+            setTimeout(() => {
+                if (!playAttempted && bgAudio && bgAudio.paused) {
+                    bgAudio.play().then(() => { playAttempted = true; }).catch(() => {});
+                }
+            }, 3000);
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && !playAttempted && bgAudio && bgAudio.paused) {
+                    bgAudio.play().catch(() => {});
+                }
+            });
+        }
+        initRobustAudio();
         
-        bgAudio.play().then(() => {
-            playAttempted = true;
-            console.log("✅ 音乐播放成功");
-        }).catch(err => {
-            console.log("⚠️ 播放失败:", err);
-            // 失败时保持等待下一次交互
-        });
-    };
-    
-    // 方式1：监听多种用户交互事件
-    const events = ['click', 'touchstart', 'keydown', 'scroll'];
-    const onUserInteraction = () => {
-        tryPlay();
-        // 播放成功后移除监听
-        if (playAttempted) {
-            events.forEach(ev => document.removeEventListener(ev, onUserInteraction));
-        }
-    };
-    events.forEach(ev => document.addEventListener(ev, onUserInteraction));
-    
-    // 方式2：延迟3秒后如果还没有播放，尝试一次（针对部分允许自动播放的环境）
-    setTimeout(() => {
-        if (!playAttempted && bgAudio && bgAudio.paused) {
-            bgAudio.play().then(() => {
-                playAttempted = true;
-                console.log("✅ 延迟自动播放成功");
-            }).catch(() => {});
-        }
-    }, 3000);
-    
-    // 方式3：监听页面可见性变化，用户切回页面时再尝试
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && !playAttempted && bgAudio && bgAudio.paused) {
-            bgAudio.play().catch(() => {});
-        }
-    });
-}
-
-initRobustAudio();
-        
+        // ---------- 3D相册 ----------
         let threeInitialized = false;
         let threeScene, threeCamera, threeRenderer, threeControls, photoCube, ringLoop, starsField3D, auraParticles, sunMesh, sunLightSoft;
         const loaderOverlay = document.getElementById('albumLoader');
-        
         const imageUrls = [
             "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/IM1.jpg",
             "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/IM2.jpg",
