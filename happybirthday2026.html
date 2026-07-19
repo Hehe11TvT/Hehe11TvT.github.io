@@ -770,7 +770,7 @@
 
 <script>
     (function() {
-        // ---------- 邮件开屏逻辑 ----------
+        //邮件开屏逻辑
         const mailSplash = document.getElementById('mailSplash');
         const mailIcon = document.getElementById('mailIconWrapper');
         const openBtn = document.getElementById('openMailBtn');
@@ -782,7 +782,7 @@
 
         let step = 'splash'; // splash | input | done
 
-        // 点击打开按钮 -> 邮件分割 + 弹出输入框
+        // 点击打开按钮邮件分割弹出输入框
         openBtn.addEventListener('click', function() {
             if (step !== 'splash') return;
             // 邮件分割动画
@@ -798,13 +798,10 @@
                 step = 'input';
             }, 900);
         });
-
-        // 确认姓名
         function handleNameConfirm() {
             if (step !== 'input') return;
             const val = nameInput.value.trim();
             if (val === '欧阳梦琪') {
-                // 正确：隐藏输入层，显示主内容，邮件完全打开（显示主页面）
                 inputArea.classList.remove('show');
                 inputArea.style.display = 'none';
                 mailSplash.classList.add('hide');
@@ -831,8 +828,6 @@
         nameInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') handleNameConfirm();
         });
-
-        // ---------- 原有逻辑（保留） ----------
         const BIRTH_MONTH = 6;
         const BIRTH_DAY = 20;
         const ANNIVERSARY_START = new Date(2026, 2, 7);
@@ -1089,7 +1084,7 @@
         
         initTimeMachine();
         
-        // ---------- 星星背景 ----------
+        //星星背景
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
@@ -1132,7 +1127,7 @@
         resizeCanvas();
         drawStars();
         
-        // ---------- 手写信笺 ----------
+        //手写信笺
         const revealBtn = document.getElementById('revealBtn');
         const hiddenMsgDiv = document.getElementById('hiddenMessage');
         let opened = false;
@@ -1156,7 +1151,7 @@
             });
         });
         
-        // ---------- 音频 ----------
+        //音频
         const FOURTH_SONG_URL = "https://cdn.jsdelivr.net/gh/Hehe11TvT/Hehe11TvT.github.io@main/Music/4.mp3";
         let bgAudio = null;
         let playAttempted = false;
@@ -1197,7 +1192,7 @@
         }
         initRobustAudio();
         
-        // ---------- 3D相册 ----------
+        //3D相册
         let threeInitialized = false;
         let threeScene, threeCamera, threeRenderer, threeControls, photoCube, ringLoop, starsField3D, auraParticles, sunMesh, sunLightSoft;
         const loaderOverlay = document.getElementById('albumLoader');
@@ -1400,7 +1395,7 @@
         }
     })();
 
-    // ========== 新增：不蒜子访问统计 ==========
+    //不蒜子访问统计
     function addBusuanziStat() {
         // 创建统计容器，放置在footer上方
         const statWrap = document.createElement('div');
@@ -1418,15 +1413,14 @@
         `;
         document.querySelector('footer').before(statWrap);
 
-        // 加载不蒜子JS
+        // 加载
         const bsScript = document.createElement('script');
         bsScript.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
         bsScript.async = true;
         document.body.appendChild(bsScript);
     }
-    // 页面加载完成后初始化统计
+    // 加载后初始化
     window.addEventListener('load', addBusuanziStat);
-    // ==========================================
 </script>
 </body>
 </html>
