@@ -1399,6 +1399,34 @@
             observer.observe(albumSection);
         }
     })();
+
+    // ========== 新增：不蒜子访问统计 ==========
+    function addBusuanziStat() {
+        // 创建统计容器，放置在footer上方
+        const statWrap = document.createElement('div');
+        statWrap.style.cssText = `
+            text-align:center;
+            margin:1.5rem 0 0.5rem;
+            font-size:0.8rem;
+            color:#b8ae8a;
+            font-family:"微软雅黑",sans-serif;
+        `;
+        statWrap.innerHTML = `
+            <span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span>
+            &nbsp;&nbsp;
+            <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span>
+        `;
+        document.querySelector('footer').before(statWrap);
+
+        // 加载不蒜子JS
+        const bsScript = document.createElement('script');
+        bsScript.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+        bsScript.async = true;
+        document.body.appendChild(bsScript);
+    }
+    // 页面加载完成后初始化统计
+    window.addEventListener('load', addBusuanziStat);
+    // ==========================================
 </script>
 </body>
 </html>
