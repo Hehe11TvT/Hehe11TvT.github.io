@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刘德华解冻进度查询</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            color: #ffd700;
+        }
+        .progress-text {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 16px 0 24px;
+            color: #ff4757;
+        }
+        .img-box {
+            width: 100%;
+            border: 3px solid #ffd700;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+        #iceImg {
+            width: 100%;
+            display: block;
+        }
+        .date-info {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #cccccc;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>刘德华解冻进度</h1>
+    <div class="progress-text" id="showPercent">0%</div>
+    <div class="img-box">
+        <img id="iceImg" alt="解冻进度图">
+    </div>
+    <div class="date-info" id="dateInfo"></div>
+</div>
+
+<script>
+    const imgUrlList = [
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua0%25.jpg",
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua10%25.jpg",
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua20%25.jpg",
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua30%25.jpg",
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua40%25.jpg",
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua50%25.jpg",
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua60%25.jpg",
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua70%25.jpg",
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua80%25.jpg",
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua90%25.jpg",
+        "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua100%25.jpg"
+    ];
+
+    const springThis = new Date("2026-02-17");
+    const springNext = new Date("2027-02-06");
+    const now = new Date();
+
+    function getDayDiff(start, end) {
+        const dayMs = 24 * 60 * 60 * 1000;
+        return Math.floor((end - start) / dayMs);
+    }
+
+    let realPercent = 0;
+    const daysAfterSpring = getDayDiff(springThis, now);
+
+    if (daysAfterSpring === 0) {
+        realPercent = 100;
+    } else if (daysAfterSpring > 0) {
+        const totalCycle = getDayDiff(springThis, springNext);
+        const daysLeft = getDayDiff(now, springNext);
+        realPercent = ((totalCycle - daysLeft) / totalCycle) * 100;
+    } else {
+        const daysBefore = Math.abs(daysAfterSpring);
+        realPercent = ((365 - daysBefore) / 365) * 100;
+    }
+
+    realPercent = Math.max(0, Math.min(realPercent, 100));
+    const roundPercent = Math.round(realPercent / 10) * 10;
+    const imgIndex = Math.min(roundPercent / 10, 10);
+
+    document.getElementById("showPercent").innerText = realPercent.toFixed(0) + "%";
+    document.getElementById("iceImg").src = imgUrlList[imgIndex];
+
+    let tipText = "";
+    if (daysAfterSpring === 0) {
+        tipText = "今日正月初一，刘德华完全解冻";
+    } else if (daysAfterSpring > 0) {
+        const remainDays = getDayDiff(now, springNext);
+        tipText = `本年度春节结束，新一轮解冻周期启动，距离2027春节还有 ${remainDays} 天`;
+    } else {
+        tipText = `距离2026春节还有 ${Math.abs(daysAfterSpring)} 天`;
+    }
+
+    document.getElementById("dateInfo").innerHTML =
+        `当前公历日期：${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}<br/>${tipText}`;
+</script>
+</body>
+</html>
