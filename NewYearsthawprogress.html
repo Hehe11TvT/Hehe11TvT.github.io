@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 修复跨域referer导致统计失效 -->
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <title>刘德华解冻进度（柠萌是个大帅比）</title>
     <style>
         * {
@@ -72,6 +74,11 @@
         a:hover {
             text-decoration: underline;
         }
+        /* 强制不蒜子容器可见，防止display:none隐藏 */
+        #busuanzi_container_site_pv,
+        #busuanzi_container_site_uv {
+            display: inline !important;
+        }
     </style>
 </head>
 <body>
@@ -82,12 +89,15 @@
         <img id="iceImg" alt="解冻进度图">
     </div>
     <div class="date-info" id="dateInfo"></div>
-
-    <!-- 不蒜子统计区域：访问量 & 访客数 -->
+    <!-- 修复点1：添加官方标准busuanzi_container容器 -->
     <div class="busuanzi-container">
-        <span>总访问量： <span id="busuanzi_value_site_pv" class="num">0</span> 次</span>
+        <span id="busuanzi_container_site_pv">
+            总访问量： <span id="busuanzi_value_site_pv" class="num">0</span> 次
+        </span>
         <span>|</span>
-        <span>访客数： <span id="busuanzi_value_site_uv" class="num">0</span> 人</span>
+        <span id="busuanzi_container_site_uv">
+            访客数： <span id="busuanzi_value_site_uv" class="num">0</span> 人
+        </span>
         <span style="display: block; margin-top: 6px; font-size: 12px; color: #666;">
             数据来源 · <a href="https://busuanzi.ibruce.info/" target="_blank">不蒜子</a>
         </span>
@@ -114,20 +124,16 @@
             "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua90%25.jpg",
             "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/liudehua/liudehua100%25.jpg"
         ];
-
         // ---------- 日期 & 进度计算 ----------
         const springThis = new Date("2026-02-17");
         const springNext = new Date("2027-02-06");
         const now = new Date();
-
         function getDayDiff(start, end) {
             const dayMs = 24 * 60 * 60 * 1000;
             return Math.floor((end - start) / dayMs);
         }
-
         let realPercent = 0;
         const daysAfterSpring = getDayDiff(springThis, now);
-
         if (daysAfterSpring === 0) {
             realPercent = 100;
         } else if (daysAfterSpring > 0) {
@@ -138,15 +144,12 @@
             const daysBefore = Math.abs(daysAfterSpring);
             realPercent = ((365 - daysBefore) / 365) * 100;
         }
-
         realPercent = Math.max(0, Math.min(realPercent, 100));
         const roundPercent = Math.round(realPercent / 10) * 10;
         const imgIndex = Math.min(roundPercent / 10, 10);
-
         // 更新 DOM
         document.getElementById("showPercent").innerText = realPercent.toFixed(0) + "%";
         document.getElementById("iceImg").src = imgUrlList[imgIndex];
-
         // 底部描述文字
         let tipText = "";
         if (daysAfterSpring === 0) {
@@ -157,13 +160,31 @@
         } else {
             tipText = `距离2026春节还有 ${Math.abs(daysAfterSpring)} 天`;
         }
-
         document.getElementById("dateInfo").innerHTML =
-            `当前公历日期：${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}<br/>${tipText}`;
+            `当前公历日期：${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}<br />${tipText}`;
     })();
-</script>
 
+    // 修复点2：轮询兜底，异步加载完成后自动刷新数字，解决长期0问题
+    function refreshBusuanziCount() {
+        const pvEl = document.getElementById("busuanzi_value_site_pv");
+        const uvEl = document.getElementById("busuanzi_value_site_uv");
+        // 数字不为0则停止轮询
+        if (pvEl && uvEl && pvEl.innerText !== "0" && uvEl.innerText !== "0") return;
+        // 300ms重试一次，最多重试20次（6秒超时）
+        let retry = 0;
+        const timer = setInterval(() => {
+            retry++;
+            const pv = document.getElementById("busuanzi_value_site_pv");
+            const uv = document.getElementById("busuanzi_value_site_uv");
+            if ((pv && pv.innerText !== "0") || retry > 20) {
+                clearInterval(timer);
+            }
+        }, 300);
+    }
+    // DOM加载完成后启动轮询
+    window.addEventListener("DOMContentLoaded", refreshBusuanziCount);
+</script>
 <!-- 说明：不蒜子会自动将访问数据渲染到 span#busuanzi_value_site_pv 和 span#busuanzi_value_site_uv 中。
-     若因网络等原因未加载，显示为0，不影响核心功能。 -->
+     若因网络等原因未加载，显示为0，增加轮询兜底逻辑自动重试。 -->
 </body>
 </html>
