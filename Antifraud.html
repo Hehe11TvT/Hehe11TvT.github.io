@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>这是一个标题～龙虾是我男神</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #ff4e50, #fc913a);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .red-packet-box {
+            width: 100%;
+            max-width: 420px;
+            background-color: #fff;
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .red-icon {
+            font-size: 80px;
+            color: #e6212a;
+            margin-bottom: 15px;
+            animation: shake 0.8s ease-in-out infinite alternate;
+        }
+        @keyframes shake {
+            from {transform: rotate(-6deg);}
+            to {transform: rotate(6deg);}
+        }
+        .tip-title {
+            font-size: 22px;
+            color: #e6212a;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .sender-name {
+            font-size: 16px;
+            color: #777;
+            margin-bottom: 25px;
+        }
+        .warn-text {
+            font-size: 17px;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .visitor-text {
+            font-size: 16px;
+            color: #d92121;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+        .emphasis {
+            color: #e6212a;
+            font-weight: bold;
+        }
+        .rule-title {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .rule-list {
+            text-align: left;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 35px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+        }
+        button {
+            flex: 1;
+            padding: 14px 0;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .back-btn {
+            background-color: #eeeeee;
+            color: #555;
+        }
+        .share-btn {
+            background-color: #e6212a;
+            color: #fff;
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+        .footer-desc {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+    <!-- 引入不蒜子JS，配置独立访客uv统计 -->
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</head>
+<body>
+    <div class="red-packet-box">
+        <div class="red-icon">🧧</div>
+        <div class="tip-title">反诈提醒</div>
+        <div class="sender-name">来自「柠萌」的温馨提示</div>
+
+        <div class="warn-text">
+            恭喜被我骗了<br>
+            牢记：<span class="emphasis">天上不会掉馅饼</span>，<br>
+            陌生链接不要随意点开，<br>
+            太贪了，bro
+        </div>
+
+        <div class="visitor-text">
+            同时，目前被"骗"的有 <span id="busuanzi_value_site_uv">加载中...</span> 人
+        </div>
+
+        <div class="rule-title">反诈小常识：</div>
+        <div class="rule-list">
+            1. 陌生红包领完记得跑路 不要贪
+            <br>
+            2. 陌生链接不要点(怎么进来的自己清楚)
+            <br>
+            3. 不透露验证码与密码
+            <br>
+            4. 周四v我50我要吃肯德基 嘻嘻
+        </div>
+
+        <div class="btn-group">
+            <button class="back-btn" onclick="history.back()">不要贪了</button>
+            <button class="share-btn" onclick="alert('快去转发捉弄你的好友，顺便提醒大家防范诈骗~')">快去转发</button>
+        </div>
+
+        <div class="footer-desc">本页面单纯想逗你 嗯对就是这样 记得V我50</div>
+    </div>
+
+    <script>
+        // 轮询检测不蒜子UV数值，0则保持加载中
+        const uvSpan = document.getElementById('busuanzi_value_site_uv');
+        const pollTimer = setInterval(() => {
+            const rawVal = uvSpan.innerText.trim();
+            if (rawVal !== '' && rawVal !== '0') {
+                clearInterval(pollTimer);
+            } else {
+                uvSpan.innerText = '加载中...';
+            }
+        }, 300);
+    </script>
+</body>
+</html>
