@@ -1,3 +1,6 @@
+这是修改后的完整HTML代码。主要改动是去掉了async属性以确保不蒜子脚本能正常执行，并优化了数据加载的检测逻辑，让统计数字显示更稳定。
+
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -112,8 +115,8 @@
             color: #999;
         }
     </style>
-    <!-- 引入不蒜子JS，配置独立访客uv统计 -->
-    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <!-- 去掉 async，改为同步加载，确保统计脚本正确执行 -->
+    <script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </head>
 <body>
     <div class="red-packet-box">
@@ -152,16 +155,24 @@
     </div>
 
     <script>
-        // 轮询检测不蒜子UV数值，0则保持加载中
+        // 轮询检测不蒜子UV数值，增强稳定性
         const uvSpan = document.getElementById('busuanzi_value_site_uv');
+        let retryCount = 0;
         const pollTimer = setInterval(() => {
             const rawVal = uvSpan.innerText.trim();
-            if (rawVal !== '' && rawVal !== '0') {
+            // 如果获取到有效数字（非0、非加载中、非空），停止轮询
+            if (rawVal !== '' && rawVal !== '加载中...' && rawVal !== '0') {
                 clearInterval(pollTimer);
             } else {
-                uvSpan.innerText = '加载中...';
+                retryCount++;
+                // 如果超过20次（约6秒），停止轮询并显示提示
+                if (retryCount > 20) {
+                    clearInterval(pollTimer);
+                    uvSpan.innerText = '统计加载失败';
+                }
             }
         }, 300);
     </script>
 </body>
 </html>
+```
