@@ -1,0 +1,23 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hehe11TvT/Hehe11TvT.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hehe11TvT/Hehe11TvT.github.io/issues"
+  },
+  "homepage": "https://github.com/Hehe11TvT/Hehe11TvT.github.io#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
