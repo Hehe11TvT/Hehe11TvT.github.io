@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>星辰轨迹 · 予你 · Happy birthday</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 30% 20%, #0a0f1f, #010105);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #edeef5;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* ===== 邮件开屏层 ===== */
+        #mailSplash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, #0a0f1f, #010105);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+            font-family: 'Inter', '微软雅黑', sans-serif;
+            padding: 1.5rem;
+        }
+        #mailSplash.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .splash-title {
+            font-size: 2.8rem;
+            font-weight: 500;
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, #F7EFDF, #DCC991);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 1.8rem;
+            line-height: 1.3;
+        }
+        .splash-title small {
+            display: block;
+            font-size: 1.2rem;
+            opacity: 0.7;
+            margin-top: 0.2rem;
+        }
+        /* 邮件图标容器 */
+        #mailIconWrapper {
+            position: relative;
+            width: 160px;
+            height: 120px;
+            margin: 0.5rem auto 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        /* 邮件主体：信封 + 封口 */
+        .envelope {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #e8dcc0;
+            border-radius: 12px 12px 6px 6px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,245,210,0.3);
+            transition: all 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
+            transform-origin: center center;
+        }
+        /* 信封封口（三角 flap） */
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #dacba8;
+            clip-path: polygon(0 0, 50% 45%, 100% 0);
+            border-radius: 12px 12px 0 0;
+            transition: all 0.7s cubic-bezier(0.34, 1.2, 0.64, 1);
+            transform-origin: top center;
+            z-index: 2;
+            box-shadow: inset 0 -6px 12px rgba(0,0,0,0.1);
+        }
+        /* 封口上的线条装饰 */
+        .envelope-flap::after {
+            content: "";
+            position: absolute;
+            top: 25%;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background: rgba(180, 150, 100, 0.3);
+            border-radius: 2px;
+        }
+        /* 信封上的"折痕"装饰线 */
+        .envelope-line {
+            position: absolute;
+            bottom: 16%;
+            left: 10%;
+            width: 80%;
+            height: 1.5px;
+            background: rgba(150, 120, 80, 0.25);
+            border-radius: 2px;
+            z-index: 1;
+        }
+        .envelope-line2 {
+            bottom: 30%;
+        }
+        /* 邮件上的"邮票"装饰 */
+        .stamp {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 28px;
+            height: 32px;
+            background: #c9b07a;
+            border-radius: 4px;
+            border: 1px solid rgba(200,170,110,0.4);
+            z-index: 3;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #4d3e2b;
+            font-weight: 600;
+            transform: rotate(8deg);
+        }
+        .stamp::after {
+            content: "✦";
+            font-size: 16px;
+        }
+        /* 邮件中间的分割线（打开时用） */
+        .envelope-split-top,
+        .envelope-split-bottom {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            overflow: hidden;
+            transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 1;
+            pointer-events: none;
+        }
+        .envelope-split-top {
+            top: 0;
+            border-radius: 12px 12px 0 0;
+            background: #e8dcc0;
+            clip-path: inset(0 0 0 0);
+        }
+        .envelope-split-bottom {
+            bottom: 0;
+            border-radius: 0 0 6px 6px;
+            background: #e8dcc0;
+            clip-path: inset(0 0 0 0);
+        }
+        /* 拆开状态：上下分离 */
+        #mailIconWrapper.split .envelope-split-top {
+            transform: translateY(-70px) scale(0.96);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        #mailIconWrapper.split .envelope-split-bottom {
+            transform: translateY(70px) scale(0.96);
+            box-shadow: 0 -20px 40px rgba(0,0,0,0.3);
+        }
+        #mailIconWrapper.split .envelope-flap {
+            opacity: 0;
+            transform: scaleY(0.2);
+        }
+        #mailIconWrapper.split .stamp,
+        #mailIconWrapper.split .envelope-line {
+            opacity: 0;
+        }
+        /* 邮件下方的按钮 */
+        #openMailBtn {
+            background: linear-gradient(115deg, #262d3f, #181e2c);
+            border: 1px solid #cfb77c;
+            color: #f5e7c1;
+            padding: 0.8rem 2.8rem;
+            font-size: 1.2rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 500;
+            backdrop-filter: blur(6px);
+            transition: 0.25s;
+            font-family: '微软雅黑', 'Inter', sans-serif;
+            letter-spacing: 2px;
+            margin-top: 0.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        #openMailBtn:hover {
+            background: #343d54;
+            border-color: #ebd5a0;
+            transform: scale(1.02);
+        }
+        /* 原有样式保留 */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #191e2c; }
+        ::-webkit-scrollbar-thumb { background: #b89f60; border-radius: 20px; }
+
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.8;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.8rem 1.5rem 4rem;
+            opacity: 0;
+            transition: opacity 1s ease 0.3s;
+        }
+        .container.reveal {
+            opacity: 1;
+        }
+
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .greeting-badge {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #dfcf9a;
+            background: rgba(15, 20, 30, 0.5);
+            backdrop-filter: blur(5px);
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            margin-bottom: 1.8rem;
+        }
+
+        .name-title {
+            font-size: 3.8rem;
+            font-weight: 500;
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, #F7EFDF, #DCC991);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.6rem;
+        }
+
+        .time-core {
+            background: rgba(8, 12, 20, 0.6);
+            backdrop-filter: blur(16px);
+            border-radius: 80px;
+            padding: 1.8rem 2rem;
+            margin: 1.5rem auto;
+            width: fit-content;
+            max-width: 90%;
+            border: 1px solid rgba(200, 175, 110, 0.5);
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+        }
+
+        .dynamic-message {
+            font-size: 2rem;
+            font-weight: 600;
+            font-family: '微软雅黑', 'Microsoft YaHei', 'Inter', sans-serif;
+            letter-spacing: 1px;
+            color: #f8efcf;
+            margin-bottom: 0.75rem;
+        }
+
+        .sub-time {
+            font-size: 1rem;
+            font-weight: 400;
+            font-family: '微软雅黑', 'Microsoft YaHei', 'Inter', sans-serif;
+            color: #cbc2a0;
+        }
+
+        .time-digits {
+            font-family: '微软雅黑', 'Microsoft YaHei', 'Inter', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #f2e5c2, #cbbf8c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .story-section {
+            background: rgba(12, 18, 28, 0.55);
+            backdrop-filter: blur(10px);
+            border-radius: 48px;
+            padding: 2.5rem 2rem;
+            margin: 2.5rem 0;
+            border: 1px solid rgba(192, 168, 106, 0.3);
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 500;
+            border-left: 4px solid #c0a86a;
+            padding-left: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .poem-text {
+            font-size: 1.15rem;
+            line-height: 1.65;
+            color: #e7eaf5;
+            margin-bottom: 1.8rem;
+            font-family: '微软雅黑', 'Microsoft YaHei', 'Inter', sans-serif;
+        }
+
+        .memory-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .memory-card {
+            background: rgba(28, 34, 48, 0.7);
+            border-radius: 28px;
+            padding: 1.5rem;
+            flex: 1 1 200px;
+            text-align: center;
+            transition: 0.25s ease;
+            border: 1px solid rgba(210, 180, 100, 0.2);
+            cursor: pointer;
+        }
+        .memory-card:hover {
+            transform: translateY(-6px);
+            background: rgba(45, 54, 75, 0.8);
+            border-color: #c7a86b;
+        }
+        .memory-icon { font-size: 2.2rem; margin-bottom: 0.8rem; }
+        .memory-title { font-weight: 600; color: #ecdcaa; margin-bottom: 0.3rem; font-family: '微软雅黑', 'Microsoft YaHei', sans-serif; }
+        .memory-desc { font-size: 0.85rem; opacity: 0.85; font-family: '微软雅黑', 'Microsoft YaHei', sans-serif; }
+
+        .romantic-quote {
+            text-align: center;
+            font-style: italic;
+            margin: 2rem 0 1rem;
+            color: #ddd2b0;
+            font-size: 1rem;
+            font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+        }
+        .signature-name {
+            text-align: center;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+            color: #e5cf9a;
+            background: rgba(20,24,34,0.4);
+            display: inline-block;
+            width: auto;
+            padding: 0.4rem 1.5rem;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+
+        .secret-section {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0 1rem;
+        }
+        .reveal-btn {
+            background: linear-gradient(115deg, #262d3f, #181e2c);
+            border: 1px solid #cfb77c;
+            color: #f5e7c1;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 500;
+            backdrop-filter: blur(6px);
+            transition: 0.2s;
+            font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+        }
+        .reveal-btn:hover {
+            background: #343d54;
+            border-color: #ebd5a0;
+            transform: scale(1.01);
+        }
+        .hidden-message {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(14px);
+            border-radius: 36px;
+            margin-top: 1rem;
+            border: 1px solid rgba(210, 180, 110, 0.4);
+        }
+        .hidden-message.show {
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        .letter-content {
+            text-align: center;
+            font-family: '微软雅黑', 'Microsoft YaHei', 'Cormorant Garamond', serif;
+            font-size: 1.18rem;
+            line-height: 1.65;
+            color: #f2ecdb;
+        }
+        .signature {
+            margin-top: 1.2rem;
+            font-weight: 500;
+            color: #e5cf92;
+            font-style: italic;
+        }
+        .album-section {
+            margin-top: 5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .album-title {
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            color: #ecdcaa;
+            letter-spacing: 2px;
+        }
+        .album-title:before,
+        .album-title:after {
+            content: "✦";
+            margin: 0 15px;
+            opacity: 0.6;
+            font-size: 1.4rem;
+        }
+        #canvas-container {
+            width: 100%;
+            height: 70vh;
+            min-height: 500px;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.6);
+            border: 1px solid rgba(200, 175, 110, 0.4);
+            background: rgba(5, 8, 18, 0.4);
+            backdrop-filter: blur(4px);
+            position: relative;
+        }
+        .album-loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 18, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            gap: 1rem;
+            transition: opacity 0.4s ease;
+            font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+            color: #ecdcaa;
+            pointer-events: none;
+        }
+        .album-loader-overlay .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(220, 190, 110, 0.3);
+            border-top: 3px solid #e0c88a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .album-loader-overlay .loading-text {
+            font-size: 1rem;
+            letter-spacing: 2px;
+            background: rgba(0,0,0,0.5);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+        }
+        .album-note {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #b8ae8a;
+            margin-top: 1rem;
+            font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            opacity: 0.5;
+            margin-top: 3rem;
+            font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+        }
+        @media (max-width: 600px) {
+            .name-title { font-size: 2.2rem; }
+            .dynamic-message { font-size: 1.5rem; }
+            .time-digits { font-size: 1.4rem; }
+            .time-core { padding: 1rem 1.2rem; }
+            .hidden-message.show { max-height: 520px; padding: 1.5rem; }
+            .letter-content { font-size: 1rem; }
+            .album-title { font-size: 1.6rem; }
+            .album-title:before,
+            .album-title:after { margin: 0 8px; font-size: 1rem; }
+            #canvas-container { height: 50vh; min-height: 400px; }
+            .splash-title { font-size: 2rem; }
+            #mailIconWrapper { width: 120px; height: 90px; }
+        }
+    </style>
+</head>
+<body>
+<canvas id="starCanvas"></canvas>
+
+<!-- ===== 邮件开屏层 ===== -->
+<div id="mailSplash">
+    <div class="splash-title">
+        你收到一封神秘邮件
+    </div>
+    <div id="mailIconWrapper">
+        <!-- 信封主体（拆解用） -->
+        <div class="envelope-split-top"></div>
+        <div class="envelope-split-bottom"></div>
+        <!-- 封口 flap -->
+        <div class="envelope-flap"></div>
+        <!-- 装饰线 -->
+        <div class="envelope-line"></div>
+        <div class="envelope-line envelope-line2"></div>
+        <!-- 邮票 -->
+        <div class="stamp"></div>
+        <!-- 邮件主体（底） -->
+        <div class="envelope" style="z-index:0;"></div>
+    </div>
+    <button id="openMailBtn">打开</button>
+</div>
+
+<!-- ===== 主内容容器 ===== -->
+<div class="container" id="mainContainer">
+    <div class="hero">
+        <div class="greeting-badge">✨ 致 独一无二的绾绾 ✨<br>十六岁，生日快乐！</div>
+        <div class="greeting-badge"> 网站有效期是永久，祝福也是</div>
+        <div class="name-title">送给最闪耀的 · </div>
+        <div class="name-title">绾绾</div>
+        <div class="time-core" id="dynamicCore">
+            <div class="dynamic-message" id="stateMessage">加载星辰祝福...</div>
+            <div class="sub-time" id="subInfo"></div>
+        </div>
+        <div style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.7; font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;">—— 时光流转 祝福常在 ——</div>
+        <div class="signature-name" id="signatureBlock">—— 永远为你喝彩的柠萌 ——</div>
+    </div>
+
+    <div class="story-section">
+        <div class="section-title">生于八月的盛夏</div>
+        <div class="poem-text">
+            2010年8月14日，世界迎来了一抹独特的明亮。那天的蝉鸣、晚风与星辰，似乎都为你做好了准备。<br>
+            十六年过去，你从光里走来，带着超越年纪的通透与坚定。我喜欢你看待世界的眼神——<br>
+            不迎合，不怯懦，有自己的星辰与湖泊。愿这份祝福，不刻意稚嫩，也不流于俗套，只想让你知道：<br>
+            你值得被世界温柔以待，且永远被时光偏爱。
+        </div>
+        <div class="memory-grid">
+            <div class="memory-card"><div class="memory-icon">🌙</div><div class="memory-title">温暖真诚</div><div class="memory-desc">你坦荡而明亮，和你在意的朋友相处如沐春风。</div></div>
+            <div class="memory-card"><div class="memory-icon">📖</div><div class="memory-title">细腻感知</div><div class="memory-desc">总能察觉细微的美好，把日子过成散文诗。</div></div>
+            <div class="memory-card"><div class="memory-icon">✨</div><div class="memory-title">未来可期</div><div class="memory-desc">你的每一个明天，都辽阔且灿烂。</div></div>
+        </div>
+    </div>
+
+    <div class="romantic-quote">
+        “ 于千万种生活中，愿你永远做最自在的自己。生日快乐，不止今天。”
+    </div>
+
+    <div class="secret-section">
+        <button class="reveal-btn" id="revealBtn">✉️ 展开手写信笺 ✉️</button>
+    </div>
+    <div class="hidden-message" id="hiddenMessage">
+        <div class="letter-content">
+            给独一无二的你：<br><br>
+            缘分让两颗星在茫茫人间短暂交错，很庆幸我们成为了朋友。<br>
+            你身上那份从容与坦荡，总让身边的人觉得安心而明亮。<br>
+            新的一岁，愿你继续忠于自己，笑得坦荡，梦得自由。<br>
+            不必急着长成大人，慢慢走，沿途都是风景。<br>
+            愿你的快乐像这个夏天一样，漫长、明亮、没有尽头。<br>
+            十六岁，生日快乐。<br>
+            <div class="signature">    —— 永远为你喝彩的柠萌</div>
+        </div>
+    </div>
+    
+    <div class="album-section" id="albumSection">
+        <div class="album-title">时光映像 · 你的光影纪念册</div>
+        <div id="canvas-container" style="position: relative;">
+            <div id="albumLoader" class="album-loader-overlay" style="display: flex;">
+                <div class="spinner"></div>
+                <div class="loading-text">正在加载</div>
+            </div>
+        </div>
+        <div class="album-note">✨ 拖拽旋转视角 | 双指缩放 ✨</div>
+    </div>
+    <footer>
+        ♾️ 时光无法稀释的祝福 · 献给2010.08.14的你<br>为你送上十六岁的美好祝愿<br>制作时间:2026年8月12日
+    </footer>
+</div>
+
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+        }
+    }
+</script>
+
+<script>
+    (function() {
+        //邮件开屏逻辑
+        const mailSplash = document.getElementById('mailSplash');
+        const mailIcon = document.getElementById('mailIconWrapper');
+        const openBtn = document.getElementById('openMailBtn');
+        const mainContainer = document.getElementById('mainContainer');
+
+        // 点击打开按钮邮件分割直接进入主页面
+        openBtn.addEventListener('click', function() {
+            // 邮件分割动画
+            mailIcon.classList.add('split');
+            // 隐藏按钮
+            openBtn.style.opacity = '0';
+            openBtn.style.pointerEvents = 'none';
+            // 延迟隐藏开屏并显示主内容
+            setTimeout(() => {
+                mailSplash.classList.add('hide');
+                mainContainer.classList.add('reveal');
+                // 触发相册加载
+                if (typeof initThreeAlbum === 'function') {
+                    // 延迟确保DOM可见
+                    setTimeout(() => { initThreeAlbum(); }, 400);
+                }
+                // 音乐播放尝试（如果有）
+                if (window.bgAudio && window.bgAudio.paused) {
+                    window.bgAudio.play().catch(()=>{});
+                }
+            }, 900);
+        });
+        const BIRTH_MONTH = 7;
+        const BIRTH_DAY = 14;
+        
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        let thisYearBirthday = new Date(currentYear, BIRTH_MONTH, BIRTH_DAY);
+        
+        function getDayStart(date) {
+            return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        }
+        const todayStart = getDayStart(today);
+        const thisBirthStart = getDayStart(thisYearBirthday);
+        
+        let status = 0;
+        if (todayStart.getTime() === thisBirthStart.getTime()) status = 1;
+        else if (todayStart < thisBirthStart) status = 0;
+        else status = 2;
+        
+        const stateMsgDiv = document.getElementById('stateMessage');
+        const subInfoDiv = document.getElementById('subInfo');
+        let countdownInterval = null;
+        
+        function getTimeRemaining(targetDate) {
+            const now = new Date();
+            const diffMs = targetDate - now;
+            if (diffMs <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 };
+            const totalSeconds = Math.floor(diffMs / 1000);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return { days, hours, minutes, seconds, total: totalSeconds };
+        }
+        
+        function formatCountdownWithBirthdayWord(remaining) {
+            let timeStr = '';
+            if (remaining.days > 0) timeStr = `${remaining.days}天${remaining.hours.toString().padStart(2,'0')}时${remaining.minutes.toString().padStart(2,'0')}分${remaining.seconds.toString().padStart(2,'0')}秒`;
+            else timeStr = `${remaining.hours.toString().padStart(2,'0')}时 ${remaining.minutes.toString().padStart(2,'0')}分 ${remaining.seconds.toString().padStart(2,'0')}秒`;
+            return `距离你生日还有🎂<br>${timeStr}`;
+        }
+        
+        function updateCountdownUI() {
+            if (status !== 0) return;
+            const remaining = getTimeRemaining(thisYearBirthday);
+            if (remaining.total <= 0) { location.reload(); return; }
+            stateMsgDiv.innerHTML = formatCountdownWithBirthdayWord(remaining);
+            subInfoDiv.innerHTML = `距离8月14日 · 你的专属星辰日`;
+        }
+        
+        function showBirthdayToday() {
+            stateMsgDiv.innerHTML = `✨ 祝你生日快乐 ✨`;
+            subInfoDiv.innerHTML = `今天是你新一岁的第一天，愿光芒永远追随你 · 八月十四日属于你`;
+            createConfettiEffect();
+        }
+        
+        function getPreciseRemainingToDate(futureDate, currentDate) {
+            let diffMs = futureDate - currentDate;
+            if (diffMs <= 0) return { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+            let totalSeconds = Math.floor(diffMs / 1000);
+            const seconds = totalSeconds % 60;
+            totalSeconds = Math.floor(totalSeconds / 60);
+            const minutes = totalSeconds % 60;
+            totalSeconds = Math.floor(totalSeconds / 60);
+            const hours = totalSeconds % 24;
+            
+            let tempDate = new Date(currentDate);
+            let years = 0;
+            let yearTest = new Date(tempDate);
+            yearTest.setFullYear(tempDate.getFullYear() + 1);
+            while (yearTest <= futureDate) {
+                years++;
+                tempDate.setFullYear(tempDate.getFullYear() + 1);
+                yearTest.setFullYear(tempDate.getFullYear() + 1);
+            }
+            let remainingMs = futureDate - tempDate;
+            let days = Math.floor(remainingMs / (1000 * 3600 * 24));
+            let monthTest = new Date(tempDate);
+            monthTest.setMonth(tempDate.getMonth() + 1);
+            let months = 0;
+            while (monthTest <= futureDate) {
+                months++;
+                tempDate.setMonth(tempDate.getMonth() + 1);
+                monthTest.setMonth(tempDate.getMonth() + 1);
+            }
+            remainingMs = futureDate - tempDate;
+            days = Math.floor(remainingMs / (1000 * 3600 * 24));
+            return { years, months, days, hours, minutes, seconds };
+        }
+        
+        function getPreciseElapsed(pastDate, currentDate) {
+            let diffMs = currentDate - pastDate;
+            if (diffMs < 0) return { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+            let totalSeconds = Math.floor(diffMs / 1000);
+            const seconds = totalSeconds % 60;
+            totalSeconds = Math.floor(totalSeconds / 60);
+            const minutes = totalSeconds % 60;
+            totalSeconds = Math.floor(totalSeconds / 60);
+            const hours = totalSeconds % 24;
+            
+            let tempDate = new Date(pastDate);
+            let years = 0;
+            let yearTest = new Date(tempDate);
+            yearTest.setFullYear(tempDate.getFullYear() + 1);
+            while (yearTest <= currentDate) {
+                years++;
+                tempDate.setFullYear(tempDate.getFullYear() + 1);
+                yearTest.setFullYear(tempDate.getFullYear() + 1);
+            }
+            let remainingMs = currentDate - tempDate;
+            let days = Math.floor(remainingMs / (1000 * 3600 * 24));
+            let monthTest = new Date(tempDate);
+            monthTest.setMonth(tempDate.getMonth() + 1);
+            let months = 0;
+            while (monthTest <= currentDate) {
+                months++;
+                tempDate.setMonth(tempDate.getMonth() + 1);
+                monthTest.setMonth(tempDate.getMonth() + 1);
+            }
+            remainingMs = currentDate - tempDate;
+            days = Math.floor(remainingMs / (1000 * 3600 * 24));
+            return { years, months, days, hours, minutes, seconds };
+        }
+        
+        function showAfterBirthdayDetailed() {
+            const sixteenBirthday = new Date(2026, 7, 14);
+            const now = new Date();
+            if (now > sixteenBirthday) {
+                const elapsed = getPreciseElapsed(sixteenBirthday, now);
+                stateMsgDiv.innerHTML = `🌟星辰见证🌟<br>十六岁礼成`;
+                subInfoDiv.innerHTML = `距离十六岁生日已经<br>${elapsed.years}年 ${elapsed.months}月 ${elapsed.days}日 ${elapsed.hours}时 ${elapsed.minutes}分 ${elapsed.seconds}秒<br>岁月为你加冕`;
+            } else {
+                const preciseRemaining = getPreciseRemainingToDate(sixteenBirthday, now);
+                stateMsgDiv.innerHTML = `🎂 距离你的十六岁生日 🎂`;
+                subInfoDiv.innerHTML = `<span class="time-digits">${preciseRemaining.years}年 ${preciseRemaining.months}月 ${preciseRemaining.days}日 ${preciseRemaining.hours}时 ${preciseRemaining.minutes}分 ${preciseRemaining.seconds}秒</span> · 时光奔赴，静候华章`;
+            }
+        }
+        
+        let afterBirthdayInterval = null;
+        function startAfterBirthdayUpdater() {
+            if (afterBirthdayInterval) clearInterval(afterBirthdayInterval);
+            const updateFunc = () => { if (status === 2) showAfterBirthdayDetailed(); };
+            updateFunc();
+            afterBirthdayInterval = setInterval(updateFunc, 1000);
+        }
+        
+        function createConfettiEffect() {
+            const colors = ['#e9d6a7', '#d8bf7a', '#f3e5c0', '#cfb778', '#f7e3b0'];
+            for (let i = 0; i < 70; i++) {
+                const conf = document.createElement('div');
+                conf.style.position = 'fixed';
+                conf.style.width = Math.random() * 8 + 3 + 'px';
+                conf.style.height = Math.random() * 8 + 3 + 'px';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.top = '-20px';
+                conf.style.left = Math.random() * window.innerWidth + 'px';
+                conf.style.borderRadius = '2px';
+                conf.style.opacity = '0.8';
+                conf.style.pointerEvents = 'none';
+                conf.style.zIndex = '9999';
+                document.body.appendChild(conf);
+                const duration = Math.random() * 2 + 1.5;
+                const drift = (Math.random() - 0.5) * 50;
+                conf.animate([
+                    { transform: `translate(0, 0) rotate(0deg)`, opacity: 0.9 },
+                    { transform: `translate(${drift}px, ${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], { duration: duration * 1000, easing: 'cubic-bezier(0.2, 0.9, 0.4, 1)' });
+                setTimeout(() => conf.remove(), duration * 1000);
+            }
+        }
+        
+        function startDateChangeWatcher() {
+            let lastDateStr = getDayStart(new Date()).toISOString().slice(0,10);
+            setInterval(() => {
+                const nowStr = getDayStart(new Date()).toISOString().slice(0,10);
+                if (nowStr !== lastDateStr) location.reload();
+            }, 60000);
+        }
+        
+        function initTimeMachine() {
+            if (status === 0) {
+                updateCountdownUI();
+                countdownInterval = setInterval(() => {
+                    const nowDate = new Date();
+                    const nowStart = getDayStart(nowDate);
+                    const currentBirthStart = getDayStart(thisYearBirthday);
+                    if (nowStart.getTime() === currentBirthStart.getTime()) {
+                        clearInterval(countdownInterval);
+                        status = 1;
+                        showBirthdayToday();
+                    } else if (nowStart > currentBirthStart && status === 0) {
+                        clearInterval(countdownInterval);
+                        status = 2;
+                        if (afterBirthdayInterval) clearInterval(afterBirthdayInterval);
+                        startAfterBirthdayUpdater();
+                    } else updateCountdownUI();
+                }, 1000);
+            } else if (status === 1) {
+                showBirthdayToday();
+                startDateChangeWatcher();
+            } else if (status === 2) {
+                startAfterBirthdayUpdater();
+                startDateChangeWatcher();
+            }
+        }
+        
+        initTimeMachine();
+        
+        //星星背景
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        let width, height;
+        
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            stars = [];
+            const starCount = Math.min(350, Math.floor(width * height / 4600));
+            for (let i = 0; i < starCount; i++) {
+                stars.push({
+                    x: Math.random() * width, y: Math.random() * height,
+                    radius: Math.random() * 2.2 + 0.6, alpha: Math.random() * 0.6 + 0.2,
+                    twinkle: 0.4 + Math.random() * 1.3, phase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+        
+        let starTime = 0;
+        function drawStars() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#03060c';
+            ctx.fillRect(0, 0, width, height);
+            for (let s of stars) {
+                const brightness = 0.45 + 0.55 * (Math.sin(starTime * 0.0025 * s.twinkle + s.phase) * 0.5 + 0.5);
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 245, 210, ${s.alpha * brightness * 0.9})`;
+                ctx.fill();
+            }
+            starTime++;
+            requestAnimationFrame(drawStars);
+        }
+        
+        window.addEventListener('resize', () => resizeCanvas());
+        resizeCanvas();
+        drawStars();
+        
+        //手写信笺
+        const revealBtn = document.getElementById('revealBtn');
+        const hiddenMsgDiv = document.getElementById('hiddenMessage');
+        let opened = false;
+        revealBtn.addEventListener('click', () => {
+            if (!opened) {
+                hiddenMsgDiv.classList.add('show');
+                revealBtn.innerHTML = '🌙 合上信笺 🌙';
+                opened = true;
+            } else {
+                hiddenMsgDiv.classList.remove('show');
+                revealBtn.innerHTML = '✉️ 展开手写信笺 ✉️';
+                opened = false;
+            }
+        });
+        
+        const cards = document.querySelectorAll('.memory-card');
+        cards.forEach(c => {
+            c.addEventListener('click', () => {
+                c.style.transform = 'scale(0.97)';
+                setTimeout(() => c.style.transform = '', 150);
+            });
+        });
+        
+        //音频
+        const FOURTH_SONG_URL = "https://cdn.jsdelivr.net/gh/Hehe11TvT/Hehe11TvT.github.io@main/Music/4.mp3";
+        let bgAudio = null;
+        let playAttempted = false;
+        function initRobustAudio() {
+            bgAudio = new Audio();
+            bgAudio.src = FOURTH_SONG_URL;
+            bgAudio.volume = 0.6;
+            bgAudio.loop = true;
+            bgAudio.preload = "auto";
+            bgAudio.load();
+            window.bgAudio = bgAudio;
+            const tryPlay = () => {
+                if (!bgAudio) return;
+                if (!bgAudio.paused) return;
+                if (playAttempted) return;
+                bgAudio.play().then(() => {
+                    playAttempted = true;
+                }).catch(err => {});
+            };
+            const events = ['click', 'touchstart', 'keydown', 'scroll'];
+            const onUserInteraction = () => {
+                tryPlay();
+                if (playAttempted) {
+                    events.forEach(ev => document.removeEventListener(ev, onUserInteraction));
+                }
+            };
+            events.forEach(ev => document.addEventListener(ev, onUserInteraction));
+            setTimeout(() => {
+                if (!playAttempted && bgAudio && bgAudio.paused) {
+                    bgAudio.play().then(() => { playAttempted = true; }).catch(() => {});
+                }
+            }, 3000);
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && !playAttempted && bgAudio && bgAudio.paused) {
+                    bgAudio.play().catch(() => {});
+                }
+            });
+        }
+        initRobustAudio();
+        
+        //3D相册
+        let threeInitialized = false;
+        let threeScene, threeCamera, threeRenderer, threeControls, photoCube, ringLoop, starsField3D, auraParticles, sunMesh, sunLightSoft;
+        const loaderOverlay = document.getElementById('albumLoader');
+        const imageUrls = [
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/mmexport1786560123131.jpg",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/mmexport1786560123131.jpg",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/mmexport1786560123131.jpg",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/mmexport1786560123131.jpg",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/mmexport1786560123131.jpg",
+            "https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/mmexport1786560123131.jpg"
+        ];
+        
+        async function initThreeAlbum() {
+            if (threeInitialized) return;
+            threeInitialized = true;
+            try {
+                const THREE = await import('three');
+                const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+                const container = document.getElementById('canvas-container');
+                if (!container) return;
+                threeScene = new THREE.Scene();
+                threeScene.background = new THREE.Color(0x050b1a);
+                threeScene.fog = new THREE.FogExp2(0x050b1a, 0.008);
+                threeCamera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 1000);
+                threeCamera.position.set(4.2, 2.8, 5.5);
+                threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                threeRenderer.setSize(container.clientWidth, container.clientHeight);
+                threeRenderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(threeRenderer.domElement);
+                threeControls = new OrbitControls(threeCamera, threeRenderer.domElement);
+                threeControls.enableDamping = true;
+                threeControls.dampingFactor = 0.06;
+                threeControls.rotateSpeed = 1.2;
+                threeControls.zoomSpeed = 1.0;
+                threeControls.enableZoom = true;
+                threeControls.enablePan = false;
+                threeControls.autoRotate = true;
+                threeControls.autoRotateSpeed = 1.2;
+                threeControls.target.set(0, 0, 0);
+                
+                const starGeo = new THREE.BufferGeometry();
+                const starCnt = 1800;
+                const starPos = new Float32Array(starCnt * 3);
+                for (let i = 0; i < starCnt; i++) {
+                    starPos[i*3] = (Math.random() - 0.5) * 1800;
+                    starPos[i*3+1] = (Math.random() - 0.5) * 1000;
+                    starPos[i*3+2] = (Math.random() - 0.5) * 400 - 150;
+                }
+                starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+                starsField3D = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.28, transparent: true, opacity: 0.6 }));
+                threeScene.add(starsField3D);
+                
+                threeScene.add(new THREE.AmbientLight(0x4a5070));
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
+                dirLight.position.set(2, 3, 2);
+                threeScene.add(dirLight);
+                const fillLight = new THREE.PointLight(0x88aacc, 0.35);
+                fillLight.position.set(-1.5, 1, 2.5);
+                threeScene.add(fillLight);
+                const sunGeometry = new THREE.SphereGeometry(0.78, 128, 128);
+                const sunMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xfff5ea,
+                    emissive: 0xffddbb,
+                    emissiveIntensity: 1.15,
+                    metalness: 0.02,
+                    roughness: 0.4
+                });
+                sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
+                sunMesh.position.set(9.2, 5.6, -22.5);
+                threeScene.add(sunMesh);
+                const glowCoreGeo = new THREE.SphereGeometry(1.25, 64, 64);
+                const glowCoreMat = new THREE.MeshBasicMaterial({
+                    color: 0xfff2e0,
+                    transparent: true,
+                    opacity: 0.21,
+                    side: THREE.BackSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const sunGlowCore = new THREE.Mesh(glowCoreGeo, glowCoreMat);
+                sunMesh.add(sunGlowCore);
+                const outerGlowGeo = new THREE.SphereGeometry(1.78, 64, 64);
+                const outerGlowMat = new THREE.MeshBasicMaterial({
+                    color: 0xffeedd,
+                    transparent: true,
+                    opacity: 0.13,
+                    side: THREE.BackSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const outerHalo = new THREE.Mesh(outerGlowGeo, outerGlowMat);
+                sunMesh.add(outerHalo);
+                const spikeGlowGeo = new THREE.SphereGeometry(2.25, 48, 48);
+                const spikeMat = new THREE.MeshBasicMaterial({
+                    color: 0xffeedd,
+                    transparent: true,
+                    opacity: 0.07,
+                    side: THREE.BackSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const spikeHalo = new THREE.Mesh(spikeGlowGeo, spikeMat);
+                sunMesh.add(spikeHalo);
+                const starBurstGeo = new THREE.SphereGeometry(2.7, 32, 32);
+                const starBurstMat = new THREE.MeshBasicMaterial({
+                    color: 0xfff5e5,
+                    transparent: true,
+                    opacity: 0.045,
+                    side: THREE.BackSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const starBurst = new THREE.Mesh(starBurstGeo, starBurstMat);
+                sunMesh.add(starBurst);
+                sunLightSoft = new THREE.PointLight(0xffeacc, 0.28, 38);
+                sunLightSoft.position.set(9.2, 5.6, -22.5);
+                threeScene.add(sunLightSoft);
+                
+                const cubeSize = 2.45;
+                const boxGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+                const materials = [];
+                function createMaterial(url) {
+                    const texture = new THREE.TextureLoader().load(url);
+                    texture.crossOrigin = "Anonymous";
+                    return new THREE.MeshStandardMaterial({ map: texture, roughness: 0.3, metalness: 0.08, side: THREE.DoubleSide });
+                }
+                for (let i = 0; i < 6; i++) materials.push(createMaterial(imageUrls[i % imageUrls.length]));
+                photoCube = new THREE.Mesh(boxGeometry, materials);
+                threeScene.add(photoCube);
+                const edgesGeo = new THREE.EdgesGeometry(boxGeometry);
+                const wireframe = new THREE.LineSegments(edgesGeo, new THREE.LineBasicMaterial({ color: 0x6c9eff }));
+                photoCube.add(wireframe);
+                
+                const auraCount = 700;
+                const auraGeo = new THREE.BufferGeometry();
+                const auraPositions = new Float32Array(auraCount * 3);
+                for (let i = 0; i < auraCount; i++) {
+                    const rad = 1.6 + Math.random() * 1.5;
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.acos(2 * Math.random() - 1);
+                    auraPositions[i*3] = rad * Math.sin(phi) * Math.cos(theta);
+                    auraPositions[i*3+1] = rad * Math.sin(phi) * Math.sin(theta);
+                    auraPositions[i*3+2] = rad * Math.cos(phi);
+                }
+                auraGeo.setAttribute('position', new THREE.BufferAttribute(auraPositions, 3));
+                auraParticles = new THREE.Points(auraGeo, new THREE.PointsMaterial({ color: 0x7aaaff, size: 0.022, transparent: true, opacity: 0.4 }));
+                threeScene.add(auraParticles);
+                
+                const ringPoints = [];
+                const ringRad = 2.1;
+                for (let i = 0; i <= 120; i++) {
+                    const ang = (i / 120) * Math.PI * 2;
+                    ringPoints.push(new THREE.Vector3(Math.cos(ang) * ringRad, 0.15, Math.sin(ang) * ringRad));
+                }
+                const ringGeo = new THREE.BufferGeometry().setFromPoints(ringPoints);
+                ringLoop = new THREE.LineLoop(ringGeo, new THREE.LineBasicMaterial({ color: 0x4c9eff }));
+                threeScene.add(ringLoop);
+                
+                let timeSun = 0;
+                function animateThree() {
+                    if (!threeRenderer || !threeScene) return;
+                    requestAnimationFrame(animateThree);
+                    timeSun += 0.005;
+                    if (sunMesh) {
+                        const scaleVar = 1 + Math.sin(timeSun * 1.4) * 0.008;
+                        sunMesh.scale.set(scaleVar, scaleVar, scaleVar);
+                        if (sunLightSoft) sunLightSoft.intensity = 0.26 + Math.sin(timeSun * 1.9) * 0.06;
+                    }
+                    if (threeControls) threeControls.update();
+                    if (starsField3D) { starsField3D.rotation.y += 0.0004; starsField3D.rotation.x += 0.0002; }
+                    if (auraParticles) { auraParticles.rotation.y += 0.0012; auraParticles.rotation.x += 0.0006; }
+                    if (ringLoop) ringLoop.rotation.z += 0.003;
+                    if (threeRenderer && threeCamera) threeRenderer.render(threeScene, threeCamera);
+                }
+                animateThree();
+                const resizeObserver = new ResizeObserver(() => {
+                    if (container && threeCamera && threeRenderer) {
+                        const w = container.clientWidth, h = container.clientHeight;
+                        threeCamera.aspect = w / h;
+                        threeCamera.updateProjectionMatrix();
+                        threeRenderer.setSize(w, h);
+                    }
+                });
+                resizeObserver.observe(container);
+                
+                if (loaderOverlay) {
+                    loaderOverlay.style.opacity = '0';
+                    setTimeout(() => { if (loaderOverlay) loaderOverlay.style.display = 'none'; }, 400);
+                }
+            } catch (error) { 
+                console.error('3D相册失败:', error);
+                if (loaderOverlay) {
+                    loaderOverlay.style.display = 'none';
+                }
+            }
+        }
+        
+        const albumSection = document.getElementById('albumSection');
+        if (albumSection) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting && !threeInitialized) initThreeAlbum(); });
+            }, { threshold: 0.2 });
+            observer.observe(albumSection);
+        }
+    })();
+
+    //不蒜子访问统计
+    function addBusuanziStat() {
+        // 创建统计容器，放置在footer上方
+        const statWrap = document.createElement('div');
+        statWrap.style.cssText = `
+            text-align:center;
+            margin:1.5rem 0 0.5rem;
+            font-size:0.8rem;
+            color:#b8ae8a;
+            font-family:"微软雅黑",sans-serif;
+        `;
+        statWrap.innerHTML = `
+            <span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span>
+            &nbsp;&nbsp;
+            <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span>
+        `;
+        document.querySelector('footer').before(statWrap);
+
+        // 加载
+        const bsScript = document.createElement('script');
+        bsScript.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+        bsScript.async = true;
+        document.body.appendChild(bsScript);
+    }
+    // 加载后初始化
+    window.addEventListener('load', addBusuanziStat);
+</script>
+</body>
+</html>
