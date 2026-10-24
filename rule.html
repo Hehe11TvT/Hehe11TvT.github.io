@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>蛋仔共号 · 规则查看</title>
+  <style>
+    /* 全局极简 + 多彩柔光 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f9f5ff;
+      background-image: radial-gradient(circle at 10% 20%, rgba(255, 210, 255, 0.5) 0%, transparent 30%),
+                        radial-gradient(circle at 90% 70%, rgba(200, 240, 255, 0.6) 0%, transparent 40%),
+                        radial-gradient(circle at 30% 80%, rgba(255, 235, 190, 0.5) 0%, transparent 35%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* 主容器 – 柔和半透明卡片 */
+    .app {
+      width: 100%;
+      max-width: 720px;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 52px;
+      padding: 28px 22px;
+      box-shadow: 0 4px 8px rgba(180, 150, 200, 0.08),
+                  0 16px 40px rgba(140, 110, 170, 0.12),
+                  0 30px 60px rgba(110, 80, 140, 0.08),
+                  inset 0 1px 2px rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      transition: all 0.3s;
+    }
+
+    /* 主页/规则页共用容器 */
+    .page {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ---------- 主页 ---------- */
+    .home-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .home-header h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #8b6fcb, #b48ad6, #6d9ee8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 2px 10px rgba(160, 120, 210, 0.2);
+      margin-bottom: 8px;
+    }
+
+    .home-header p {
+      color: #8a7a9a;
+      font-size: 1rem;
+      letter-spacing: 1px;
+    }
+
+    /* 两个账号按钮 – 同心圆角 + 多层阴影 */
+    .account-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+      margin-top: 16px;
+      padding: 6px;
+    }
+
+    .acc-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 28px;
+      border-radius: 68px;        /* 大圆角 */
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 2px 6px rgba(170, 140, 200, 0.15),
+                  0 12px 28px -8px rgba(150, 120, 180, 0.25),
+                  0 24px 48px -12px rgba(120, 90, 150, 0.15),
+                  inset 0 1px 4px rgba(255, 255, 255, 0.9),
+                  inset 0 -2px 4px rgba(200, 180, 220, 0.2);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      color: #4e3d5e;
+      font-size: 1.6rem;
+      font-weight: 550;
+      letter-spacing: 1px;
+      /* 同心圆角：内部用伪元素做一个小圆角 */
+    }
+
+    /* 内部小圆角环 – 增加设计感 */
+    .acc-btn::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      border-radius: 58px;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      pointer-events: none;
+      opacity: 0.8;
+      box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.5);
+    }
+
+    .acc-btn span {
+      position: relative;
+      z-index: 2;
+    }
+
+    .acc-btn .acc-icon {
+      font-size: 1.8rem;
+      opacity: 0.8;
+      filter: drop-shadow(0 2px 4px rgba(180, 150, 210, 0.3));
+    }
+
+    .acc-btn:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 6px 12px rgba(170, 140, 200, 0.2),
+                  0 20px 36px -8px rgba(150, 120, 180, 0.35),
+                  0 32px 56px -12px rgba(120, 90, 150, 0.2),
+                  inset 0 1px 6px rgba(255, 255, 255, 1);
+      border-color: rgba(210, 180, 240, 0.9);
+    }
+
+    .acc-btn:active {
+      transform: translateY(0px) scale(0.99);
+      box-shadow: 0 2px 6px rgba(170, 140, 200, 0.15),
+                  0 8px 18px -6px rgba(150, 120, 180, 0.2),
+                  inset 0 1px 4px rgba(255, 255, 255, 0.8);
+    }
+
+    /* 多彩点缀 – 每个按钮不同色调 */
+    .acc-btn[data-theme="1"] {
+      background: linear-gradient(145deg, rgba(255, 240, 250, 0.8), rgba(245, 230, 255, 0.75));
+      border-color: rgba(220, 190, 255, 0.9);
+    }
+
+    .acc-btn[data-theme="2"] {
+      background: linear-gradient(145deg, rgba(235, 245, 255, 0.85), rgba(230, 240, 255, 0.75));
+      border-color: rgba(180, 210, 255, 0.9);
+    }
+
+    /* ---------- 规则页面 ---------- */
+    .rule-page {
+      animation: fadeIn 0.5s ease;
+    }
+
+    /* 上方返回按钮 */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1.5px solid rgba(255, 255, 255, 0.8);
+      border-radius: 48px;
+      padding: 8px 18px;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      color: #5e4b6e;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 2px 10px rgba(160, 130, 190, 0.1), inset 0 1px 4px rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: 0.2s;
+      width: fit-content;
+      font-weight: 500;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 14px rgba(160, 130, 190, 0.2);
+      transform: translateX(-2px);
+    }
+
+    /* 时钟 – 等宽数字，两行 */
+    .clock-area {
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 44px;
+      padding: 16px 18px;
+      margin-bottom: 24px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 6px 18px rgba(170, 140, 200, 0.1),
+                  inset 0 2px 6px rgba(255, 255, 255, 0.8);
+      font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
+    }
+
+    .clock-date {
+      font-size: 1.5rem;
+      font-weight: 450;
+      color: #56456b;
+      letter-spacing: 1.5px;
+      line-height: 1.3;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    }
+
+    .clock-time {
+      font-size: 2rem;
+      font-weight: 480;
+      color: #4d3a64;
+      letter-spacing: 3px;
+      line-height: 1.2;
+      text-shadow: 0 2px 6px rgba(190, 160, 220, 0.2);
+    }
+
+    /* 账号昵称标题 */
+    .rule-title {
+      font-size: 2.2rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      background: linear-gradient(145deg, #7d62b0, #b18bd9, #6f91d6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-align: center;
+      margin-bottom: 18px;
+      text-shadow: 0 4px 16px rgba(140, 110, 190, 0.25);
+      padding-bottom: 4px;
+      border-bottom: 2px dashed rgba(190, 165, 220, 0.4);
+    }
+
+    /* 规则内容卡片 – 错开入场动画容器 */
+    .rules-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* 每个规则块 – 用于错开动画 */
+    .rule-block {
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 32px;
+      padding: 18px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 12px rgba(170, 140, 200, 0.08),
+                  0 12px 28px -8px rgba(150, 120, 180, 0.15),
+                  inset 0 1px 6px rgba(255, 255, 255, 0.8);
+      transition: all 0.2s;
+      transform-origin: top center;
+      animation: slideUpFade 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0; /* 初始透明，靠动画显现 */
+    }
+
+    /* 动画延迟 – 错开入场 */
+    .rule-block:nth-child(1) { animation-delay: 0.02s; }
+    .rule-block:nth-child(2) { animation-delay: 0.08s; }
+    .rule-block:nth-child(3) { animation-delay: 0.14s; }
+    .rule-block:nth-child(4) { animation-delay: 0.20s; }
+    .rule-block:nth-child(5) { animation-delay: 0.26s; }
+    .rule-block:nth-child(6) { animation-delay: 0.32s; }
+    .rule-block:nth-child(7) { animation-delay: 0.38s; }
+    .rule-block:nth-child(8) { animation-delay: 0.44s; }
+    .rule-block:nth-child(9) { animation-delay: 0.50s; }
+    .rule-block:nth-child(10) { animation-delay: 0.56s; }
+    .rule-block:nth-child(11) { animation-delay: 0.62s; }
+    .rule-block:nth-child(12) { animation-delay: 0.68s; }
+
+    @keyframes slideUpFade {
+      0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.96);
+        filter: blur(2px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    /* 规则文本样式 */
+    .rule-block h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #5c4580;
+      margin-bottom: 10px;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rule-block h3 .emoji-bullet {
+      font-size: 1.3rem;
+      filter: drop-shadow(0 2px 4px rgba(170, 140, 210, 0.3));
+    }
+
+    .rule-block ul, .rule-block p {
+      color: #3f3152;
+      font-size: 0.98rem;
+      line-height: 1.6;
+      margin-bottom: 6px;
+      padding-left: 4px;
+    }
+
+    .rule-block li {
+      margin-bottom: 6px;
+      list-style: none;
+      position: relative;
+      padding-left: 22px;
+    }
+
+    .rule-block li::before {
+      content: "·";
+      position: absolute;
+      left: 6px;
+      color: #ab8bc0;
+      font-weight: 700;
+      font-size: 1.3rem;
+      line-height: 1;
+      top: 2px;
+    }
+
+    /* 价格标签小点缀 */
+    .price-tag {
+      display: inline-block;
+      background: rgba(220, 200, 240, 0.45);
+      border-radius: 30px;
+      padding: 2px 10px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #6a4e8a;
+      margin-left: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+    }
+
+    /* 脚注 */
+    .footnote {
+      margin-top: 20px;
+      padding: 14px 18px;
+      border-radius: 36px;
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-size: 0.9rem;
+      color: #5e4f70;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: inset 0 1px 6px rgba(255, 255, 255, 0.7), 0 4px 12px rgba(150, 120, 180, 0.08);
+      text-align: center;
+      font-style: italic;
+      letter-spacing: 0.3px;
+    }
+
+    /* 通用动画 */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* 响应式 */
+    @media (max-width: 480px) {
+      .app {
+        padding: 18px 16px;
+        border-radius: 40px;
+      }
+      .acc-btn {
+        padding: 18px 22px;
+        font-size: 1.35rem;
+      }
+      .acc-btn::before {
+        top: 6px; left: 6px; right: 6px; bottom: 6px;
+        border-radius: 50px;
+      }
+      .clock-date { font-size: 1.2rem; }
+      .clock-time { font-size: 1.6rem; }
+      .rule-title { font-size: 1.8rem; }
+      .rule-block h3 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+  <!-- 主页：显示两个账号按钮 -->
+  <div id="homePage" class="page">
+    <div class="home-header">
+      <h1>✨ 共号规则 ✨</h1>
+      <p>选择要查看的账号</p>
+    </div>
+    <div class="account-buttons">
+      <div class="acc-btn" data-account="1" data-theme="1" id="btnAccount1">
+        <span>柠萌软萌</span>
+        <span class="acc-icon">🍋</span>
+      </div>
+      <div class="acc-btn" data-account="2" data-theme="2" id="btnAccount2">
+        <span>痛爱小嘉</span>
+        <span class="acc-icon">💖</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 规则页：账号1 -->
+  <div id="rulePage1" class="page hidden rule-page">
+    <div class="back-btn" data-back="home">← 返回账号选择</div>
+    <!-- 时钟 -->
+    <div class="clock-area" id="clock1">
+      <div class="clock-date" id="clockDate1">2025-03-24</div>
+      <div class="clock-time" id="clockTime1">14:23:45</div>
+    </div>
+    <div class="rule-title">柠萌软萌</div>
+    <div class="rules-container" id="rulesContainer1"></div>
+    <div class="footnote">📌 以上注意事项和规则根据实际情况调整，如有违规则交保证金，严重或多次即撤销共号资格。</div>
+  </div>
+
+  <!-- 规则页：账号2 -->
+  <div id="rulePage2" class="page hidden rule-page">
+    <div class="back-btn" data-back="home">← 返回账号选择</div>
+    <div class="clock-area" id="clock2">
+      <div class="clock-date" id="clockDate2">2025-03-24</div>
+      <div class="clock-time" id="clockTime2">14:23:45</div>
+    </div>
+    <div class="rule-title">痛爱小嘉</div>
+    <div class="rules-container" id="rulesContainer2"></div>
+    <div class="footnote">📌 以上注意事项和规则根据实际情况调整，如有违规则交保证金，严重或多次即撤销共号资格。</div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ---------- 数据：账号1规则 ----------
+    const account1Rules = [
+      {
+        title: '一、账号安全与登录',
+        items: [
+          '禁止转借/共享/出租：未经允许，不得将号转借、共享或出租 <span class="price-tag">¥10</span>',
+          '上号须报备：每次上号前必须提前报备 <span class="price-tag">¥1</span>',
+          '登录频率：每2天至少上线1次；放长假（法定节假日、寒暑假）期间1天至少上线1次游戏 <span class="price-tag">¥0 / 多次不达到要求则撤共号资格</span>',
+          '游戏资产：贵重道具货币消耗前需征得同意，包含蛋币.许愿币.彩虹币等（未经同意的消耗按实际价值计算）'
+        ]
+      },
+      {
+        title: '二、禁止改动的内容',
+        items: [
+          '亲密关系、主页留言板、昵称、原好友、蛋圈 <span class="price-tag">¥2</span>',
+          '更改主页生日日期 <span class="price-tag">¥10</span>',
+          '禁止删除原好友、相册图片、他人的主页留言 <span class="price-tag">¥3</span>',
+          '头像可改，但下线后须复原 <span class="price-tag">¥0.5</span>'
+        ]
+      },
+      {
+        title: '三、行为规范',
+        items: [
+          '不恶意：提前退出、恶意挂机、骂人、找事、卡bug、刷屏。若被扣除蛋誉分或被禁言则：<span class="price-tag">¥2～¥20，视严重情况而定</span>',
+          '对亲密值较高的好友，只能声明自己不是号主；对亲密值较低或自己加的好友，可称自己是号主。'
+        ]
+      },
+      {
+        title: '四、每日/每赛季任务',
+        items: [
+          '每日：领取呦呦彩虹币',
+          '每周1～5：下线前领取活动奖励',
+          '每周六日：疯狂星期六任务',
+          '每赛季：结束前上凤凰',
+          '（多次未达到要求则撤销共号资格）'
+        ]
+      }
+    ];
+
+    // ---------- 数据：账号2规则 ----------
+    const account2Rules = [
+      {
+        title: '一、账号安全与登录',
+        items: [
+          '禁止转借/共享/出租：未经允许，不得将号转借、共享或出租 <span class="price-tag">¥10</span>',
+          '上号须报备：每次上号前必须提前报备 <span class="price-tag">¥0.5</span>',
+          '登录频率：每3天至少上线1次；放长假（法定节假日、寒暑假）期间2天至少上线1次游戏 <span class="price-tag">¥0 / 多次不达到则取消共号权限</span>',
+          '游戏资产：贵重道具货币消耗前需征得同意，包含蛋币.许愿币.彩虹币等（未经同意的消耗按实际价值计算）'
+        ]
+      },
+      {
+        title: '二、禁止改动的内容',
+        items: [
+          '亲密关系、主页留言板、昵称、原好友、蛋圈 <span class="price-tag">¥1</span>',
+          '更改主页生日日期 <span class="price-tag">¥5</span>',
+          '禁止删除原好友、相册图片、他人的主页留言 <span class="price-tag">¥3</span>',
+          '头像可改，但下线后须复原 <span class="price-tag">¥0.5</span>'
+        ]
+      },
+      {
+        title: '三、行为规范',
+        items: [
+          '不恶意：提前退出、恶意挂机、骂人、找事、卡bug、刷屏。若被扣除蛋誉分或被禁言则：<span class="price-tag">¥1～¥15，视严重情况而定</span>',
+          '对亲密值较高的好友，只能声明自己不是号主；对亲密值较低或自己加的好友，可称自己是号主。'
+        ]
+      },
+      {
+        title: '四、每日/每赛季任务',
+        items: [
+          '每日：领取呦呦彩虹币',
+          '每周1～5：下线前领取活动奖励',
+          '每周六日：疯狂星期六任务 (二选一)',
+          '每赛季：结束前上凤凰 / 超燃上传奇',
+          '(每日任务未完成 ¥0.5)',
+          '(未完成赛季任务两次则取消共号)',
+          '（多次未达到要求则撤销共号资格）'
+        ]
+      }
+    ];
+
+    // 渲染规则到容器
+    function renderRules(containerId, rulesData) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = ''; // 清空
+      rulesData.forEach((block, idx) => {
+        const blockDiv = document.createElement('div');
+        blockDiv.className = 'rule-block';
+        // 设置延迟 (CSS nth-child已处理，但以防结构变化可保留)
+        // blockDiv.style.animationDelay = `${idx * 0.06}s`;
+
+        const h3 = document.createElement('h3');
+        h3.innerHTML = `<span class="emoji-bullet">${block.title.includes('安全') ? '🔒' : block.title.includes('禁止') ? '🚫' : block.title.includes('行为') ? '🤝' : '🎯'}</span>${block.title}`;
+        blockDiv.appendChild(h3);
+
+        const ul = document.createElement('ul');
+        block.items.forEach(itemText => {
+          const li = document.createElement('li');
+          li.innerHTML = itemText;
+          ul.appendChild(li);
+        });
+        blockDiv.appendChild(ul);
+        container.appendChild(blockDiv);
+      });
+    }
+
+    // 初始化时渲染两个页面的规则
+    renderRules('rulesContainer1', account1Rules);
+    renderRules('rulesContainer2', account2Rules);
+
+    // ---------- 网络时间获取 & 时钟更新 ----------
+    // 使用世界标准时间API (worldtimeapi) 或者 可回退到本地时间并校准。
+    // 为了稳定，使用 fetch 获取网络时间，失败则用本地时间偏移。
+    let timeOffset = 0; // 网络时间与本地时间的差值（毫秒），用于校准
+
+    // 异步获取网络时间
+    async function fetchNetworkTime() {
+      try {
+        // 使用世界时间API（免费，无需key）
+        const response = await fetch('https://worldtimeapi.org/api/ip');
+        if (!response.ok) throw new Error('网络时间请求失败');
+        const data = await response.json();
+        const serverTime = new Date(data.datetime).getTime();
+        const localTime = Date.now();
+        timeOffset = serverTime - localTime; // 计算偏移
+      } catch (error) {
+        console.warn('获取网络时间失败，使用本地时间。', error);
+        timeOffset = 0; // 回退本地时间
+      }
+    }
+
+    // 获取当前校准后的时间
+    function getNow() {
+      return new Date(Date.now() + timeOffset);
+    }
+
+    // 更新所有时钟显示
+    function updateClocks() {
+      const now = getNow();
+      // 账号1时钟元素
+      const date1 = document.getElementById('clockDate1');
+      const time1 = document.getElementById('clockTime1');
+      // 账号2时钟元素
+      const date2 = document.getElementById('clockDate2');
+      const time2 = document.getElementById('clockTime2');
+
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+
+      const dateStr = `${year}-${month}-${day}`;
+      const timeStr = `${hours}:${minutes}:${seconds}`;
+
+      if (date1) date1.textContent = dateStr;
+      if (time1) time1.textContent = timeStr;
+      if (date2) date2.textContent = dateStr;
+      if (time2) time2.textContent = timeStr;
+    }
+
+    // 启动时钟 (每秒更新)
+    fetchNetworkTime().then(() => {
+      updateClocks();
+      setInterval(updateClocks, 1000);
+    }).catch(() => {
+      // 即便fetch失败，也要启动本地时间
+      updateClocks();
+      setInterval(updateClocks, 1000);
+    });
+
+    // 即使fetch异步尚未完成，也启动本地时间作为后备
+    updateClocks();
+    setInterval(updateClocks, 1000); // 这会在fetch完成后自动使用偏移量
+
+    // ---------- 页面切换逻辑 ----------
+    const homePage = document.getElementById('homePage');
+    const rulePage1 = document.getElementById('rulePage1');
+    const rulePage2 = document.getElementById('rulePage2');
+
+    function showHome() {
+      homePage.classList.remove('hidden');
+      rulePage1.classList.add('hidden');
+      rulePage2.classList.add('hidden');
+    }
+
+    function showRulePage(accountId) {
+      homePage.classList.add('hidden');
+      if (accountId === '1') {
+        rulePage1.classList.remove('hidden');
+        rulePage2.classList.add('hidden');
+        // 重新触发动画 (移除再添加类无法直接重启动画，重置容器内元素的动画)
+        resetAnimations('rulesContainer1');
+      } else if (accountId === '2') {
+        rulePage2.classList.remove('hidden');
+        rulePage1.classList.add('hidden');
+        resetAnimations('rulesContainer2');
+      }
+      // 更新一次时钟确保显示正确
+      updateClocks();
+    }
+
+    // 重置动画：移除并重新添加rule-block的类，强制重绘
+    function resetAnimations(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const blocks = container.querySelectorAll('.rule-block');
+      blocks.forEach(block => {
+        // 移除动画类并强制重排
+        block.style.animation = 'none';
+        // 触发重排
+        void block.offsetHeight;
+        // 重新设置动画（使用默认的动画，由CSS定义）
+        block.style.animation = '';
+      });
+    }
+
+    // 绑定账号按钮点击
+    document.getElementById('btnAccount1').addEventListener('click', () => {
+      showRulePage('1');
+    });
+    document.getElementById('btnAccount2').addEventListener('click', () => {
+      showRulePage('2');
+    });
+
+    // 绑定所有返回按钮
+    document.querySelectorAll('.back-btn').forEach(btn => {
+      btn.addEventListener('click', showHome);
+    });
+
+    // 处理页面初始化显示主页
+    showHome();
+
+    // 可选：如果通过URL hash可保留页面，但不需要
+  })();
+</script>
+</body>
+</html>
