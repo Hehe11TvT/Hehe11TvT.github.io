@@ -154,6 +154,29 @@
       backdrop-filter: blur(4px);
       letter-spacing: 0.3px;
       white-space: nowrap;
+      appearance: none;
+      -webkit-appearance: none;
+      margin: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .violation-badge:hover {
+      background: rgba(255, 232, 238, 0.9);
+      box-shadow: 0 4px 12px rgba(200, 140, 165, 0.2);
+    }
+
+    .violation-badge:active {
+      transform: scale(0.92);
+      background: rgba(255, 222, 232, 0.95);
+    }
+
+    .violation-badge .violation-arrow {
+      font-size: 0.85rem;
+      line-height: 1;
+      color: #c78ba3;
+      margin-left: 2px;
     }
 
     .violation-badge .price-tag {
@@ -645,6 +668,62 @@
       margin-left: 4px;
     }
 
+    /* 违规记录弹窗 */
+    .violation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 54vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 2px;
+    }
+
+    .violation-list::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .violation-list::-webkit-scrollbar-thumb {
+      background: rgba(200, 170, 220, 0.5);
+      border-radius: 4px;
+    }
+
+    .violation-item {
+      background: rgba(255, 244, 247, 0.85);
+      border: 1px solid rgba(255, 216, 226, 0.9);
+      border-radius: 22px;
+      padding: 13px 16px;
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.8);
+    }
+
+    .violation-date {
+      display: inline-block;
+      background: rgba(255, 224, 234, 0.85);
+      border: 1px solid rgba(255, 205, 220, 0.9);
+      border-radius: 20px;
+      padding: 2px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #b1506f;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .violation-reason {
+      font-size: 0.94rem;
+      color: #4e3d5e;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+
+    .violation-empty {
+      text-align: center;
+      color: #9a8aae;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      padding: 16px 0 8px;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -701,8 +780,8 @@
         <div class="acc-content">
           <div class="acc-left">
             <span class="acc-name">软萌柠萌</span>
-            <!-- ⚠️ 修改违规次数：直接改下方数字即可 🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴-->
-            <span class="violation-badge">违规记录: <span class="price-tag">1</span>次</span>
+            <!-- ⚠️ 违规记录：请修改脚本内 violationRecords['1'] 数组（按钮次数会自动同步）🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴-->
+            <button type="button" class="violation-badge" id="btnViolation1" data-violation="1">违规记录: <span class="price-tag">1</span>次 <span class="violation-arrow">›</span></button>
           </div>
           <span class="acc-icon">🍋</span>
         </div>
@@ -711,8 +790,8 @@
         <div class="acc-content">
           <div class="acc-left">
             <span class="acc-name">痛爱小嘉</span>
-            <!-- ⚠️ 修改违规次数：直接改下方数字即可🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴 -->
-            <span class="violation-badge">违规记录: <span class="price-tag">0</span>次</span>
+            <!-- ⚠️ 违规记录：请修改脚本内 violationRecords['2'] 数组（按钮次数会自动同步）🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴 -->
+            <button type="button" class="violation-badge" id="btnViolation2" data-violation="2">违规记录: <span class="price-tag">0</span>次 <span class="violation-arrow">›</span></button>
           </div>
           <span class="acc-icon">💖</span>
         </div>
@@ -721,7 +800,7 @@
 
     <!-- 联系我按钮 -->
     <div class="contact-btn" id="contactBtn">
-      <span class="contact-label">💬 点击此处联系我</span>
+      <span class="contact-label">有疑问？点击此处联系我</span>
     </div>
   </div>
 
@@ -782,8 +861,28 @@
   </div>
 </div>
 
+<!-- 违规记录弹窗 -->
+<div class="contact-modal" id="violationModal">
+  <div class="contact-card">
+    <div class="contact-close" id="violationClose">✕</div>
+    <div class="contact-title" id="violationTitle">违规记录</div>
+    <div class="contact-sub" id="violationSub">共 0 次</div>
+    <div class="violation-list" id="violationList"></div>
+  </div>
+</div>
+
 <script>
   (function() {
+    // ⚠️ 违规记录数据（每个账号独立维护）：date 格式 YYYY-MM-DD，只精确到月份可写 YYYY-MM，reason 为违规原因
+    // 增删条目后，首页按钮上的违规次数会自动同步
+    const violationRecords = {
+      '1': [
+        { date: '2026-10-未收录', reason: '规定最长时间未上号' },
+        { date: '2026-11-07', reason: '规定最长时间未上号' }
+      ],
+      '2': []
+    };
+
     const account1Rules = [
       {
         title: '一、账号安全与登录',
@@ -1060,6 +1159,91 @@
     contactModal.addEventListener('click', (e) => {
       if (e.target === contactModal) {
         contactModal.classList.remove('open');
+      }
+    });
+
+    // ---------- 违规记录弹窗 ----------
+    const violationModal = document.getElementById('violationModal');
+    const violationClose = document.getElementById('violationClose');
+    const violationTitle = document.getElementById('violationTitle');
+    const violationSub = document.getElementById('violationSub');
+    const violationList = document.getElementById('violationList');
+
+    function formatViolationDate(value) {
+      const str = String(value).trim();
+      let m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(str);
+      if (m) return `${m[1]}年${m[2].padStart(2, '0')}月${m[3].padStart(2, '0')}日`;
+      m = /^(\d{4})-(\d{1,2})$/.exec(str);
+      if (m) return `${m[1]}年${m[2].padStart(2, '0')}月`;
+      return str;
+    }
+
+    function renderViolationBadges() {
+      ['1', '2'].forEach(id => {
+        const btn = document.getElementById('btnViolation' + id);
+        if (!btn) return;
+        const tag = btn.querySelector('.price-tag');
+        if (tag) tag.textContent = (violationRecords[id] || []).length;
+      });
+    }
+
+    function openViolationModal(accountId) {
+      const accBtn = document.getElementById('btnAccount' + accountId);
+      const nameEl = accBtn ? accBtn.querySelector('.acc-name') : null;
+      const records = (violationRecords[accountId] || [])
+        .slice()
+        .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+
+      violationTitle.textContent = (nameEl ? nameEl.textContent.trim() : '账号') + ' · 违规记录';
+      violationSub.textContent = records.length ? `共 ${records.length} 次` : '暂无违规记录';
+      violationList.innerHTML = '';
+
+      if (!records.length) {
+        const empty = document.createElement('div');
+        empty.className = 'violation-empty';
+        empty.textContent = '🎉 暂无违规记录，继续保持哦';
+        violationList.appendChild(empty);
+      } else {
+        records.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'violation-item';
+
+          const dateEl = document.createElement('div');
+          dateEl.className = 'violation-date';
+          dateEl.textContent = '📅 ' + formatViolationDate(item.date);
+
+          const reasonEl = document.createElement('div');
+          reasonEl.className = 'violation-reason';
+          reasonEl.textContent = item.reason || '（未填写原因）';
+
+          row.appendChild(dateEl);
+          row.appendChild(reasonEl);
+          violationList.appendChild(row);
+        });
+      }
+
+      violationModal.classList.add('open');
+    }
+
+    function closeViolationModal() {
+      violationModal.classList.remove('open');
+    }
+
+    renderViolationBadges();
+
+    document.querySelectorAll('.violation-badge').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        openViolationModal(btn.dataset.violation);
+      });
+    });
+
+    violationClose.addEventListener('click', closeViolationModal);
+
+    violationModal.addEventListener('click', (e) => {
+      if (e.target === violationModal) {
+        closeViolationModal();
       }
     });
 
