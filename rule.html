@@ -1296,7 +1296,7 @@
 
         const count = (violationRecords[id] || []).filter(item => item.handled !== true).length;
         if (count > 0) {
-          text.textContent = `有（${count}）条违规记录未处理`;
+          text.textContent = `有${count}条违规记录未处理`;
           box.classList.remove('hidden');
         } else {
           box.classList.add('hidden');
