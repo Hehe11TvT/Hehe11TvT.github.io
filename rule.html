@@ -131,6 +131,15 @@
 
     .acc-btn .acc-left {
       display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .acc-btn .acc-name-row {
+      display: flex;
       align-items: center;
       gap: 14px;
       flex-wrap: wrap;
@@ -188,6 +197,38 @@
       padding: 2px 10px;
       font-size: 0.85rem;
       border: 1px solid rgba(255, 200, 200, 0.9);
+    }
+
+    /* 新增：账号卡片内的未处理提示 */
+    .unhandled-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 12px;
+      border-radius: 30px;
+      background: rgba(255, 228, 230, 0.85);
+      border: 1px solid rgba(255, 195, 200, 0.9);
+      color: #d6353f;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      line-height: 1.4;
+      pointer-events: none;
+      animation: tipFadeIn 0.35s ease;
+    }
+
+    .unhandled-inline .unhandled-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #d6353f;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px rgba(214, 53, 63, 0.6);
+    }
+
+    @keyframes tipFadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     .acc-btn .acc-icon {
@@ -777,7 +818,7 @@
         top: 6px; left: 6px; right: 6px; bottom: 6px;
         border-radius: 50px;
       }
-      .acc-btn .acc-left {
+      .acc-btn .acc-name-row {
         gap: 8px;
       }
       .violation-badge {
@@ -787,6 +828,10 @@
       .violation-badge .price-tag {
         padding: 1px 8px;
         font-size: 0.75rem;
+      }
+      .unhandled-inline {
+        font-size: 0.72rem;
+        padding: 2px 10px;
       }
       .clock-date { font-size: 1.2rem; }
       .clock-time { font-size: 1.6rem; }
@@ -817,9 +862,16 @@
       <div class="acc-btn" data-account="1" data-theme="1" id="btnAccount1">
         <div class="acc-content">
           <div class="acc-left">
-            <span class="acc-name">软萌柠萌</span>
-            <!-- ⚠️ 违规记录：请修改脚本内 violationRecords['1'] 数组（按钮次数会自动同步）🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴-->
-            <button type="button" class="violation-badge" id="btnViolation1" data-violation="1">违规记录: <span class="price-tag">1</span>次 <span class="violation-arrow">›</span></button>
+            <div class="acc-name-row">
+              <span class="acc-name">软萌柠萌</span>
+              <!-- ⚠️ 违规记录：请修改脚本内 violationRecords['1'] 数组（按钮次数会自动同步）-->
+              <button type="button" class="violation-badge" id="btnViolation1" data-violation="1">违规记录: <span class="price-tag">1</span>次 <span class="violation-arrow">›</span></button>
+            </div>
+            <!-- 新增：该账号未处理违规提示（无未处理时自动隐藏） -->
+            <div class="unhandled-inline hidden" id="unhandledInline1">
+              <span class="unhandled-dot"></span>
+              <span class="unhandled-inline-text" id="unhandledInlineText1"></span>
+            </div>
           </div>
           <span class="acc-icon">🍋</span>
         </div>
@@ -827,11 +879,18 @@
       <div class="acc-btn" data-account="2" data-theme="2" id="btnAccount2">
         <div class="acc-content">
           <div class="acc-left">
-            <span class="acc-name">痛爱小嘉</span>
-            <!-- ⚠️ 违规记录：请修改脚本内 violationRecords['2'] 数组（按钮次数会自动同步）🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴 -->
-            <button type="button" class="violation-badge" id="btnViolation2" data-violation="2">违规记录: <span class="price-tag">0</span>次 <span class="violation-arrow">›</span></button>
+            <div class="acc-name-row">
+              <span class="acc-name">痛爱小嘉</span>
+              <!-- ⚠️ 违规记录：请修改脚本内 violationRecords['2'] 数组（按钮次数会自动同步）-->
+              <button type="button" class="violation-badge" id="btnViolation2" data-violation="2">违规记录: <span class="price-tag">0</span>次 <span class="violation-arrow">›</span></button>
+            </div>
+            <!-- 新增：该账号未处理违规提示（无未处理时自动隐藏） -->
+            <div class="unhandled-inline hidden" id="unhandledInline2">
+              <span class="unhandled-dot"></span>
+              <span class="unhandled-inline-text" id="unhandledInlineText2"></span>
+            </div>
           </div>
-          <span class="acc-icon">💖</span>
+          <span class="acc-icon">空闲账号</span>
         </div>
       </div>
     </div>
@@ -1153,6 +1212,7 @@
       homePage.classList.remove('hidden');
       rulePage1.classList.add('hidden');
       rulePage2.classList.add('hidden');
+      renderAccountUnhandledHints();
     }
 
     function showRulePage(accountId) {
@@ -1227,6 +1287,24 @@
       });
     }
 
+    // 新增：按账号分别渲染未处理违规提示
+    function renderAccountUnhandledHints() {
+      ['1', '2'].forEach(id => {
+        const box = document.getElementById('unhandledInline' + id);
+        const text = document.getElementById('unhandledInlineText' + id);
+        if (!box || !text) return;
+
+        const count = (violationRecords[id] || []).filter(item => item.handled !== true).length;
+        if (count > 0) {
+          text.textContent = `有（${count}）条违规记录未处理`;
+          box.classList.remove('hidden');
+        } else {
+          box.classList.add('hidden');
+          text.textContent = '';
+        }
+      });
+    }
+
     function openViolationModal(accountId) {
       const accBtn = document.getElementById('btnAccount' + accountId);
       const nameEl = accBtn ? accBtn.querySelector('.acc-name') : null;
@@ -1253,7 +1331,7 @@
 
           const dateEl = document.createElement('div');
           dateEl.className = 'violation-date';
-          dateEl.textContent = '📅 ' + formatViolationDate(item.date);
+          dateEl.textContent = formatViolationDate(item.date);
 
           const reasonEl = document.createElement('div');
           reasonEl.className = 'violation-reason';
@@ -1278,9 +1356,11 @@
 
     function closeViolationModal() {
       violationModal.classList.remove('open');
+      renderAccountUnhandledHints();
     }
 
     renderViolationBadges();
+    renderAccountUnhandledHints();
 
     document.querySelectorAll('.violation-badge').forEach(btn => {
       btn.addEventListener('click', (e) => {
