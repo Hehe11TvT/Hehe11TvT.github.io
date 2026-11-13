@@ -689,6 +689,10 @@
     }
 
     .violation-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       background: rgba(255, 244, 247, 0.85);
       border: 1px solid rgba(255, 216, 226, 0.9);
       border-radius: 22px;
@@ -696,8 +700,17 @@
       box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.8);
     }
 
+    .violation-item-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+    }
+
     .violation-date {
       display: inline-block;
+      align-self: flex-start;
       background: rgba(255, 224, 234, 0.85);
       border: 1px solid rgba(255, 205, 220, 0.9);
       border-radius: 20px;
@@ -706,7 +719,6 @@
       font-weight: 600;
       color: #b1506f;
       letter-spacing: 0.5px;
-      margin-bottom: 8px;
     }
 
     .violation-reason {
@@ -714,6 +726,29 @@
       color: #4e3d5e;
       line-height: 1.55;
       word-break: break-word;
+    }
+
+    /* 违规处理状态 */
+    .violation-status {
+      flex-shrink: 0;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      padding: 4px 12px;
+      border-radius: 30px;
+    }
+
+    .violation-status.unhandled {
+      color: #d6353f;
+      background: rgba(255, 228, 230, 0.9);
+      border: 1px solid rgba(255, 195, 200, 0.9);
+    }
+
+    .violation-status.handled {
+      color: #1f9d55;
+      background: rgba(225, 250, 235, 0.9);
+      border: 1px solid rgba(180, 235, 205, 0.9);
     }
 
     .violation-empty {
@@ -765,6 +800,9 @@
       .contact-card { padding: 22px 18px 18px; border-radius: 34px; }
       .contact-title { font-size: 1.4rem; }
       .ci-value { font-size: 0.88rem; }
+      .violation-item { padding: 12px 13px; gap: 8px; }
+      .violation-reason { font-size: 0.9rem; }
+      .violation-status { font-size: 0.78rem; padding: 3px 10px; }
     }
   </style>
 </head>
@@ -873,15 +911,14 @@
 
 <script>
   (function() {
-    // ⚠️ 违规记录数据（每个账号独立维护）：date 格式 YYYY-MM-DD，只精确到月份可写 YYYY-MM，reason 为违规原因
-    // 增删条目后，首页按钮上的违规次数会自动同步
     const violationRecords = {
-      '1': [
-        { date: '2026-10-未收录', reason: '48小时未上号' },
-        { date: '2026-11-07', reason: '48小时未上号' },
-        { date: '2026-11-11', reason: '48小时未上号' }
-      ],
-      '2': []
+      '1': [/*示例
+        { date: '2026-10-未收录', reason: '48小时未上号', handled: true },
+        { date: '2026-11-07', reason: '48小时未上号', handled: true },
+        { date: '2026-11-11', reason: '48小时未上号', handled: false }
+     */ ],
+      '2': [
+      ]
     };
 
     const account1Rules = [
@@ -1209,6 +1246,9 @@
           const row = document.createElement('div');
           row.className = 'violation-item';
 
+          const left = document.createElement('div');
+          left.className = 'violation-item-left';
+
           const dateEl = document.createElement('div');
           dateEl.className = 'violation-date';
           dateEl.textContent = '📅 ' + formatViolationDate(item.date);
@@ -1217,8 +1257,16 @@
           reasonEl.className = 'violation-reason';
           reasonEl.textContent = item.reason || '（未填写原因）';
 
-          row.appendChild(dateEl);
-          row.appendChild(reasonEl);
+          left.appendChild(dateEl);
+          left.appendChild(reasonEl);
+
+          const statusEl = document.createElement('div');
+          const handled = item.handled === true;
+          statusEl.className = 'violation-status ' + (handled ? 'handled' : 'unhandled');
+          statusEl.textContent = handled ? '已处理' : '未处理';
+
+          row.appendChild(left);
+          row.appendChild(statusEl);
           violationList.appendChild(row);
         });
       }
