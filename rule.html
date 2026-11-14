@@ -3,8 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- 固定浅色配色：防止 Chrome / 华为浏览器等强制深色（自动反色）把页面变黑 -->
+  <meta name="color-scheme" content="only light">
+  <meta name="theme-color" content="#f9f5ff">
   <title>蛋仔共号 · 规则查看</title>
   <style>
+    :root {
+      color-scheme: only light;
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -12,9 +19,18 @@
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     }
 
+    html {
+      /* 关闭安卓浏览器的「文字自动放大 / 字体缩放」，避免文字被放大后把按钮撑变形 */
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      background-color: #f9f5ff;
+    }
+
     body {
       min-height: 100vh;
       background: #f9f5ff;
+      background-color: #f9f5ff;
+      overflow-x: hidden;
       background-image: radial-gradient(circle at 10% 20%, rgba(255, 210, 255, 0.5) 0%, transparent 30%),
                         radial-gradient(circle at 90% 70%, rgba(200, 240, 255, 0.6) 0%, transparent 40%),
                         radial-gradient(circle at 30% 80%, rgba(255, 235, 190, 0.5) 0%, transparent 35%);
@@ -141,12 +157,15 @@
     .acc-btn .acc-name-row {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
+      width: 100%;
     }
 
     .acc-btn .acc-name {
       font-weight: 550;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .violation-badge {
@@ -163,6 +182,8 @@
       backdrop-filter: blur(4px);
       letter-spacing: 0.3px;
       white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1.3;
       appearance: none;
       -webkit-appearance: none;
       margin: 0;
@@ -811,23 +832,32 @@
         border-radius: 40px;
       }
       .acc-btn {
-        padding: 18px 20px;
-        font-size: 1.35rem;
+        padding: 16px 18px;
+        /* 随屏宽微调，保证「账号名 + 违规记录」始终能排在一行 */
+        font-size: clamp(1.12rem, 4.85vw, 1.3rem);
       }
       .acc-btn::before {
         top: 6px; left: 6px; right: 6px; bottom: 6px;
         border-radius: 50px;
       }
+      .acc-btn .acc-content {
+        gap: 10px;
+      }
       .acc-btn .acc-name-row {
-        gap: 8px;
+        gap: clamp(6px, 2vw, 10px);
+      }
+      .acc-btn .acc-icon {
+        font-size: 1.6rem;
       }
       .violation-badge {
-        font-size: 0.75rem;
-        padding: 3px 10px;
+        font-size: clamp(0.64rem, 2.8vw, 0.76rem);
+        padding: 3px clamp(6px, 1.8vw, 10px);
+        gap: 4px;
       }
       .violation-badge .price-tag {
-        padding: 1px 8px;
-        font-size: 0.75rem;
+        padding: 1px 6px;
+        font-size: clamp(0.64rem, 2.8vw, 0.76rem);
+        margin-left: 2px;
       }
       .unhandled-inline {
         font-size: 0.72rem;
@@ -972,7 +1002,7 @@
   (function() {
     const violationRecords = {
       '1': [
-      { date: '2026-11-11', reason: '【小王】上号未报备', handled: false }
+      { date: '2026-11-11', reason: '【小王】上号未报备 ¥1', handled: false }
       /*示例
         { date: '2026-10-未收录', reason: '48小时未上号', handled: true },
         { date: '2026-11-07', reason: '48小时未上号', handled: true },
@@ -1296,7 +1326,7 @@
 
         const count = (violationRecords[id] || []).filter(item => item.handled !== true).length;
         if (count > 0) {
-          text.textContent = `有${count}条违规记录未处理`;
+          text.textContent = `你有${count}条违规记录请尽快处理`;
           box.classList.remove('hidden');
         } else {
           box.classList.add('hidden');
