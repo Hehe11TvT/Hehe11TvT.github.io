@@ -1188,6 +1188,109 @@
       animation: pageIn 0.44s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
+    /* ---------- 顶部吸顶条：日期/时间/昵称滑出屏幕后固定在顶上 ---------- */
+    .mini-head {
+      position: fixed;
+      top: 10px;
+      left: 16px;
+      right: 16px;
+      max-width: 560px;
+      margin: 0 auto;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 14px;
+      border-radius: 14px;
+      background: rgba(252, 251, 253, 0.9);
+      -webkit-backdrop-filter: blur(16px) saturate(1.5);
+      backdrop-filter: blur(16px) saturate(1.5);
+      box-shadow: 0 6px 20px rgba(28, 27, 31, 0.12), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      opacity: 0;
+      transform: translateY(-130%);
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), opacity 0.22s ease;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    .mini-head.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .mini-back {
+      width: 28px;
+      height: 28px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: var(--surface-2);
+      color: var(--on-surface-var);
+      font-size: 1rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.16s ease, transform 0.16s ease;
+    }
+
+    .mini-back:active {
+      background: var(--surface-3);
+      transform: scale(0.92);
+    }
+
+    .mini-back .ico {
+      stroke-width: 2.2;
+    }
+
+    .mini-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      flex: 0 0 auto;
+      box-shadow: 0 0 0 3px rgba(60, 98, 140, 0.12);
+    }
+
+    .mini-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--on-surface);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-clock {
+      margin-left: auto;
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .mini-date {
+      font-size: 0.72rem;
+      color: var(--on-surface-dim);
+    }
+
+    .mini-time {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--on-surface-var);
+    }
+
+    /* 校时失败时（页面里显示「网络连接超时」）就不摆一串占位符 */
+    .mini-head.no-clock .mini-clock {
+      display: none;
+    }
+
     @keyframes pageIn {
       from { opacity: 0; transform: translateY(10px) scale(0.988); }
       to   { opacity: 1; transform: none; }
@@ -1421,6 +1524,14 @@
     <div class="rules-container" id="rulesContainer2"></div>
     <div class="footnote"><svg class="ico" aria-hidden="true"><use href="#pin"/></svg>以上注意事项和规则根据实际情况调整，如有违规则交保证金，严重或多次即撤销共号资格。</div>
   </div>
+</div>
+
+<!-- 吸顶信息条：规则页往下翻时固定在顶部，简要显示昵称 / 日期 / 时间 -->
+<div class="mini-head" id="miniHead">
+  <button class="mini-back" id="miniBack" type="button" aria-label="返回账号选择"><svg class="ico" aria-hidden="true"><use href="#chevron-left"/></svg></button>
+  <span class="mini-dot" id="miniDot"></span>
+  <span class="mini-name" id="miniName">--</span>
+  <span class="mini-clock"><span class="mini-date" id="miniDate">--</span><span class="mini-time" id="miniTime">--:--:--</span></span>
 </div>
 
 <!-- 联系我弹窗 -->
@@ -1664,6 +1775,7 @@
       if (t1) t1.textContent = timeStr;
       if (d2) d2.textContent = dateStr;
       if (t2) t2.textContent = timeStr;
+      if (miniVisible) refreshMiniContent(currentRulePage());
     }
 
     async function tryFetchTime() {
@@ -1734,6 +1846,7 @@
       rulePage1.classList.add('hidden');
       rulePage2.classList.add('hidden');
       renderAccountUnhandledHints();
+      syncMiniHead();
     }
 
     function showRulePage(accountId, instant) {
@@ -1758,6 +1871,7 @@
         }
       }
       if (networkSuccess) updateClocks();
+      syncMiniHead();
     }
 
     function resetAnimations(containerId) {
@@ -1775,6 +1889,66 @@
     document.getElementById('btnAccount2').addEventListener('click', (e) =>
       requestAccess('2', 'rules', e.currentTarget.querySelector('.acc-icon')));
     document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', showHome));
+
+    // ---------- 顶部吸顶条 ----------
+    const miniHead = document.getElementById('miniHead');
+    const miniDot = document.getElementById('miniDot');
+    const miniName = document.getElementById('miniName');
+    const miniDate = document.getElementById('miniDate');
+    const miniTime = document.getElementById('miniTime');
+    let miniVisible = false;
+
+    function currentRulePage() {
+      if (!homePage.classList.contains('hidden')) return null;
+      if (rulePage1 && !rulePage1.classList.contains('hidden')) return rulePage1;
+      if (rulePage2 && !rulePage2.classList.contains('hidden')) return rulePage2;
+      return null;
+    }
+
+    // 内容直接照抄页面里的那份，避免两处时间对不上
+    function refreshMiniContent(page) {
+      if (!page) return;
+      const id = page === rulePage1 ? '1' : '2';
+      const nameEl = page.querySelector('.rule-title');
+      const dateEl = document.getElementById('clockDate' + id);
+      const timeEl = document.getElementById('clockTime' + id);
+      miniName.textContent = nameEl ? nameEl.textContent.trim() : '';
+      miniDate.textContent = dateEl ? dateEl.textContent : '--';
+      miniTime.textContent = timeEl ? timeEl.textContent : '--:--:--';
+      const clockOk = !!(timeEl && timeEl.textContent && timeEl.textContent !== '--:--:--');
+      miniHead.classList.toggle('no-clock', !clockOk);
+      const accent = document.querySelector('#btnAccount' + id + ' .acc-name');
+      miniDot.style.background = accent ? window.getComputedStyle(accent).color : '';
+    }
+
+    function setMini(show) {
+      if (show === miniVisible) return;
+      miniVisible = show;
+      miniHead.classList.toggle('show', show);
+    }
+
+    function syncMiniHead() {
+      const page = currentRulePage();
+      if (!page) { setMini(false); return; }
+      const title = page.querySelector('.rule-title');
+      if (!title) { setMini(false); return; }
+      const top = title.getBoundingClientRect().top;
+      //  hysteresis：快贴到顶栏才出现，滚回来要明显看见标题才收起，避免抖动
+      const show = miniVisible ? top < 72 : top < 44;
+      if (show) refreshMiniContent(page);
+      setMini(show);
+    }
+
+    document.getElementById('miniBack').addEventListener('click', showHome);
+
+    let miniTick = false;
+    function onMiniScroll() {
+      if (miniTick) return;
+      miniTick = true;
+      window.requestAnimationFrame(() => { miniTick = false; syncMiniHead(); });
+    }
+    window.addEventListener('scroll', onMiniScroll, { passive: true, capture: true });
+    window.addEventListener('resize', onMiniScroll);
 
     // ---------- 联系我弹窗 ----------
     const contactBtn = document.getElementById('contactBtn');
