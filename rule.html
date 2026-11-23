@@ -1189,9 +1189,10 @@
     }
 
     /* ---------- 顶部吸顶条：日期/时间/昵称滑出屏幕后固定在顶上 ---------- */
+    /* 吸顶条：磨砂玻璃 + 左侧返回 + 状态灯 + 昵称 + 右侧时间胶囊 */
     .mini-head {
       position: fixed;
-      top: 10px;
+      top: 9px;
       left: 16px;
       right: 16px;
       max-width: 560px;
@@ -1199,40 +1200,54 @@
       z-index: 40;
       display: flex;
       align-items: center;
-      gap: 9px;
-      padding: 9px 14px;
-      border-radius: 14px;
-      background: rgba(252, 251, 253, 0.9);
-      -webkit-backdrop-filter: blur(16px) saturate(1.5);
-      backdrop-filter: blur(16px) saturate(1.5);
-      box-shadow: 0 6px 20px rgba(28, 27, 31, 0.12), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
-      border: 1px solid rgba(255, 255, 255, 0.75);
+      gap: 8px;
+      padding: 4px 10px 4px 4px;
+      border-radius: 16px;
+      background: rgba(252, 251, 253, 0.86);
+      -webkit-backdrop-filter: blur(20px) saturate(1.7);
+      backdrop-filter: blur(20px) saturate(1.7);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 12px 30px -10px rgba(28, 27, 31, 0.30),
+        0 2px 6px rgba(28, 27, 31, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.9) inset;
       opacity: 0;
-      transform: translateY(-130%);
-      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), opacity 0.22s ease;
+      transform: translateY(-140%) scale(0.97);
+      transition:
+        transform 0.34s cubic-bezier(0.2, 0, 0, 1),
+        opacity 0.24s ease;
       pointer-events: none;
       will-change: transform, opacity;
     }
 
     .mini-head.show {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
       pointer-events: auto;
     }
 
+    .mini-head::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow: 0 0 0 1px rgba(60, 62, 74, 0.06) inset;
+    }
+
     .mini-back {
-      width: 28px;
-      height: 28px;
+      width: 34px;
+      height: 34px;
       flex: 0 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 0;
       border: none;
-      border-radius: 50%;
-      background: var(--surface-2);
+      border-radius: 11px;
+      background: transparent;
       color: var(--on-surface-var);
-      font-size: 1rem;
+      font-size: 1.1rem;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: background 0.16s ease, transform 0.16s ease;
@@ -1240,23 +1255,108 @@
 
     .mini-back:active {
       background: var(--surface-3);
-      transform: scale(0.92);
+      transform: scale(0.93);
     }
 
     .mini-back .ico {
-      stroke-width: 2.2;
+      stroke-width: 2.4;
     }
 
-    .mini-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--primary);
+    /* 状态灯：菲涅尔灯珠 + 白热核心 + 双层涟漪 + 呼吸光晕 + 点亮瞬间 */
+    .mini-led {
+      position: relative;
       flex: 0 0 auto;
-      box-shadow: 0 0 0 3px rgba(60, 98, 140, 0.12);
+      width: 7px;
+      height: 7px;
+      margin-left: 2px;
+      isolation: isolate;
+    }
+
+    /* 外层光晕：白热→淡绿→透明，隔着模糊，呼吸 */
+    .mini-led::before {
+      content: "";
+      position: absolute;
+      inset: -16px;
+      z-index: 1;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.62) 0%,
+        rgba(160, 246, 194, 0.46) 20%,
+        rgba(34, 197, 94, 0.22) 46%,
+        rgba(34, 197, 94, 0) 74%);
+      filter: blur(6px);
+      animation: ledBreath 3.6s ease-in-out infinite;
+    }
+
+    /* 涟漪：两圈错开半个呼吸周期，像心跳一样往外荡 */
+    .mini-led .led-ripple {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(74, 222, 128, 0.55);
+      animation: ledRipple 3.6s cubic-bezier(0.2, 0.55, 0.3, 1) infinite;
+    }
+
+    .mini-led .led-ripple.delay {
+      animation-delay: -1.8s;
+      border-color: rgba(134, 239, 172, 0.42);
+    }
+
+    /* 灯珠本体：中心白热、外层翠绿、边缘压深，加内反光当玻璃壳 */
+    .mini-led .led-core {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 35% 30%,
+        #ffffff 0%,
+        #e4fff0 12%,
+        #9df6c2 30%,
+        #35d67a 55%,
+        #12a051 78%,
+        #076633 100%);
+      box-shadow:
+        inset 0 -1.5px 2px rgba(3, 45, 20, 0.42),
+        inset 0 1px 1px rgba(255, 255, 255, 0.92),
+        0 0 0 0.5px rgba(6, 95, 46, 0.28);
+    }
+
+    /* 高光点：玻璃珠上那一小撮反光 */
+    .mini-led .led-glint {
+      position: absolute;
+      left: 1.4px;
+      top: 1.1px;
+      z-index: 3;
+      width: 1.7px;
+      height: 1.7px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0) 72%);
+      filter: blur(0.3px);
+      animation: ledGlint 5.2s ease-in-out infinite;
+    }
+
+    @keyframes ledBreath {
+      0%, 100% { opacity: 0.5; transform: scale(0.90); }
+      45%      { opacity: 0.95; transform: scale(1.06); }
+    }
+
+    @keyframes ledRipple {
+      0%   { transform: scale(0.85); opacity: 0.50; }
+      62%  { transform: scale(2.4);  opacity: 0; }
+      100% { transform: scale(2.4);  opacity: 0; }
+    }
+
+    @keyframes ledGlint {
+      0%, 100% { opacity: 0.75; }
+      50%      { opacity: 1; }
     }
 
     .mini-name {
+      flex: 0 1 auto;
+      min-width: 0;
       font-size: 0.92rem;
       font-weight: 700;
       letter-spacing: -0.01em;
@@ -1266,23 +1366,38 @@
       text-overflow: ellipsis;
     }
 
+    /* 时间做成胶囊，右侧不再是一片飘着的文字 */
     .mini-clock {
       margin-left: auto;
-      display: flex;
-      align-items: baseline;
-      gap: 7px;
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: var(--surface-2);
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
 
+    .mini-sep {
+      width: 1px;
+      height: 10px;
+      border-radius: 1px;
+      background: var(--outline);
+    }
+
     .mini-date {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
       color: var(--on-surface-dim);
     }
 
     .mini-time {
-      font-size: 0.82rem;
-      font-weight: 600;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
       color: var(--on-surface-var);
     }
 
@@ -1529,9 +1644,9 @@
 <!-- 吸顶信息条：规则页往下翻时固定在顶部，简要显示昵称 / 日期 / 时间 -->
 <div class="mini-head" id="miniHead">
   <button class="mini-back" id="miniBack" type="button" aria-label="返回账号选择"><svg class="ico" aria-hidden="true"><use href="#chevron-left"/></svg></button>
-  <span class="mini-dot" id="miniDot"></span>
+  <span class="mini-led" aria-hidden="true"><span class="led-ripple"></span><span class="led-ripple delay"></span><span class="led-core"></span><span class="led-glint"></span></span>
   <span class="mini-name" id="miniName">--</span>
-  <span class="mini-clock"><span class="mini-date" id="miniDate">--</span><span class="mini-time" id="miniTime">--:--:--</span></span>
+  <span class="mini-clock"><span class="mini-date" id="miniDate">--</span><span class="mini-sep" aria-hidden="true"></span><span class="mini-time" id="miniTime">--:--:--</span></span>
 </div>
 
 <!-- 联系我弹窗 -->
@@ -1892,7 +2007,6 @@
 
     // ---------- 顶部吸顶条 ----------
     const miniHead = document.getElementById('miniHead');
-    const miniDot = document.getElementById('miniDot');
     const miniName = document.getElementById('miniName');
     const miniDate = document.getElementById('miniDate');
     const miniTime = document.getElementById('miniTime');
@@ -1917,8 +2031,6 @@
       miniTime.textContent = timeEl ? timeEl.textContent : '--:--:--';
       const clockOk = !!(timeEl && timeEl.textContent && timeEl.textContent !== '--:--:--');
       miniHead.classList.toggle('no-clock', !clockOk);
-      const accent = document.querySelector('#btnAccount' + id + ' .acc-name');
-      miniDot.style.background = accent ? window.getComputedStyle(accent).color : '';
     }
 
     function setMini(show) {
