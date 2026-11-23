@@ -5,27 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <!-- 固定浅色配色：防止 Chrome / 华为浏览器等强制深色（自动反色）把页面变黑 -->
   <meta name="color-scheme" content="only light">
-  <meta name="theme-color" content="#f9f5ff">
+  <meta name="theme-color" content="#fbfafc">
   <title>蛋仔共号 · 规则查看</title>
   <style>
     :root {
       color-scheme: only light;
 
-      /* ---- 色彩系统（Material 3 tonal，seed = 紫） ---- */
-      --bg: #FBF8FE;
+      /* ---- 色彩系统（Material 3 tonal，seed = 雾蓝，暖黄作辅色） ---- */
+      --bg: #FBFAFC;
       --surface: #FFFFFF;
-      --surface-2: #F4EFFA;
-      --surface-3: #EDE6F7;
-      --on-surface: #1C1B1F;
-      --on-surface-var: #49454F;
-      --on-surface-dim: #6B6478;
-      --outline: #CAC4D0;
-      --outline-weak: #E8E2F0;
+      --surface-2: #F2F4F8;
+      --surface-3: #E8ECF3;
+      --on-surface: #1B1C20;
+      --on-surface-var: #474C56;
+      --on-surface-dim: #6B7280;
+      --outline: #C9CCD4;
+      --outline-weak: #E5E9F0;
 
-      --primary: #6A4C93;
+      --primary: #3C628C;
       --on-primary: #FFFFFF;
-      --primary-container: #EADDFF;
-      --on-primary-container: #21005D;
+      --primary-container: #E5EEF9;
+      --on-primary-container: #16344F;
 
       --danger: #B3261E;
       --danger-container: #FBE3E1;
@@ -112,9 +112,9 @@
       z-index: -2;
       pointer-events: none;
       background:
-        radial-gradient(120% 55% at 50% -8%, rgba(106, 76, 147, 0.14) 0%, rgba(106, 76, 147, 0) 62%),
-        radial-gradient(80% 45% at 102% 2%, rgba(214, 120, 150, 0.11) 0%, rgba(214, 120, 150, 0) 58%),
-        radial-gradient(75% 40% at -2% 26%, rgba(120, 170, 220, 0.09) 0%, rgba(120, 170, 220, 0) 55%);
+        radial-gradient(120% 55% at 50% -8%, rgba(60, 98, 140, 0.11) 0%, rgba(60, 98, 140, 0) 62%),
+        radial-gradient(80% 45% at 102% 2%, rgba(240, 186, 84, 0.13) 0%, rgba(240, 186, 84, 0) 58%),
+        radial-gradient(75% 40% at -2% 26%, rgba(120, 170, 220, 0.10) 0%, rgba(120, 170, 220, 0) 55%);
     }
 
     body::after {
@@ -151,8 +151,18 @@
     .home-logo-wrap {
       flex: 0 0 auto;
       width: clamp(96px, 31vw, 150px);
-      animation: logoIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+      opacity: 0;
       will-change: transform, opacity;
+    }
+
+    /* 图片 onload 之后才加这个 class，入场动画不会空播 */
+    .home-logo-wrap.is-ready {
+      animation: logoIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    /* 图挂了就整块收起，不留破图标 */
+    .home-logo-wrap.is-failed {
+      display: none;
     }
 
     .home-logo {
@@ -160,11 +170,14 @@
       width: 100%;
       height: auto;
       transform-origin: 50% 72%;
-      animation: logoFloat 5.6s ease-in-out 1s infinite;
       will-change: transform;
       user-select: none;
       -webkit-user-drag: none;
       -webkit-user-select: none;
+    }
+
+    .home-logo-wrap.is-ready .home-logo {
+      animation: logoFloat 5.6s ease-in-out 1s infinite;
     }
 
     /* 入场：从右下轻轻滑进来，带一点超调，不硬切 */
@@ -214,8 +227,8 @@
       padding: 10px;
       border-radius: 16px;
       color: var(--primary);
-      background: linear-gradient(150deg, #F2EAFF, #E1D2FA);
-      box-shadow: 0 8px 18px -8px rgba(106, 76, 147, 0.55), inset 0 1px 2px #fff;
+      background: linear-gradient(150deg, #EBF3FD, #D6E6F7);
+      box-shadow: 0 8px 18px -8px rgba(60, 98, 140, 0.5), inset 0 1px 2px #fff;
       animation: twinkle 5s ease-in-out infinite;
     }
 
@@ -466,7 +479,7 @@
     }
 
     .contact-btn:hover {
-      background: #DFCDFB;
+      background: #D8E6F6;
       transform: translateY(-1px);
     }
 
@@ -743,12 +756,12 @@
       display: inline-block;
       padding: 1px 8px;
       border-radius: var(--r-full);
-      background: var(--surface-2);
-      color: var(--primary);
+      background: #F3F5F9;
+      color: #5A6472;
       font-size: 0.76rem;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
-      border: 1px solid var(--outline-weak);
+      border: 1px solid #E4E8EF;
       white-space: nowrap;
       vertical-align: 1px;
     }
@@ -1083,7 +1096,7 @@
     .gate-input:focus {
       border-color: var(--primary);
       background: var(--surface);
-      box-shadow: 0 0 0 3px rgba(106, 76, 147, 0.14);
+      box-shadow: 0 0 0 3px rgba(60, 98, 140, 0.16);
     }
 
     .gate-input.is-error {
@@ -1128,6 +1141,56 @@
       opacity: 0.6;
       cursor: default;
       transform: none;
+    }
+
+    /* ---------- 图标 → 密码框 / 规则页 的变形动画 ---------- */
+    .morph-glyph {
+      margin: 0 !important;
+      transform-origin: 50% 50%;
+      transition: none !important;
+      will-change: transform, opacity;
+    }
+
+    /* 变形过程中先藏内容，等框长开了再淡进来 */
+    .gate-card.is-morphing {
+      transition: none !important;
+    }
+
+    .contact-card .contact-title,
+    .contact-card .contact-sub,
+    .contact-card .gate-form,
+    .contact-card .contact-close,
+    .contact-card .violation-list {
+      transition: opacity 0.2s ease;
+    }
+
+    .gate-card.is-morphing .contact-title,
+    .gate-card.is-morphing .contact-sub,
+    .gate-card.is-morphing .gate-form,
+    .gate-card.is-morphing .contact-close {
+      opacity: 0;
+    }
+
+    /* 违规记录：卡片从徽标里长出来时，同样先藏内容 */
+    .violation-card.is-morphing {
+      transition: none !important;
+    }
+
+    .violation-card.is-morphing .contact-title,
+    .violation-card.is-morphing .contact-sub,
+    .violation-card.is-morphing .contact-close,
+    .violation-card.is-morphing .violation-list {
+      opacity: 0;
+    }
+
+    /* 规则页入场：比硬切多一点点位移，接住从密码框放大过来的那一下 */
+    .rule-page.page-in {
+      animation: pageIn 0.44s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.988); }
+      to   { opacity: 1; transform: none; }
     }
 
     @keyframes shakeX {
@@ -1386,7 +1449,7 @@
 
 <!-- 违规记录弹窗 -->
 <div class="contact-modal" id="violationModal">
-  <div class="contact-card">
+  <div class="contact-card violation-card" id="violationCard">
     <div class="contact-close" id="violationClose"><svg class="ico" aria-hidden="true"><use href="#x"/></svg></div>
     <div class="contact-title" id="violationTitle">违规记录</div>
     <div class="contact-sub" id="violationSub">共 0 次</div>
@@ -1673,16 +1736,26 @@
       renderAccountUnhandledHints();
     }
 
-    function showRulePage(accountId) {
+    function showRulePage(accountId, instant) {
       homePage.classList.add('hidden');
+      let page = null;
       if (accountId === '1') {
+        page = rulePage1;
         rulePage1.classList.remove('hidden');
         rulePage2.classList.add('hidden');
         resetAnimations('rulesContainer1');
       } else if (accountId === '2') {
+        page = rulePage2;
         rulePage2.classList.remove('hidden');
         rulePage1.classList.add('hidden');
         resetAnimations('rulesContainer2');
+      }
+      if (page) {
+        page.classList.remove('page-in');
+        if (!instant) {
+          void page.offsetWidth;
+          page.classList.add('page-in');
+        }
       }
       if (networkSuccess) updateClocks();
     }
@@ -1697,8 +1770,10 @@
       });
     }
 
-    document.getElementById('btnAccount1').addEventListener('click', () => requestAccess('1', 'rules'));
-    document.getElementById('btnAccount2').addEventListener('click', () => requestAccess('2', 'rules'));
+    document.getElementById('btnAccount1').addEventListener('click', (e) =>
+      requestAccess('1', 'rules', e.currentTarget.querySelector('.acc-icon')));
+    document.getElementById('btnAccount2').addEventListener('click', (e) =>
+      requestAccess('2', 'rules', e.currentTarget.querySelector('.acc-icon')));
     document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', showHome));
 
     // ---------- 联系我弹窗 ----------
@@ -1781,6 +1856,9 @@
 
     // ---------- 违规记录弹窗 ----------
     const violationModal = document.getElementById('violationModal');
+    const violationCard = document.getElementById('violationCard');
+    let violationClosing = false;
+    let violationAccount = null;
     const violationClose = document.getElementById('violationClose');
     const violationTitle = document.getElementById('violationTitle');
     const violationSub = document.getElementById('violationSub');
@@ -1830,7 +1908,7 @@
       });
     }
 
-    function openViolationModal(accountId) {
+    function openViolationModal(accountId, sourceEl) {
       const accBtn = document.getElementById('btnAccount' + accountId);
       const nameEl = accBtn ? accBtn.querySelector('.acc-name') : null;
       const records = (violationRecords[accountId] || [])
@@ -1876,12 +1954,95 @@
         });
       }
 
+      violationClosing = false;
+      violationAccount = accountId;
       violationModal.classList.add('open');
+      if (sourceEl && !reduceMotion) morphViolationOpen(sourceEl);
     }
 
+    // 违规卡片从徽标（或图标）的位置和大小长出来，和账号卡片进规则页是一套语言
+    function morphViolationOpen(sourceEl) {
+      const card = violationCard;
+      if (!card) return;
+      card.classList.add('is-morphing');
+      void card.offsetWidth;
+
+      const sRect = sourceEl.getBoundingClientRect();
+      const cRect = card.getBoundingClientRect();
+      if (!cRect.width || !sRect.width) {
+        card.classList.remove('is-morphing');
+        return;
+      }
+      const scale = Math.max(sRect.width / cRect.width, 0.06);
+      const dx = (sRect.left + sRect.width / 2) - (cRect.left + cRect.width / 2);
+      const dy = (sRect.top + sRect.height / 2) - (cRect.top + cRect.height / 2);
+      const radius = Math.min(sRect.height / 2 / scale, 999);
+
+      const anim = card.animate([
+        { transform: 'translate(' + dx + 'px, ' + dy + 'px) scale(' + scale + ')', borderRadius: radius + 'px', opacity: 0.9 },
+        { transform: 'none', borderRadius: window.getComputedStyle(card).borderRadius || '24px', opacity: 1 }
+      ], { duration: 460, easing: 'cubic-bezier(0.2, 0.9, 0.25, 1)', fill: 'both' });
+
+      // 长到七八成再把内容淡进来
+      window.setTimeout(() => card.classList.remove('is-morphing'), 300);
+      anim.onfinish = () => {
+        anim.cancel();
+        card.classList.remove('is-morphing');
+      };
+    }
+
+    // 关掉时缩回徽标，和账号卡片的缩回是同一套动作
     function closeViolationModal() {
+      if (!violationModal.classList.contains('open') || violationClosing) return;
+      const badge = violationAccount ? document.getElementById('btnViolation' + violationAccount) : null;
+      if (badge && violationCard && !reduceMotion) { morphViolationClose(badge); return; }
+      finishViolationClose();
+    }
+
+    function finishViolationClose() {
+      violationModal.style.transition = 'none';
       violationModal.classList.remove('open');
+      if (violationCard) {
+        violationCard.classList.remove('is-morphing');
+        violationCard.style.transform = '';
+      }
+      void violationModal.offsetWidth;
+      violationModal.style.transition = '';
+      violationClosing = false;
       renderAccountUnhandledHints();
+    }
+
+    function morphViolationClose(targetEl) {
+      const card = violationCard;
+      violationClosing = true;
+      card.classList.add('is-morphing');
+
+      const sRect = targetEl.getBoundingClientRect();
+      const cRect = card.getBoundingClientRect();
+      if (!cRect.width || !sRect.width) { finishViolationClose(); return; }
+      const scale = Math.max(sRect.width / cRect.width, 0.06);
+      const dx = (sRect.left + sRect.width / 2) - (cRect.left + cRect.width / 2);
+      const dy = (sRect.top + sRect.height / 2) - (cRect.top + cRect.height / 2);
+      const radius = Math.min(sRect.height / 2 / scale, 999);
+      const nowStyle = window.getComputedStyle(card);
+      const fromTransform = nowStyle.transform && nowStyle.transform !== 'none' ? nowStyle.transform : 'none';
+      const fromRadius = nowStyle.borderRadius || '24px';
+
+      const scrim = violationModal.animate([
+        { opacity: 1 },
+        { opacity: 0 }
+      ], { duration: 340, easing: 'ease-out', fill: 'both' });
+
+      const anim = card.animate([
+        { transform: fromTransform, borderRadius: fromRadius, opacity: 1 },
+        { transform: 'translate(' + dx + 'px, ' + dy + 'px) scale(' + scale + ') rotate(-10deg)', borderRadius: radius + 'px', opacity: 0.9 }
+      ], { duration: 340, easing: 'cubic-bezier(0.4, 0, 0.5, 1)', fill: 'both' });
+
+      anim.onfinish = () => {
+        finishViolationClose();
+        anim.cancel();
+        scrim.cancel();
+      };
     }
 
     // ---------- 查看密码验证 ----------
@@ -1995,19 +2156,301 @@
       return nameEl ? nameEl.textContent.trim() : '账号';
     }
 
-    function requestAccess(id, action) {
-      if (!GATE[id]) { runAccess(id, action); return; }
-      if (isUnlocked(id)) { runAccess(id, action); return; }
-      openGate(id, action);
+    function requestAccess(id, action, iconEl) {
+      if (bloomBusy) return;                 // 图标正在长成页面，别叠别的弹窗
+      if (!GATE[id] || isUnlocked(id)) {
+        if (action === 'rules') enterRulesWithBloom(id, iconEl);
+        else runAccess(id, action, iconEl);
+        return;
+      }
+      openGate(id, action, iconEl);
     }
 
-    function runAccess(id, action) {
-      if (action === 'violation') openViolationModal(id);
+    function runAccess(id, action, iconEl) {
+      if (action === 'violation') openViolationModal(id, iconEl);
       else showRulePage(id);
     }
 
-    function openGate(id, action) {
-      pendingGate = { id: id, action: action };
+    // ---------- 变形动画 ----------
+    const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    let gateMorph = null;
+    let gateClosing = false;
+
+    // 把账号卡片里的图标原样复制一份，固定在屏幕上，用它来演「图标变大旋转」
+    function cloneIconGlyph(iconEl) {
+      const rect = iconEl.getBoundingClientRect();
+      const cs = window.getComputedStyle(iconEl);
+      const node = iconEl.cloneNode(true);
+      node.classList.add('morph-glyph');
+      node.style.cssText = [
+        'position: fixed',
+        'left: ' + rect.left + 'px',
+        'top: ' + rect.top + 'px',
+        'width: ' + cs.width,
+        'height: ' + cs.height,
+        'padding: ' + cs.padding,
+        'box-sizing: content-box',
+        'border-radius: ' + cs.borderRadius,
+        'background: ' + cs.background,
+        'color: ' + cs.color,
+        'box-shadow: ' + cs.boxShadow,
+        'z-index: 1002',
+        'pointer-events: none'
+      ].join(';');
+      document.body.appendChild(node);
+      return node;
+    }
+
+    // 图标 → 密码框：卡片从图标的位置和大小长出来，图标同时放大、旋转、淡出
+    function morphCardOpen(iconEl) {
+      gateCard.classList.add('is-morphing');
+      void gateCard.offsetWidth; // 先让「无过渡」生效，再量最终位置
+
+      const iconRect = iconEl.getBoundingClientRect();
+      const cardRect = gateCard.getBoundingClientRect();
+      const scale = iconRect.width / cardRect.width;
+      const dx = (iconRect.left + iconRect.width / 2) - (cardRect.left + cardRect.width / 2);
+      const dy = (iconRect.top + iconRect.height / 2) - (cardRect.top + cardRect.height / 2);
+
+      const glyph = cloneIconGlyph(iconEl);
+      const gAnim = glyph.animate([
+        { transform: 'translate(0px, 0px) scale(1) rotate(0deg)', opacity: 1 },
+        { transform: 'translate(0px, -6px) scale(1.3) rotate(85deg)', opacity: 1, offset: 0.55 },
+        { transform: 'translate(0px, -10px) scale(1.46) rotate(140deg)', opacity: 0 }
+      ], { duration: 560, easing: 'cubic-bezier(0.3, 0.6, 0.3, 1)', fill: 'both' });
+      gAnim.onfinish = () => { gAnim.cancel(); glyph.remove(); };
+
+      const cAnim = gateCard.animate([
+        {
+          transform: 'translate(' + dx + 'px, ' + dy + 'px) scale(' + scale + ') rotate(-16deg)',
+          borderRadius: Math.round(18 / scale) + 'px'
+        },
+        { transform: 'translate(0px, 0px) scale(1) rotate(0deg)', borderRadius: '28px' }
+      ], { duration: 620, easing: 'cubic-bezier(0.2, 0.9, 0.25, 1)', fill: 'both' });
+      cAnim.onfinish = () => {
+        cAnim.cancel();
+        if (gateMorph) gateMorph.settled = true;   // 已回到正常布局，位置可以重新量
+      };
+
+      // 框基本长开后，再把标题、输入框淡进来
+      window.setTimeout(() => gateCard.classList.remove('is-morphing'), 430);
+
+      gateMorph = { iconEl: iconEl, dx: dx, dy: dy, scale: scale, settled: false };
+    }
+
+    // 变形收尾：先关过渡再摘 .open，让遮罩瞬间消失。
+    // 顺序很重要——先 cancel 动画再收遮罩的话，卡片会闪回原尺寸被看到。
+    function hideGateNow() {
+      if (gateCloseTimer) { clearTimeout(gateCloseTimer); gateCloseTimer = null; }
+      gateModal.style.transition = 'none';
+      gateModal.classList.remove('open');
+      gateCard.classList.remove('is-morphing');
+      gateCard.classList.remove('shake');
+      void gateModal.offsetWidth;          // 让「无过渡」真正生效
+      gateModal.style.transition = '';
+      try { gateInput.blur(); } catch (e) {}
+      pendingGate = null;
+      gateMorph = null;
+      gateClosing = false;
+    }
+
+    // 密码框 → 缩回图标
+    function morphCardClose() {
+      const m = gateMorph;
+      gateCard.classList.add('is-morphing');
+
+      // 入场已落位（没有残留 transform）就按此刻的真实布局重算落点，
+      // 键盘收起、旋转、滚动导致的位移都不会再让缩回歪掉
+      if (m.settled) {
+        const iconRect = m.iconEl.getBoundingClientRect();
+        const cardRect = gateCard.getBoundingClientRect();
+        m.dx = (iconRect.left + iconRect.width / 2) - (cardRect.left + cardRect.width / 2);
+        m.dy = (iconRect.top + iconRect.height / 2) - (cardRect.top + cardRect.height / 2);
+        m.scale = iconRect.width / cardRect.width;
+      }
+
+      // 遮罩跟着一起淡，不要等卡片缩完再整块消失
+      const scrim = gateModal.animate([
+        { opacity: 1 },
+        { opacity: 0 }
+      ], { duration: 400, easing: 'ease-out', fill: 'both' });
+
+      const glyph = cloneIconGlyph(m.iconEl);
+      const gAnim = glyph.animate([
+        { transform: 'translate(0px, -8px) scale(1.32) rotate(120deg)', opacity: 0 },
+        { transform: 'translate(0px, 0px) scale(1) rotate(0deg)', opacity: 1 }
+      ], { duration: 420, easing: 'cubic-bezier(0.4, 0, 0.3, 1)', fill: 'both' });
+      gAnim.onfinish = () => { gAnim.cancel(); glyph.remove(); };
+
+      // 从「当前真实形态」起手：万一是入场动画没播完就点了叉，也不会跳一下
+      const nowStyle = window.getComputedStyle(gateCard);
+      const fromTransform = nowStyle.transform && nowStyle.transform !== 'none' ? nowStyle.transform : 'none';
+      const fromRadius = nowStyle.borderRadius || '28px';
+
+      const cAnim = gateCard.animate([
+        { transform: fromTransform, borderRadius: fromRadius },
+        {
+          transform: 'translate(' + m.dx + 'px, ' + m.dy + 'px) scale(' + m.scale + ') rotate(-16deg)',
+          borderRadius: Math.round(18 / m.scale) + 'px'
+        }
+      ], { duration: 400, easing: 'cubic-bezier(0.4, 0, 0.5, 1)', fill: 'both' });
+      cAnim.onfinish = () => {
+        hideGateNow();   // 先让遮罩不可见
+        cAnim.cancel();  // 再撤销动画，跳变发生在看不见的状态里
+        scrim.cancel();
+      };
+    }
+
+    function finishGateClose() {
+      if (gateCloseTimer) { clearTimeout(gateCloseTimer); gateCloseTimer = null; }
+      if (gateClosing) return;
+      gateClosing = true;
+      window.setTimeout(() => { gateClosing = false; }, 60);
+      gateCard.classList.remove('is-morphing');
+      gateCard.classList.remove('shake');
+      gateModal.classList.remove('open');
+      try { gateInput.blur(); } catch (e) {}
+      pendingGate = null;
+      gateMorph = null;
+    }
+
+    // 密码框 → 撑满屏幕，交棒给规则页
+    function morphGateToRules(id) {
+      gateModal.style.pointerEvents = 'none';
+      try { gateInput.blur(); } catch (e) {}   // 键盘会和放大动画抢视口，先收掉
+      const rect = gateCard.getBoundingClientRect();
+      const vw = Math.max(window.innerWidth, document.documentElement.clientWidth || 0);
+      const vh = Math.max(window.innerHeight, document.documentElement.clientHeight || 0,
+                          (window.screen && window.screen.height) || 0);
+      const cover = Math.max(vw / rect.width, vh / rect.height) * 1.06;
+
+      const scrim = gateModal.animate([
+        { opacity: 1 },
+        { opacity: 0 }
+      ], { duration: 620, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'both' });
+
+      const anim = gateCard.animate([
+        { transform: 'translate(0px, 0px) scale(1)', opacity: 1 },
+        { transform: 'scale(' + cover + ')', opacity: 1, offset: 0.62 },
+        { transform: 'scale(' + (cover * 1.03) + ')', opacity: 0 }
+      ], { duration: 620, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'both' });
+
+      window.setTimeout(() => showRulePage(id), 330);
+      anim.onfinish = () => {
+        hideGateNow();
+        anim.cancel();
+        scrim.cancel();
+        gateModal.style.pointerEvents = '';
+        gateSubmit.disabled = false;
+      };
+    }
+
+    // 已经验证过的账号：图标变大旋转，直接化进规则页
+    let bloomBusy = false;
+
+    function enterRulesWithBloom(id, iconEl) {
+      if (!iconEl || reduceMotion) { showRulePage(id); return; }
+      if (bloomBusy) return;              // 动画期间不再响应，避免两层底片打架
+      bloomBusy = true;
+
+      const rect = iconEl.getBoundingClientRect();
+      const cs = window.getComputedStyle(iconEl);
+      const half = rect.width / 2;
+
+      // 图标中心到屏幕最远角的距离：底片放大到能盖住它，才算真的「覆盖」
+      const dx = Math.max(rect.left, window.innerWidth - (rect.left + rect.width));
+      const dy = Math.max(rect.top, window.innerHeight - (rect.top + rect.height));
+      const reach = Math.sqrt(dx * dx + dy * dy);
+      const cover = (reach / half) * 1.04;
+
+      const iconShadow = cs.boxShadow && cs.boxShadow !== 'none' ? cs.boxShadow : 'none';
+      const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+      const pageBg = bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' ? bodyBg : '#FBFAFC';
+
+      // 底片：起始与图标完全重合（尺寸/圆角/底色/投影照抄），最后铺满全屏
+      const surface = document.createElement('div');
+      surface.className = 'bloom-surface';
+      surface.style.cssText = [
+        'position: fixed',
+        'left: ' + rect.left + 'px',
+        'top: ' + rect.top + 'px',
+        'width: ' + rect.width + 'px',
+        'height: ' + rect.height + 'px',
+        'border-radius: ' + cs.borderRadius,
+        'background: ' + cs.background,
+        'box-shadow: ' + cs.boxShadow,
+        'z-index: 1200',
+        'pointer-events: none',
+        'will-change: transform, opacity'
+      ].join(';');
+
+      // 图标本体（矢量）跟着底片一起放大，中途转着淡出——「图标变成页面」
+      const glyph = iconEl.cloneNode(true);
+      glyph.classList.add('bloom-glyph');
+      glyph.style.cssText = [
+        'position: absolute',
+        'left: 50%',
+        'top: 50%',
+        'width: 22px',
+        'height: 22px',
+        'margin: -11px 0 0 -11px',
+        'padding: 0',
+        'border-radius: 0',
+        'background: none',
+        'box-shadow: none',
+        'color: ' + cs.color,
+        'pointer-events: none'
+      ].join(';');
+      surface.appendChild(glyph);
+
+      document.body.appendChild(surface);
+      iconEl.style.visibility = 'hidden';
+
+      const T = 1150;
+      const pageAt = Math.round(T * 0.28);   // 页面在放大的前半程就开始浮现
+
+      // 图标本体自己转一大圈：正方形底片转 90° 看不出来，旋转感主要靠它
+      glyph.animate([
+        { transform: 'rotate(0deg) scale(1)', opacity: 1 },
+        { transform: 'rotate(210deg) scale(1.55)', opacity: 0 }
+      ], { duration: 700, easing: 'cubic-bezier(0.35, 0, 0.55, 1)', fill: 'both' });
+
+      // 底片不铺满也不做「整块盖住」：边放大边变淡，页面从头到尾都能透出来
+      const surfAnim = surface.animate([
+        { transform: 'scale(1) rotate(0deg)', borderRadius: cs.borderRadius,
+          backgroundColor: cs.backgroundColor, boxShadow: iconShadow, opacity: 1, offset: 0 },
+        { transform: 'scale(1.13) rotate(-7deg)', borderRadius: '20px',
+          boxShadow: 'none', opacity: 1, offset: 0.12 },
+        { transform: 'scale(3.4) rotate(18deg)', borderRadius: '14px', opacity: 1, offset: 0.34 },
+        { transform: 'scale(8.5) rotate(40deg)', borderRadius: '6px',
+          backgroundColor: pageBg, opacity: 0.55, offset: 0.62 },
+        { transform: 'scale(' + cover + ') rotate(54deg)', borderRadius: '2px', opacity: 0, offset: 1 }
+      ], { duration: T, easing: 'cubic-bezier(0.25, 0.6, 0.35, 1)', fill: 'both' });
+
+      let swapped = false, cleaned = false;
+      const reveal = () => {
+        if (swapped) return;
+        swapped = true;
+        showRulePage(id);      // 动画还在跑就翻页，页面从底片下面长出来
+      };
+      const clean = () => {
+        if (cleaned) return;
+        cleaned = true;
+        bloomBusy = false;
+        try { surfAnim.cancel(); } catch (e) {}
+        surface.remove();
+        iconEl.style.visibility = '';
+      };
+
+      surfAnim.onfinish = clean;
+      window.setTimeout(reveal, pageAt);
+      window.setTimeout(clean, T + 80);   // 兜底
+    }
+
+    function openGate(id, action, iconEl) {
+      if (gateCloseTimer) { clearTimeout(gateCloseTimer); gateCloseTimer = null; }
+      pendingGate = { id: id, action: action, iconEl: iconEl || null };
+      gateMorph = null;
       const name = accountName(id);
       gateSub.textContent = action === 'violation'
         ? `「${name}」的违规记录需要密码`
@@ -2020,14 +2463,38 @@
       gateSubmit.disabled = false;
       gateSubmit.textContent = '确认进入';
       gateModal.classList.add('open');
-      setTimeout(() => { try { gateInput.focus(); } catch (e) {} }, 200);
+
+      const canMorph = !reduceMotion && !!iconEl && action === 'rules';
+      if (canMorph) {
+        morphCardOpen(iconEl);
+        // 等变形结束再聚焦：键盘弹出会改视口，动画中途弹会把卡片顶歪
+        window.setTimeout(() => { try { gateInput.focus(); } catch (e) {} }, 640);
+      } else {
+        window.setTimeout(() => { try { gateInput.focus(); } catch (e) {} }, 200);
+      }
     }
 
+    let gateCloseTimer = null;
+
     function closeGate() {
-      gateModal.classList.remove('open');
-      gateCard.classList.remove('shake');
-      gateInput.blur();
-      pendingGate = null;
+      if (!gateModal.classList.contains('open')) return;
+      if (gateCloseTimer) return;                 // 已经在等键盘收起了
+      if (gateMorph && !reduceMotion) {
+        // 键盘还开着的话，先收起键盘、等视口回稳，再按新布局量坐标；
+        // 否则卡片会朝着「键盘弹起前」的图标位置缩，一缩就歪
+        const editing = document.activeElement === gateInput;
+        try { gateInput.blur(); } catch (e) {}
+        if (editing) {
+          gateCloseTimer = window.setTimeout(() => {
+            gateCloseTimer = null;
+            if (gateModal.classList.contains('open') && gateMorph && pendingGate) morphCardClose();
+          }, 260);
+        } else {
+          morphCardClose();
+        }
+      } else {
+        finishGateClose();
+      }
     }
 
     function gateFail(message) {
@@ -2042,6 +2509,7 @@
 
     gateForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      if (gateCloseTimer) { clearTimeout(gateCloseTimer); gateCloseTimer = null; }
       if (!pendingGate || gateSubmit.disabled) return;
       const password = gateInput.value.trim();
       if (!password) { gateFail('请先输入密码'); return; }
@@ -2064,11 +2532,18 @@
 
         if (pass) {
           markUnlocked(target.id);
-          gateModal.classList.remove('open');
           gateCard.classList.remove('shake');
-          gateInput.blur();
-          pendingGate = null;
-          runAccess(target.id, target.action);
+          pendingGate = null;          // 锁住二次提交
+          gateSubmit.disabled = true;
+          if (reduceMotion) {
+            finishGateClose();
+            runAccess(target.id, target.action);
+          } else if (target.action === 'rules') {
+            morphGateToRules(target.id);
+          } else {
+            finishGateClose();
+            openViolationModal(target.id, document.getElementById('btnViolation' + target.id));
+          }
         } else {
           gateFail('密码不正确，请重新输入');
         }
@@ -2090,6 +2565,23 @@
       gateError.classList.remove('visible');
     });
 
+    // 品牌图：等图片真的加载完再放入场动画，避免动画播完了图还没到
+    const logoWrap = document.querySelector('.home-logo-wrap');
+    if (logoWrap) {
+      const logoImg = logoWrap.querySelector('img');
+      const playLogoIn = () => logoWrap.classList.add('is-ready');
+      const failLogo = () => logoWrap.classList.add('is-failed');
+      if (!logoImg) {
+        playLogoIn();
+      } else if (logoImg.complete) {
+        // 已经在缓存里：可能连 load 事件都错过了
+        if (logoImg.naturalWidth > 0) playLogoIn(); else failLogo();
+      } else {
+        logoImg.addEventListener('load', playLogoIn, { once: true });
+        logoImg.addEventListener('error', failLogo, { once: true });
+      }
+    }
+
     renderViolationBadges();
     renderAccountUnhandledHints();
 
@@ -2097,7 +2589,7 @@
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        requestAccess(btn.dataset.violation, 'violation');
+        requestAccess(btn.dataset.violation, 'violation', btn);
       });
     });
 
