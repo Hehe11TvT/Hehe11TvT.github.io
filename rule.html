@@ -1002,6 +1002,102 @@
       50%      { transform: scale(1.06) rotate(4deg); }
     }
 
+    /* ---------- 账号密码验证弹窗（复用违规记录弹窗的卡片样式） ---------- */
+    .gate-card {
+      max-width: 340px;
+    }
+
+    .gate-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .gate-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      border-radius: var(--r-sm);
+      border: 1.5px solid var(--outline);
+      background: var(--surface-2);
+      color: var(--on-surface);
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .gate-input::placeholder {
+      color: var(--on-surface-dim);
+      font-size: 0.9rem;
+      letter-spacing: 0;
+    }
+
+    .gate-input:focus {
+      border-color: var(--primary);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(106, 76, 147, 0.14);
+    }
+
+    .gate-input.is-error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.12);
+    }
+
+    .gate-error {
+      min-height: 17px;
+      font-size: 0.78rem;
+      line-height: 1.4;
+      color: var(--danger);
+      opacity: 0;
+      transition: opacity 0.16s ease;
+    }
+
+    .gate-error.visible {
+      opacity: 1;
+    }
+
+    .gate-submit {
+      width: 100%;
+      height: 46px;
+      border: none;
+      border-radius: var(--r-full);
+      background: var(--primary);
+      color: var(--on-primary);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: transform 0.14s ease, opacity 0.18s ease;
+    }
+
+    .gate-submit:active {
+      transform: scale(0.985);
+    }
+
+    .gate-submit[disabled] {
+      opacity: 0.6;
+      cursor: default;
+      transform: none;
+    }
+
+    @keyframes shakeX {
+      0%, 100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(3px); }
+    }
+
+    .gate-card.shake {
+      animation: shakeX 0.38s ease;
+    }
+
     /* ---------- 窄屏微调 ---------- */
     @media (max-width: 480px) {
       body { padding: 14px 14px 36px; }
@@ -1248,12 +1344,28 @@
   </div>
 </div>
 
+<!-- 账号验证弹窗：查看规则 / 违规记录前先输密码（复用违规记录弹窗的框） -->
+<div class="contact-modal" id="gateModal">
+  <div class="contact-card gate-card" id="gateCard">
+    <div class="contact-close" id="gateClose"><svg class="ico" aria-hidden="true"><use href="#x"/></svg></div>
+    <div class="contact-title"><svg class="ico" aria-hidden="true"><use href="#lock"/></svg>账号验证</div>
+    <div class="contact-sub" id="gateSub">请输入密码</div>
+    <form class="gate-form" id="gateForm" autocomplete="off" novalidate>
+      <input class="gate-input" id="gateInput" type="password" name="pwd"
+             inputmode="text" enterkeyhint="go" autocomplete="new-password"
+             autocapitalize="off" autocorrect="off" spellcheck="false"
+             aria-label="账号密码" placeholder="输入密码">
+      <div class="gate-error" id="gateError" role="alert"></div>
+      <button class="gate-submit" id="gateSubmit" type="submit">确认进入</button>
+    </form>
+  </div>
+</div>
+
 <script>
   (function() {
     const violationRecords = {
       '1': [
-      { date: '2026-11-15', reason: '【小王】未完成疯狂周六任务', handled: true },
-      { date: '2026-11-15', reason: '【晶晶】未完成疯狂周六任务', handled: true }
+      { date: '2026-11-15', reason: '未完成疯狂周六任务', handled: true }
       /* { date: '2026-10-未收录', reason: '48小时未上号', handled: true },
         { date: '2026-11-07', reason: '48小时未上号', handled: true },
         { date: '2026-11-11', reason: '48小时未上号', handled: false }
@@ -1535,8 +1647,8 @@
       });
     }
 
-    document.getElementById('btnAccount1').addEventListener('click', () => showRulePage('1'));
-    document.getElementById('btnAccount2').addEventListener('click', () => showRulePage('2'));
+    document.getElementById('btnAccount1').addEventListener('click', () => requestAccess('1', 'rules'));
+    document.getElementById('btnAccount2').addEventListener('click', () => requestAccess('2', 'rules'));
     document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', showHome));
 
     // ---------- 联系我弹窗 ----------
@@ -1722,6 +1834,212 @@
       renderAccountUnhandledHints();
     }
 
+    // ---------- 查看密码验证 ----------
+    // 文件里只保存「盐 + 多轮 SHA-256」的结果，没有明文密码，也无法反推；
+    // 想改密码时，用同样的 deriveDigest(新密码, salt) 生成 64 位十六进制替换下方 digest 即可。
+    const GATE_ROUNDS = 8000;
+    const GATE = {
+      '1': { salt: '2980050efd0db3e9ea', digest: ['86758d13', '976da2fe', '183d097f', 'aab58f40', '35819167', '45e61ff9', '06eb07d0', 'a8e670b6'] },
+      '2': { salt: 'f633bcee7e6f694eb8', digest: ['90d1bf4e', '2f718487', 'a744afe2', 'e1d07f83', '74069cfd', '1e52cd1c', 'fb4903f0', '252b7c54'] }
+    };
+    const SHA256_K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+    const SHA256_H0 = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+
+    function utf8Bytes(str) {
+      const out = [];
+      for (let i = 0; i < str.length; i++) {
+        const c = str.charCodeAt(i);
+        if (c < 0x80) out.push(c);
+        else if (c < 0x800) out.push(0xc0 | (c >> 6), 0x80 | (c & 63));
+        else if (c >= 0xd800 && c <= 0xdbff && i + 1 < str.length) {
+          const cp = 0x10000 + ((c - 0xd800) << 10) + (str.charCodeAt(++i) - 0xdc00);
+          out.push(0xf0 | (cp >> 18), 0x80 | ((cp >> 12) & 63), 0x80 | ((cp >> 6) & 63), 0x80 | (cp & 63));
+        } else out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      }
+      return out;
+    }
+
+    function sha256Hex(str) {
+      const bytes = utf8Bytes(str);
+      const bitLen = bytes.length * 8;
+      bytes.push(0x80);
+      while (bytes.length % 64 !== 56) bytes.push(0);
+      const hi = Math.floor(bitLen / 0x100000000);
+      const lo = bitLen >>> 0;
+      bytes.push((hi >>> 24) & 255, (hi >>> 16) & 255, (hi >>> 8) & 255, hi & 255);
+      bytes.push((lo >>> 24) & 255, (lo >>> 16) & 255, (lo >>> 8) & 255, lo & 255);
+
+      const H = SHA256_H0.slice();
+      const w = new Array(64);
+      for (let off = 0; off < bytes.length; off += 64) {
+        for (let i = 0; i < 16; i++) {
+          const j = off + i * 4;
+          w[i] = ((bytes[j] << 24) | (bytes[j + 1] << 16) | (bytes[j + 2] << 8) | bytes[j + 3]) | 0;
+        }
+        for (let i = 16; i < 64; i++) {
+          const x = w[i - 15], y = w[i - 2];
+          const s0 = ((x >>> 7) | (x << 25)) ^ ((x >>> 18) | (x << 14)) ^ (x >>> 3);
+          const s1 = ((y >>> 17) | (y << 15)) ^ ((y >>> 19) | (y << 13)) ^ (y >>> 10);
+          w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+        }
+        let a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+        for (let i = 0; i < 64; i++) {
+          const S1 = ((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7));
+          const t1 = (h + S1 + ((e & f) ^ (~e & g)) + SHA256_K[i] + w[i]) | 0;
+          const S0 = ((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10));
+          const t2 = (S0 + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+          h = g; g = f; f = e; e = (d + t1) | 0;
+          d = c; c = b; b = a; a = (t1 + t2) | 0;
+        }
+        H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+        H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+      }
+      return H.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+    }
+
+    function deriveDigest(password, salt) {
+      let h = sha256Hex(salt + ':' + password);
+      for (let i = 1; i < GATE_ROUNDS; i++) h = sha256Hex(h + salt);
+      return h;
+    }
+
+    // 本机解锁缓存：按账号分开记，规则与违规记录共用
+    const GATE_STORE_KEY = 'dz-gate-unlocked-v1';
+    const gateMemory = {};
+
+    function readGateStore() {
+      try {
+        const map = JSON.parse(localStorage.getItem(GATE_STORE_KEY) || '{}');
+        return map && typeof map === 'object' ? map : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function isUnlocked(id) {
+      return !!gateMemory[id] || !!readGateStore()[id];
+    }
+
+    function markUnlocked(id) {
+      gateMemory[id] = true;
+      try {
+        const map = readGateStore();
+        map[id] = Date.now();
+        localStorage.setItem(GATE_STORE_KEY, JSON.stringify(map));
+      } catch (e) {}
+    }
+
+    const gateModal = document.getElementById('gateModal');
+    const gateCard = document.getElementById('gateCard');
+    const gateClose = document.getElementById('gateClose');
+    const gateSub = document.getElementById('gateSub');
+    const gateForm = document.getElementById('gateForm');
+    const gateInput = document.getElementById('gateInput');
+    const gateError = document.getElementById('gateError');
+    const gateSubmit = document.getElementById('gateSubmit');
+    let pendingGate = null;
+
+    function accountName(id) {
+      const btn = document.getElementById('btnAccount' + id);
+      const nameEl = btn ? btn.querySelector('.acc-name') : null;
+      return nameEl ? nameEl.textContent.trim() : '账号';
+    }
+
+    function requestAccess(id, action) {
+      if (!GATE[id]) { runAccess(id, action); return; }
+      if (isUnlocked(id)) { runAccess(id, action); return; }
+      openGate(id, action);
+    }
+
+    function runAccess(id, action) {
+      if (action === 'violation') openViolationModal(id);
+      else showRulePage(id);
+    }
+
+    function openGate(id, action) {
+      pendingGate = { id: id, action: action };
+      const name = accountName(id);
+      gateSub.textContent = action === 'violation'
+        ? `「${name}」的违规记录需要密码`
+        : `进入「${name}」的规则前需要密码`;
+      gateInput.value = '';
+      gateInput.classList.remove('is-error');
+      gateError.textContent = '';
+      gateError.classList.remove('visible');
+      gateCard.classList.remove('shake');
+      gateSubmit.disabled = false;
+      gateSubmit.textContent = '确认进入';
+      gateModal.classList.add('open');
+      setTimeout(() => { try { gateInput.focus(); } catch (e) {} }, 200);
+    }
+
+    function closeGate() {
+      gateModal.classList.remove('open');
+      gateCard.classList.remove('shake');
+      gateInput.blur();
+      pendingGate = null;
+    }
+
+    function gateFail(message) {
+      gateInput.classList.add('is-error');
+      gateError.textContent = message;
+      gateError.classList.add('visible');
+      gateCard.classList.remove('shake');
+      void gateCard.offsetWidth;
+      gateCard.classList.add('shake');
+      try { gateInput.select(); } catch (e) {}
+    }
+
+    gateForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!pendingGate || gateSubmit.disabled) return;
+      const password = gateInput.value.trim();
+      if (!password) { gateFail('请先输入密码'); return; }
+
+      const target = pendingGate;
+      const config = GATE[target.id];
+      gateSubmit.disabled = true;
+      gateSubmit.textContent = '验证中…';
+
+      // 先让「验证中」渲染出来，再跑多轮哈希，避免按钮卡住没反馈
+      setTimeout(() => {
+        let pass = false;
+        try {
+          pass = deriveDigest(password, config.salt) === config.digest.join('');
+        } catch (err) {
+          pass = false;
+        }
+        gateSubmit.disabled = false;
+        gateSubmit.textContent = '确认进入';
+
+        if (pass) {
+          markUnlocked(target.id);
+          gateModal.classList.remove('open');
+          gateCard.classList.remove('shake');
+          gateInput.blur();
+          pendingGate = null;
+          runAccess(target.id, target.action);
+        } else {
+          gateFail('密码不正确，请重新输入');
+        }
+      }, 30);
+    });
+
+    gateClose.addEventListener('click', closeGate);
+
+    gateModal.addEventListener('click', (e) => {
+      if (e.target === gateModal) closeGate();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && gateModal.classList.contains('open')) closeGate();
+    });
+
+    gateInput.addEventListener('input', () => {
+      gateInput.classList.remove('is-error');
+      gateError.classList.remove('visible');
+    });
+
     renderViolationBadges();
     renderAccountUnhandledHints();
 
@@ -1729,7 +2047,7 @@
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        openViolationModal(btn.dataset.violation);
+        requestAccess(btn.dataset.violation, 'violation');
       });
     });
 
