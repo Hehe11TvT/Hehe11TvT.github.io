@@ -135,8 +135,52 @@
     }
 
     .home-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       text-align: left;
       margin: 4px 4px 0;
+    }
+
+    .home-header-text {
+      min-width: 0;
+    }
+
+    /* 标题右侧的品牌图（透明底 PNG，直接走直链） */
+    .home-logo-wrap {
+      flex: 0 0 auto;
+      width: clamp(96px, 31vw, 150px);
+      animation: logoIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+      will-change: transform, opacity;
+    }
+
+    .home-logo {
+      display: block;
+      width: 100%;
+      height: auto;
+      transform-origin: 50% 72%;
+      animation: logoFloat 5.6s ease-in-out 1s infinite;
+      will-change: transform;
+      user-select: none;
+      -webkit-user-drag: none;
+      -webkit-user-select: none;
+    }
+
+    /* 入场：从右下轻轻滑进来，带一点超调，不硬切 */
+    @keyframes logoIn {
+      0%   { opacity: 0; transform: translate3d(12px, 10px, 0) scale(0.86) rotate(7deg); }
+      60%  { opacity: 1; }
+      100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+    }
+
+    /* 常驻：像贴纸被风托着，上下浮 + 轻微摇摆，不是机械平移 */
+    @keyframes logoFloat {
+      0%   { transform: translateY(0) rotate(0deg); }
+      25%  { transform: translateY(-7px) rotate(1.8deg); }
+      50%  { transform: translateY(-1px) rotate(0deg); }
+      75%  { transform: translateY(-5px) rotate(-1.6deg); }
+      100% { transform: translateY(0) rotate(0deg); }
     }
 
     .eyebrow {
@@ -1220,9 +1264,15 @@
 <div class="app" id="app">
   <div id="homePage" class="page home-page">
     <div class="home-header">
-      <div class="eyebrow">蛋仔派对 · 共号</div>
-      <h1><svg class="ico title-ico" aria-hidden="true"><use href="#sparkles"/></svg>共号规则</h1>
-      <p>选择要查看的账号</p>
+      <div class="home-header-text">
+        <div class="eyebrow">蛋仔派对 · 共号</div>
+        <h1><svg class="ico title-ico" aria-hidden="true"><use href="#sparkles"/></svg>共号规则</h1>
+        <p>选择要查看的账号</p>
+      </div>
+      <div class="home-logo-wrap">
+        <img class="home-logo" src="https://musichehe121.oss-cn-chengdu.aliyuncs.com/picture/retouch_2026112312202514.png"
+             alt="蛋仔派对" width="284" height="147" decoding="async" referrerpolicy="no-referrer">
+      </div>
     </div>
     <div class="account-buttons">
       <div class="acc-btn" data-account="1" data-theme="1" data-index="01" id="btnAccount1" role="button" tabindex="0">
