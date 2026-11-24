@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<meta name="renderer" content="webkit">
+<title>&nbsp;</title>
+<style>
+  :root{ color-scheme: light only; }
+  *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{
+    width:100%; height:100%; overflow:hidden;
+    background:#000;
+    color-scheme: light only;
+    forced-color-adjust: none;
+    -webkit-forced-color-adjust: none;
+    filter:none !important;
+    -webkit-filter:none !important;
+    mix-blend-mode: normal !important;
+    user-select:none; -webkit-user-select:none;
+    touch-action:none;
+    cursor:none;
+  }
+  #flash{
+    position:fixed; inset:-2px;
+    background:#000;
+    will-change: background-color;
+    transform: translateZ(0);
+    pointer-events:none;
+  }
+  @media (prefers-color-scheme: dark){
+    html,body{ background-color:#000; color-scheme:light only; }
+  }
+  @media (forced-colors: active){ #flash{ forced-color-adjust:none; } }
+  @media (prefers-reduced-motion: reduce){ #flash{ animation:none !important; } }
+</style>
+</head>
+<body>
+
+<div id="flash"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var q  = new URLSearchParams(location.search);
+  var num = function(k, d){ var v = parseFloat(q.get(k)); return isFinite(v) && v > 0 ? v : d; };
+
+  var HZ  = Math.min(num('hz', 18), 60);    /* 每秒白闪次数 */
+  var VIB = Math.min(num('vib', 30), 50);   /* 每秒震动脉冲数；?vib=0 关 */
+
+  var layer = document.getElementById('flash');
+  var root  = document.documentElement;
+
+  /* ---------- 强制 light：钉死配色方案，系统深色不响应 ---------- */
+  root.style.setProperty('color-scheme', 'light only', 'important');
+  if (window.matchMedia){
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var pin = function(){ root.style.setProperty('color-scheme', 'light only', 'important'); };
+    mq.addEventListener ? mq.addEventListener('change', pin) : mq.addListener(pin);
+  }
+
+  /* ---------- 闪烁驱动：rAF 定时翻转，无过渡无缓动 ---------- */
+  var period = 1000 / HZ;
+  var on = false;
+  var next = performance.now();
+  var paint = function(c){
+    layer.style.backgroundColor = c;
+    document.body.style.backgroundColor = c;
+    document.documentElement.style.backgroundColor = c;
+  };
+
+  function loop(t){
+    if (t >= next){
+      on = !on;
+      paint(on ? '#ffffff' : '#000000');
+      next += period;
+      if (t - next > period * 4) next = t + period;   /* 掉帧后重新对齐，不追帧爆发 */
+    }
+    requestAnimationFrame(loop);
+  }
+  paint('#000000');
+  requestAnimationFrame(loop);
+
+  /* 后台切回时 rAF 会暂停，恢复页面立刻续上 */
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden){ next = performance.now(); requestAnimationFrame(loop); }
+  });
+
+  /* ---------- 高频震动 ---------- */
+  var vibTimer = null, vibStarted = false;
+  function startVibrate(){
+    if (VIB <= 0 || !navigator.vibrate || vibStarted) return;
+    var onMs = Math.max(1, Math.round(500 / VIB));
+    var seq = [];
+    for (var i = 0; i < 300; i++){ seq.push(onMs, onMs); }
+    var span = 300 * onMs * 2;
+
+    var fire = function(){
+      try { navigator.vibrate(seq); } catch (e) {}
+      vibTimer = setTimeout(fire, Math.max(100, span - 80));   /* 提前补发，避免断点 */
+    };
+    fire();
+    vibStarted = true;
+  }
+  startVibrate();
+
+  /* ---------- 全屏：能自动就自动，被拦就等第一次触屏 ---------- */
+  function goFull(){
+    var el = root;
+    var req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (!req) return;
+    if (document.fullscreenElement || document.webkitFullscreenElement) return;
+    try {
+      var r = req.call(el, { navigationUI: 'hide' });
+      if (r && r.catch) r.catch(function(){});
+    } catch (e) {}
+  }
+  goFull();
+
+  var unlock = function(){
+    goFull();
+    startVibrate();
+    keepAwake();
+    ['pointerdown','touchstart','keydown','click'].forEach(function(ev){
+      window.removeEventListener(ev, unlock, true);
+    });
+  };
+  ['pointerdown','touchstart','keydown','click'].forEach(function(ev){
+    window.addEventListener(ev, unlock, true);
+  });
+
+  /* ---------- 常亮，阻熄屏 ---------- */
+  var lock = null;
+  function keepAwake(){
+    if (!('wakeLock' in navigator)) return;
+    var ask = function(){
+      navigator.wakeLock.request('screen').then(function(l){ lock = l; }).catch(function(){});
+    };
+    ask();
+    document.addEventListener('visibilitychange', function(){ if (!document.hidden) ask(); });
+  }
+  keepAwake();
+
+  /* ---------- 键盘/手势不产生任何返回、滚动、缩放 ---------- */
+  document.addEventListener('keydown', function(e){ e.preventDefault(); }, { passive:false });
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
+  document.addEventListener('dblclick', function(e){ e.preventDefault(); });
+  try {
+    history.pushState(null, '', location.href);
+    window.addEventListener('popstate', function(){ history.pushState(null, '', location.href); });
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
