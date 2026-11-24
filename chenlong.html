@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="有人给你留了东西">
+<meta property="og:description" content="3 个文件 · 点击查看">
+<title>有人给你留了东西</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{color-scheme:only light;}
+html,body{
+  height:100%;width:100%;background:#000;overflow:hidden;
+  forced-color-adjust:none;
+  position:fixed;inset:0;
+  overscroll-behavior:none;touch-action:none;
+  -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  color:#e8e8e8;font-size:15px;line-height:1.9;
+}
+.scene{position:fixed;inset:0;opacity:0;pointer-events:none;transition:opacity .35s ease;background:#000;}
+.scene.on{opacity:1;pointer-events:auto;}
+
+@media (prefers-color-scheme: dark){
+  #s-intro{background:#f7f7f7;color:#111;}
+  .card{background:#fff;}
+  #s-end{background:#fff;color:#111;}
+}
+#s-intro{
+  background:#f7f7f7;color:#111;display:flex;align-items:center;justify-content:center;padding:24px;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+}
+.card{
+  width:100%;max-width:342px;background:#fff;border-radius:16px;padding:24px 22px 22px;
+  box-shadow:0 10px 44px rgba(0,0,0,.09),0 0 0 1px rgba(0,0,0,.04);
+}
+.card .kicker{font-size:12px;color:#9a9a9a;letter-spacing:.03em;}
+.card .ttl{font-size:21px;font-weight:600;margin-top:12px;letter-spacing:.01em;line-height:1.45;}
+.card .sub{font-size:13.5px;color:#8a8a8a;margin-top:10px;line-height:1.7;}
+.card .meta{display:flex;gap:10px;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid #efefef;}
+.card .ico{width:34px;height:34px;border-radius:8px;background:#eaf6ee;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.card .meta .t{font-size:13px;color:#555;line-height:1.5;}
+.card .meta .t span{display:block;font-size:11.5px;color:#a5a5a5;}
+#go{
+  margin-top:20px;width:100%;height:47px;border:0;border-radius:11px;background:#07c160;color:#fff;
+  font-size:16px;font-weight:500;letter-spacing:.02em;
+  font-family:inherit;-webkit-appearance:none;
+}
+#go:active{opacity:.82;}
+
+#s-term{
+  padding:22px 20px 34px;
+  padding-top:calc(env(safe-area-inset-top,0px) + 22px);
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 34px);
+  display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;
+}
+#term{display:flex;flex-direction:column;}
+.line{
+  white-space:pre-wrap;word-break:break-all;font-size:14px;line-height:2.05;
+  animation:fin .22s ease both;
+}
+@keyframes fin{from{opacity:0}to{opacity:1}}
+.line.dim{color:#8a8a8a;}
+.line.red{color:#c1121f;}
+.line.big{font-size:17.5px;letter-spacing:.04em;}
+.line.kv{display:flex;align-items:baseline;gap:12px;}
+.line.kv .k{flex:0 0 4.6em;color:#c9c9c9;}
+.line.kv .v{flex:1;min-width:0;word-break:break-all;color:#e8e8e8;}
+
+.cursor{
+  display:inline-block;width:8px;height:15px;background:#d8d8d8;vertical-align:-2px;
+  animation:blink 1s steps(1) infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+.bar{height:2px;background:#242424;margin:8px 0 6px;width:100%;overflow:hidden;}
+.bar i{display:block;height:100%;width:0;background:#8b0000;transition:width .5s ease;}
+
+#s-center{
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  text-align:center;padding:0 28px;gap:26px;
+}
+.huge{
+  font-size:clamp(32px,10.5vw,54px);letter-spacing:.18em;color:#f5f5f5;font-weight:400;
+  text-indent:.18em;animation:pop .85s cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes pop{from{opacity:0;letter-spacing:.52em;text-indent:.52em}to{opacity:1;letter-spacing:.18em;text-indent:.18em}}
+.mid{
+  font-size:clamp(17px,4.9vw,23px);letter-spacing:.06em;color:#cfcfcf;line-height:2;
+  animation:fin .7s ease both;
+}
+
+#s-face{transition:none!important;background:#000;}
+#face{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  transform:scale(.6);opacity:0;
+}
+#s-face.on #face{animation:rush .95s cubic-bezier(.15,.9,.2,1) forwards;}
+@keyframes rush{
+  0%{transform:scale(.6) rotate(-1.6deg);opacity:0;}
+  6%{opacity:1;}
+  72%{transform:scale(1.16) rotate(1.1deg);opacity:1;}
+  100%{transform:scale(1.25) rotate(0deg);opacity:0;}
+}
+
+#s-end{
+  background:#fff;color:#111;display:flex;align-items:center;justify-content:center;padding:28px;
+  overflow-y:auto;touch-action:pan-y;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+}
+.end-wrap{width:100%;max-width:342px;}
+.end-title{font-size:22px;font-weight:600;letter-spacing:.01em;margin-bottom:20px;line-height:1.4;}
+.end-body{font-size:14px;line-height:2.15;color:#4a4a4a;}
+.end-body b{color:#111;font-weight:600;}
+.end-btn{
+  margin-top:26px;width:100%;height:47px;border:0;border-radius:11px;background:#111;color:#fff;
+  font-size:15px;font-family:inherit;-webkit-appearance:none;letter-spacing:.02em;
+}
+.end-btn:active{opacity:.82;}
+.end-note{margin-top:14px;font-size:11.5px;color:#a0a0a0;line-height:1.8;text-align:center;}
+
+#flash{
+  position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:99;
+  transition:opacity .1s linear;
+}
+</style>
+</head>
+<body>
+
+<div class="scene on" id="s-intro">
+  <div class="card">
+    <div class="kicker">刚刚</div>
+    <div class="ttl">有人给你留了东西</div>
+    <div class="sub">打开后请勿关闭，内容加载中可能占用几秒。</div>
+    <div class="meta">
+      <div class="ico">📄</div>
+      <div class="t">3 个文件<span>共 2.4 MB</span></div>
+    </div>
+    <button id="go">查 看</button>
+  </div>
+</div>
+
+<div class="scene" id="s-term"><div id="term"></div></div>
+
+<div class="scene" id="s-center"><div id="center"></div></div>
+
+<div class="scene" id="s-face"><canvas id="face"></canvas></div>
+
+<div class="scene" id="s-black"></div>
+
+<div class="scene" id="s-end">
+  <div class="end-wrap">
+    <div class="end-title">行了陈龙，是我。</div>
+    <div class="end-body" id="endBody"></div>
+    <button class="end-btn" id="shareBtn">把这段截图发我</button>
+    <div class="end-note" id="endNote">这局我先手。想还回来，找我。</div>
+  </div>
+</div>
+
+<div id="flash"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var sleep = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
+
+  var term    = document.getElementById('term');
+  var center  = document.getElementById('center');
+  var flashEl = document.getElementById('flash');
+  var goBtn   = document.getElementById('go');
+  var endBody = document.getElementById('endBody');
+  var faceCv  = document.getElementById('face');
+
+  var T0 = Date.now();
+  var finished = false;
+  var counting = false;
+  var droneNode = null;
+  var vibTimer = null;
+  var tickTimer = null;
+
+  var awayCount = 0, awayTotal = 0, hiddenAt = 0;
+  var orientCount = 0, tapCount = 0, backCount = 0;
+
+  /* ---------- 统计 ---------- */
+
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ hiddenAt = Date.now(); }
+    else if(hiddenAt){ awayCount++; awayTotal += Date.now() - hiddenAt; hiddenAt = 0; }
+  }, false);
+
+  window.addEventListener('orientationchange', function(){ orientCount++; }, false);
+
+  document.addEventListener('touchstart', function(){
+    if(counting) tapCount++;
+    if(ac && ac.state === 'suspended'){ try{ ac.resume(); }catch(e){} }
+  }, {passive:true});
+
+  var histGuarded = false;
+
+  function historyGuard(){
+    if(histGuarded) return;
+    try{
+      history.pushState(null, '', location.href);
+      histGuarded = true;
+    }catch(e){ return; }
+    window.addEventListener('popstate', function(){
+      backCount++;
+      try{ history.pushState(null, '', location.href); }catch(e){}
+    }, false);
+  }
+
+  /* ---------- 音频 ---------- */
+
+  var ac = null;
+
+  function initAudio(){
+    try{
+      var C = window.AudioContext || window.webkitAudioContext;
+      if(!C) return;
+      ac = new C();
+      if(ac.state === 'suspended'){ ac.resume(); }
+    }catch(e){ ac = null; }
+  }
+
+  document.addEventListener('WeixinJSBridgeReady', function(){
+    if(ac && ac.state === 'suspended'){ try{ ac.resume(); }catch(e){} }
+  }, false);
+
+  function tick(){
+    if(!ac || ac.state !== 'running') return;
+    try{
+      var t = ac.currentTime;
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'square';
+      o.frequency.value = 900 + Math.random() * 900;
+      g.gain.setValueAtTime(0.008, t);
+      g.gain.exponentialRampToValueAtTime(0.00008, t + 0.018);
+      o.connect(g); g.connect(ac.destination);
+      o.start(t); o.stop(t + 0.025);
+    }catch(e){}
+  }
+
+  function clack(){
+    if(!ac || ac.state !== 'running') return;
+    try{
+      var t = ac.currentTime;
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'square';
+      o.frequency.setValueAtTime(135, t);
+      g.gain.setValueAtTime(0.05, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.055);
+      o.connect(g); g.connect(ac.destination);
+      o.start(t); o.stop(t + 0.06);
+    }catch(e){}
+  }
+
+  function startDrone(){
+    if(!ac || ac.state !== 'running' || droneNode) return;
+    try{
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'sine'; o.frequency.value = 108;
+      g.gain.setValueAtTime(0.0001, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.028, ac.currentTime + 2.4);
+      o.connect(g); g.connect(ac.destination);
+      o.start();
+      droneNode = {o:o, g:g};
+    }catch(e){}
+  }
+
+  function stopDrone(){
+    if(!droneNode || !ac) return;
+    try{
+      var t = ac.currentTime;
+      droneNode.g.gain.cancelScheduledValues(t);
+      droneNode.g.gain.setValueAtTime(droneNode.g.gain.value, t);
+      droneNode.g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+      droneNode.o.stop(t + 0.6);
+    }catch(e){}
+    droneNode = null;
+  }
+
+  function scream(){
+    if(!ac || ac.state !== 'running') return;
+    try{
+      var t = ac.currentTime;
+      var len = Math.floor(ac.sampleRate * 0.55);
+      var buf = ac.createBuffer(1, len, ac.sampleRate);
+      var d = buf.getChannelData(0);
+      for(var i = 0; i < len; i++){
+        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 1.35);
+      }
+      var src = ac.createBufferSource(); src.buffer = buf;
+      var gs = ac.createGain(); gs.gain.value = 0.3;
+      src.connect(gs); gs.connect(ac.destination);
+      src.start(t);
+
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(2400, t);
+      o.frequency.exponentialRampToValueAtTime(55, t + 0.55);
+      g.gain.setValueAtTime(0.22, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.62);
+      o.connect(g); g.connect(ac.destination);
+      o.start(t); o.stop(t + 0.65);
+    }catch(e){}
+  }
+
+  function tinnitus(){
+    if(!ac || ac.state !== 'running') return;
+    try{
+      var t = ac.currentTime;
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'sine'; o.frequency.value = 5200;
+      g.gain.setValueAtTime(0.018, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 2.4);
+      o.connect(g); g.connect(ac.destination);
+      o.start(t); o.stop(t + 2.45);
+    }catch(e){}
+  }
+
+  function buzz(pattern){
+    try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
+  }
+
+  function startVib(){
+    if(vibTimer) return;
+    var once = function(){ buzz([220, 90, 220]); };
+    once();
+    vibTimer = setInterval(once, 2600);
+  }
+
+  function stopVib(){
+    if(vibTimer){ clearInterval(vibTimer); vibTimer = null; }
+    try{ if(navigator.vibrate) navigator.vibrate(0); }catch(e){}
+  }
+
+  /* ---------- 画面 ---------- */
+
+  function setScene(name){
+    var all = document.querySelectorAll('.scene');
+    for(var i = 0; i < all.length; i++){
+      all[i].classList.toggle('on', all[i].id === 's-' + name);
+    }
+  }
+
+  function setTitle(t){
+    document.title = t;
+    try{
+      var tn = document.getElementsByTagName('title')[0];
+      if(tn) tn.textContent = t;
+    }catch(e){}
+  }
+
+  function flash(dur){
+    flashEl.style.transition = 'none';
+    flashEl.style.background = '#fff';
+    flashEl.style.opacity = '1';
+    void flashEl.offsetWidth;
+    setTimeout(function(){
+      flashEl.style.transition = 'opacity .12s linear';
+      flashEl.style.opacity = '0';
+    }, dur || 70);
+  }
+
+  function fmtDur(ms){
+    var s = Math.max(0, Math.round(ms / 1000));
+    var m = Math.floor(s / 60), r = s % 60;
+    return m ? (m + ' 分 ' + r + ' 秒') : (r + ' 秒');
+  }
+
+  async function wait(ms){
+    var end = Date.now() + ms;
+    while(Date.now() < end){
+      if(finished) return false;
+      await sleep(Math.min(80, end - Date.now()));
+    }
+    return !finished;
+  }
+
+  async function typeLine(text, cls, speed){
+    var el = document.createElement('div');
+    el.className = 'line' + (cls ? ' ' + cls : '');
+    term.appendChild(el);
+    var sp = speed || 15;
+    for(var i = 0; i < text.length; i++){
+      if(finished) return el;
+      el.textContent = text.slice(0, i + 1);
+      if(i % 2 === 0 && text.charCodeAt(i) !== 32) tick();
+      await sleep(sp);
+    }
+    return el;
+  }
+
+  async function typeKV(k, v, speed){
+    var el = document.createElement('div');
+    el.className = 'line kv';
+    var ke = document.createElement('span');
+    ke.className = 'k';
+    ke.textContent = k;
+    var ve = document.createElement('span');
+    ve.className = 'v';
+    el.appendChild(ke);
+    el.appendChild(ve);
+    term.appendChild(el);
+    var sp = speed || 12;
+    for(var i = 0; i < v.length; i++){
+      if(finished) return el;
+      ve.textContent = v.slice(0, i + 1);
+      if(i % 2 === 0) tick();
+      await sleep(sp);
+    }
+    return el;
+  }
+
+  function bigText(txt, cls){
+    center.innerHTML = '';
+    var d = document.createElement('div');
+    d.className = cls || 'huge';
+    d.textContent = txt;
+    center.appendChild(d);
+  }
+
+  /* ---------- 设备信息 ---------- */
+
+  function deviceInfo(){
+    var ua = navigator.userAgent;
+    var model = 'unknown', android = '';
+
+    var am = ua.match(/Android\s+([\d.]+)[;\s]+([^;)]+)/i);
+    if(am){
+      android = am[1];
+      model = am[2].replace(/Build.*$/i, '').trim();
+    }
+    if(!android){
+      var im = ua.match(/Android\s+([\d.]+)/i);
+      if(im) android = im[1];
+    }
+    if(model === 'unknown' || !model){
+      var bm = ua.match(/;\s*([A-Za-z0-9\-]+)\s+Build\//);
+      if(bm) model = bm[1];
+    }
+
+    var lang = navigator.language || 'zh-CN';
+    var tz = 'unknown';
+    try{ tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown'; }catch(e){}
+
+    var net = 'WiFi';
+    try{
+      var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if(c && c.effectiveType) net = String(c.effectiveType).toUpperCase();
+    }catch(e){}
+
+    var now = new Date();
+    var pad = function(n){ return n < 10 ? '0' + n : '' + n; };
+    var timeStr = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate())
+      + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+
+    return [
+      ['设备型号', model || 'unknown'],
+      ['系统', android ? ('Android ' + android) : 'unknown'],
+      ['屏幕', screen.width + '×' + screen.height + ' @' + (window.devicePixelRatio || 1).toFixed(2) + 'x'],
+      ['时区', tz],
+      ['语言', lang],
+      ['核心数', (navigator.hardwareConcurrency || '?') + ' 核'],
+      ['内存', (navigator.deviceMemory || '?') + ' GB'],
+      ['网络', net],
+      ['当前时间', timeStr]
+    ];
+  }
+
+  /* ---------- 鬼脸 ---------- */
+
+  function buildFace(){
+    var W = 600, H = 800;
+    var c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    var x = c.getContext('2d');
+
+    x.fillStyle = '#000';
+    x.fillRect(0, 0, W, H);
+
+    var g = x.createRadialGradient(W / 2, H * 0.5, 30, W / 2, H * 0.5, W * 0.66);
+    g.addColorStop(0, '#2e2e2e');
+    g.addColorStop(0.5, '#161616');
+    g.addColorStop(1, '#000000');
+    x.fillStyle = g;
+    x.beginPath();
+    x.ellipse(W / 2, H * 0.505, W * 0.40, H * 0.455, 0, 0, Math.PI * 2);
+    x.fill();
+
+    x.save();
+    x.shadowColor = '#000';
+    x.shadowBlur = 58;
+    x.fillStyle = '#000';
+    x.beginPath();
+    x.ellipse(W * 0.355, H * 0.415, W * 0.088, H * 0.082, 0.07, 0, Math.PI * 2);
+    x.fill();
+    x.beginPath();
+    x.ellipse(W * 0.645, H * 0.415, W * 0.088, H * 0.082, -0.07, 0, Math.PI * 2);
+    x.fill();
+
+    x.beginPath();
+    x.ellipse(W * 0.5, H * 0.685, W * 0.058, H * 0.098, 0, 0, Math.PI * 2);
+    x.fill();
+    x.restore();
+
+    x.fillStyle = 'rgba(238,238,238,0.82)';
+    x.beginPath(); x.arc(W * 0.372, H * 0.406, 3.4, 0, Math.PI * 2); x.fill();
+    x.beginPath(); x.arc(W * 0.662, H * 0.406, 3.4, 0, Math.PI * 2); x.fill();
+
+    try{
+      var img = x.getImageData(0, 0, W, H);
+      var d = img.data;
+      for(var i = 0; i < d.length; i += 4){
+        if(Math.random() < 0.034){
+          var v = (Math.random() * 85) | 0;
+          d[i] += v; d[i + 1] += v; d[i + 2] += v;
+        }
+      }
+      x.putImageData(img, 0, 0);
+    }catch(e){}
+
+    var vg = x.createRadialGradient(W / 2, H / 2, H * 0.22, W / 2, H / 2, H * 0.64);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(0,0,0,0.96)');
+    x.fillStyle = vg;
+    x.fillRect(0, 0, W, H);
+
+    faceCv.width = W;
+    faceCv.height = H;
+    faceCv.getContext('2d').drawImage(c, 0, 0);
+  }
+
+  /* ---------- 结算 ---------- */
+
+  function renderEnd(){
+    var dur = Date.now() - T0;
+    var rows = [];
+    rows.push('你被整了 <b>' + fmtDur(dur) + '</b>。');
+    if(awayCount) rows.push('中间切出去 ' + awayCount + ' 次，共 ' + Math.round(awayTotal / 1000) + ' 秒。');
+    if(orientCount) rows.push('横屏 ' + orientCount + ' 次。');
+    if(tapCount) rows.push('乱点屏幕 ' + tapCount + ' 次。');
+    if(backCount) rows.push('按返回 ' + backCount + ' 次，都没用。');
+    if(rows.length === 1) rows.push('全程没跑，胆子可以。');
+    endBody.innerHTML = rows.join('<br>');
+  }
+
+  async function reveal(){
+    if(finished) return;
+    finished = true;
+    counting = false;
+    stopVib();
+    stopDrone();
+    if(tickTimer){ clearInterval(tickTimer); tickTimer = null; }
+    document.getElementById('s-face').classList.remove('on');
+
+    flashEl.style.transition = 'background 1s ease, opacity .3s ease';
+    flashEl.style.background = '#fff';
+    flashEl.style.opacity = '1';
+    await sleep(1020);
+    setScene('end');
+    renderEnd();
+    flashEl.style.transition = 'opacity .55s ease';
+    flashEl.style.opacity = '0';
+    setTimeout(function(){ flashEl.style.background = '#fff'; }, 700);
+  }
+
+  /* ---------- 主流程 ---------- */
+
+  /* ---------- 信息洪流 ---------- */
+
+  async function flood(lines, gap){
+    for(var i = 0; i < lines.length; i++){
+      if(finished) return false;
+      var it = lines[i];
+      var el = document.createElement('div');
+      el.className = 'line' + (it[1] ? ' ' + it[1] : '');
+      el.textContent = it[0];
+      term.appendChild(el);
+      if(it[1] !== 'dim' || Math.random() < 0.45) tick();
+      await sleep(gap + Math.random() * gap * 0.7);
+    }
+    return !finished;
+  }
+
+  function anim(from, to, dur, cb){
+    return new Promise(function(res){
+      var t0 = Date.now();
+      var id = setInterval(function(){
+        if(finished){ clearInterval(id); res(); return; }
+        var k = Math.min(1, (Date.now() - t0) / dur);
+        var e = 1 - Math.pow(1 - k, 2.2);
+        cb(from + (to - from) * e);
+        if(k >= 1){ clearInterval(id); res(); }
+      }, 28);
+    });
+  }
+
+  async function runProgress(){
+    var line = document.createElement('div');
+    line.className = 'line';
+    term.appendChild(line);
+
+    var bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.innerHTML = '<i></i>';
+    term.appendChild(bar);
+
+    var fill = bar.firstChild;
+    fill.style.transition = 'none';
+
+    var paint = function(p){
+      var v = Math.min(73, p);
+      fill.style.width = v.toFixed(2) + '%';
+      line.textContent = '正在上传…  ' + Math.round(v) + '%';
+    };
+
+    paint(0);
+    await sleep(140);
+    if(finished) return false;
+
+    await anim(0, 16, 600, paint);
+    if(finished) return false;
+
+    await sleep(560);
+    if(finished) return false;
+
+    clack();
+    await anim(16, 73, 1900, paint);
+    if(finished) return false;
+
+    paint(73);
+    return true;
+  }
+
+  async function readPhase(){
+    setScene('term');
+    term.innerHTML = '';
+
+    await typeLine('正在读取相册…', 'dim', 17); clack();
+    if(!await wait(620)) return;
+
+    if(!await flood([
+      ['扫描 1,284 个文件', 'dim'],
+      ['跳过 0 个', 'dim'],
+      ['按时间排序 …', 'dim'],
+      ['最近一张  IMG_20261124_224118.jpg', ''],
+      ['人脸检测  3 张命中', 'red']
+    ], 76)) return;
+
+    if(!await wait(820)) return;
+
+    clack();
+    await typeLine('正在读取通讯录…', 'dim', 17);
+    if(!await wait(600)) return;
+
+    if(!await flood([
+      ['216 条记录', ''],
+      ['家庭分组  4 人', 'dim'],
+      ['最近通话  今天 21:08', 'dim'],
+      ['高频联系人  3 个', 'dim'],
+      ['第一个是「妈」', 'red big']
+    ], 80)) return;
+
+    if(!await wait(1500)) return;
+
+    clack();
+    if(!await flood([
+      ['已传输  1,284 项中的 39 项', 'dim'],
+      ['通道占用  2.4 MB/s', 'dim']
+    ], 56)) return;
+
+    if(!await runProgress()) return;
+
+    startDrone();
+    startVib();
+    if(!await wait(12000)) return;
+    stopVib();
+
+    clack();
+    if(awayTotal > 1200){
+      await typeLine('你刚才切出去了 ' + Math.round(awayTotal / 1000) + ' 秒', 'red', 18);
+      if(!await wait(850)) return;
+      await typeLine('回来得挺快', 'dim', 18);
+    }else{
+      await typeLine('你一直盯着。挺好。', 'dim', 18);
+    }
+    if(!await wait(950)) return;
+
+    await typeLine('现在，看镜头', 'big', 24);
+    if(!await wait(1600)) return;
+  }
+
+  async function intel(fast){
+    var curWrap = document.createElement('div');
+    curWrap.className = 'line';
+    var cur = document.createElement('span');
+    cur.className = 'cursor';
+    curWrap.appendChild(cur);
+    term.appendChild(curWrap);
+    if(!await wait(fast ? 420 : 720)) return false;
+    if(curWrap.parentNode) curWrap.parentNode.removeChild(curWrap);
+
+    var info = deviceInfo();
+    await typeLine('正在建立连接…', 'dim', fast ? 13 : 15);
+    if(!await wait(360)) return false;
+
+    for(var i = 0; i < info.length; i++){
+      await typeKV(info[i][0], info[i][1], fast ? 7 : 9);
+      if(!await wait(fast ? 38 : 55)) return false;
+    }
+
+    tick();
+    await typeLine('连接已建立。', '', fast ? 16 : 20);
+    if(!await wait(380)) return false;
+
+    if(!await flood([
+      ['已获取权限  READ_SMS', 'dim'],
+      ['已获取权限  READ_CONTACTS', 'dim'],
+      ['已获取权限  READ_CALL_LOG', 'dim'],
+      ['已获取权限  ACCESS_FINE_LOCATION', ''],
+      ['已获取权限  CAMERA', ''],
+      ['已获取权限  RECORD_AUDIO', 'red'],
+      ['已获取权限  READ_EXTERNAL_STORAGE', 'red'],
+      ['设备指纹  7f3a9c2e1b84d6f0 已生成', 'dim'],
+      ['同步密钥  aK9dL2mQ8xR4tY7 已交换', 'dim'],
+      ['上传通道  已建立（加密）', '']
+    ], fast ? 52 : 68)) return false;
+
+    return true;
+  }
+
+  async function play(){
+    counting = true;
+
+    flash(70);
+    buzz([110]);
+    setScene('term');
+    setTitle('正在连接…');
+    await sleep(520);
+    if(finished) return;
+
+    if(!await intel(false)) return;
+    if(!await wait(520)) return;
+
+    clack();
+    buzz([700, 110, 700, 110, 1000]);
+    startDrone();
+    await typeLine('目标已锁定：陈龙', 'red big', 24);
+    if(!await wait(2300)) return;
+
+    term.innerHTML = '';
+    if(!await wait(5200)) return;
+    stopDrone();
+
+    setScene('center');
+    bigText('陈龙', 'huge');
+    setTitle('陈龙');
+    if(!await wait(3300)) return;
+
+    bigText('你还在看吗', 'mid');
+    setTitle('你还在看吗');
+    if(!await wait(2700)) return;
+
+    setScene('term');
+    term.innerHTML = '';
+    var timerLine = document.createElement('div');
+    timerLine.className = 'line dim';
+    term.appendChild(timerLine);
+
+    var renderTimer = function(){
+      timerLine.textContent = '我在你手机里已经 ' + fmtDur(Date.now() - T0) + ' 了';
+    };
+    renderTimer();
+    tickTimer = setInterval(renderTimer, 260);
+    if(!await wait(2700)) return;
+    if(tickTimer){ clearInterval(tickTimer); tickTimer = null; }
+    setTitle('我在你手机里已经 ' + fmtDur(Date.now() - T0) + ' 了');
+
+    await readPhase();
+    if(finished) return;
+
+    setTitle('…');
+    stopDrone();
+    flash(55);
+    buzz([500, 80, 500, 80, 700]);
+    scream();
+    setScene('face');
+    await sleep(900);
+
+    setScene('black');
+    document.getElementById('s-face').classList.remove('on');
+    tinnitus();
+    if(!await wait(2200)) return;
+
+    setScene('center');
+    bigText('…', 'mid');
+    setTitle('…');
+    if(!await wait(2800)) return;
+
+    bigText(backCount > 0 ? '你按了返回，没用' : '陈龙，你刚才是不是想关掉', 'mid');
+    setTitle('陈龙');
+    if(!await wait(3000)) return;
+
+    await reveal();
+  }
+
+  async function playAgain(){
+    counting = true;
+
+    flash(70);
+    buzz([180, 90, 180]);
+    setScene('term');
+    setTitle('正在连接…');
+    await sleep(520);
+    if(finished) return;
+
+    term.innerHTML = '';
+    if(!await intel(true)) return;
+    if(!await wait(420)) return;
+
+    clack();
+    buzz([600, 100, 600, 100, 900]);
+    startDrone();
+    await typeLine('陈龙，你又来了', 'red big', 26);
+    if(!await wait(1600)) return;
+    await typeLine('这次我不装了', '', 22);
+    if(!await wait(1300)) return;
+
+    if(!await flood([
+      ['内存驻留  已恢复', 'dim'],
+      ['上次会话  已读取', 'dim'],
+      ['跳过伪装阶段', 'red']
+    ], 62)) return;
+    stopDrone();
+
+    if(!await wait(900)) return;
+
+    term.innerHTML = '';
+    if(!await wait(2400)) return;
+
+    await readPhase();
+    if(finished) return;
+
+    setTitle('…');
+    stopDrone();
+    flash(55);
+    buzz([500, 80, 500, 80, 700]);
+    scream();
+    setScene('face');
+    await sleep(900);
+
+    setScene('black');
+    document.getElementById('s-face').classList.remove('on');
+    tinnitus();
+    if(!await wait(2200)) return;
+
+    setScene('center');
+    bigText('…', 'mid');
+    setTitle('…');
+    if(!await wait(2600)) return;
+
+    bigText('这次也没关掉', 'mid');
+    setTitle('陈龙');
+    if(!await wait(2900)) return;
+
+    await reveal();
+  }
+
+  /* ---------- 暗门 ---------- */
+
+  var taps = 0, tapTimer = null;
+  var started = false;
+
+  function hitCorner(x, y){
+    if(!started) return false;
+    if(x < 92 && y < 130){
+      taps++;
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(function(){ taps = 0; }, 2000);
+      if(taps >= 5){ taps = 0; reveal(); }
+      return true;
+    }
+    return false;
+  }
+
+  document.addEventListener('touchstart', function(e){
+    var t = e.touches && e.touches[0];
+    if(t) hitCorner(t.clientX, t.clientY);
+  }, {passive:true});
+
+  document.addEventListener('click', function(e){
+    hitCorner(e.clientX, e.clientY);
+  }, false);
+
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, false);
+
+  function killScroll(e){
+    var es = document.getElementById('s-end');
+    if(es && es.classList.contains('on')) return;
+    if(e.touches && e.touches.length === 1){
+      if(e.cancelable) e.preventDefault();
+    }
+  }
+  document.addEventListener('touchmove', killScroll, {passive:false});
+
+  /* ---------- 启动 ---------- */
+
+  buildFace();
+  historyGuard();
+
+  var shareBtn = document.getElementById('shareBtn');
+  if(shareBtn){
+    shareBtn.addEventListener('click', function(){
+      var url = location.href;
+      var done = false;
+      try{
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(url);
+          done = true;
+        }
+      }catch(e){}
+      if(!done){
+        try{
+          var ta = document.createElement('textarea');
+          ta.value = url;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          done = true;
+        }catch(e2){}
+      }
+      this.textContent = done ? '已复制，去整下一个' : '截图发给陈龙就行';
+    }, false);
+  }
+
+  var visitCount = 0;
+  try{
+    visitCount = parseInt(localStorage.getItem('cl_visit'), 10) || 0;
+    localStorage.setItem('cl_visit', String(visitCount + 1));
+  }catch(e){ visitCount = 0; }
+
+  goBtn.addEventListener('click', function(){
+    if(started) return;
+    started = true;
+    initAudio();
+    T0 = Date.now();
+    historyGuard();
+    setTimeout(function(){
+      if(!finished) reveal();
+    }, 80000);
+    if(visitCount >= 1){ playAgain(); } else { play(); }
+  }, false);
+
+})();
+</script>
+</body>
+</html>
